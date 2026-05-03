@@ -1,9 +1,6 @@
 "use client"
 
-import { useRef } from "react"
 import { Trophy, ExternalLink, Users } from "lucide-react"
-import { useInView } from "@/hooks/use-in-view"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const achievements = [
@@ -26,36 +23,27 @@ const extracurricular = [
 ]
 
 export function AchievementsSection() {
-  const ref = useRef<HTMLElement>(null)
-  const isInView = useInView(ref, { threshold: 0.1 })
-
   return (
-    <section id="achievements" ref={ref} className="px-4 sm:px-6 bg-[#0f0a06]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
       <div className="max-w-[1100px] mx-auto">
-        <h2 className={cn(
-          "text-3xl sm:text-4xl font-medium text-center mb-16 text-[#f5ede6] transition-all duration-700",
-          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        )}>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
           Achievements
-        </h2>
+        </h1>
 
         {/* Achievements List */}
         <div className="space-y-4 mb-20">
           {achievements.map((achievement, index) => (
             <div
               key={index}
-              className={cn(
-                "glass-card glass-card-hover transition-all duration-500 flex items-center gap-4",
-                isInView ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
-              )}
-              style={{ transitionDelay: `${index * 50}ms` }}
+              className="glass-card glass-card-hover flex items-center gap-4 animate-fade-in-up"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="p-5 flex items-center gap-4 flex-1">
                 <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.1)] shrink-0">
                   <Trophy className="h-5 w-5 text-[#ff6a00]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-[#f5ede6]">{achievement.title}</h3>
+                  <h2 className="font-semibold text-[#f5ede6]">{achievement.title}</h2>
                   <p className="text-sm text-[rgba(245,237,230,0.5)]">{achievement.issuer}</p>
                 </div>
                 {achievement.link && (
@@ -64,6 +52,7 @@ export function AchievementsSection() {
                     size="sm"
                     className="shrink-0 gap-2 text-[rgba(245,237,230,0.5)] hover:text-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)]"
                     asChild
+                    data-magnetic
                   >
                     <a href={achievement.link} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="h-4 w-4" />
@@ -77,27 +66,21 @@ export function AchievementsSection() {
         </div>
 
         {/* Extra-Curricular */}
-        <h3 className={cn(
-          "text-2xl font-medium text-center mb-10 text-[#f5ede6] transition-all duration-700",
-          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        )}>
+        <h2 className="text-2xl font-medium text-center mb-10 text-[#f5ede6] animate-fade-in-up">
           Extra-Curricular Activities
-        </h3>
+        </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {extracurricular.map((activity, index) => (
             <div
               key={index}
-              className={cn(
-                "glass-card glass-card-hover transition-all duration-500 flex items-center gap-4 p-5",
-                isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              )}
-              style={{ transitionDelay: `${(achievements.length + index) * 50}ms` }}
+              className="glass-card glass-card-hover flex items-center gap-4 p-5 animate-fade-in-up"
+              style={{ animationDelay: `${(achievements.length + index) * 50}ms` }}
             >
               <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.08)] shrink-0">
                 <Users className="h-5 w-5 text-[#ff6a00]" />
               </div>
-              <h4 className="font-medium text-[#f5ede6]">{activity.title}</h4>
+              <h3 className="font-medium text-[#f5ede6]">{activity.title}</h3>
             </div>
           ))}
         </div>

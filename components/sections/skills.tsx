@@ -1,9 +1,6 @@
 "use client"
 
-import { useRef } from "react"
 import { Code, Server, Cog, BarChart3, Lightbulb } from "lucide-react"
-import { useInView } from "@/hooks/use-in-view"
-import { cn } from "@/lib/utils"
 
 const skillCategories = [
   {
@@ -34,28 +31,19 @@ const skillCategories = [
 ]
 
 export function SkillsSection() {
-  const ref = useRef<HTMLElement>(null)
-  const isInView = useInView(ref, { threshold: 0.1 })
-
   return (
-    <section id="skills" ref={ref} className="px-4 sm:px-6 bg-[#0f0a06]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
       <div className="max-w-[1100px] mx-auto">
-        <h2 className={cn(
-          "text-3xl sm:text-4xl font-medium text-center mb-16 text-[#f5ede6] transition-all duration-700",
-          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        )}>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
           Skills
-        </h2>
+        </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {skillCategories.map((category, index) => (
             <div
               key={index}
-              className={cn(
-                "glass-card glass-card-hover transition-all duration-500 relative overflow-hidden",
-                isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              )}
-              style={{ transitionDelay: `${index * 100}ms` }}
+              className="glass-card glass-card-hover relative overflow-hidden animate-fade-in-up"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Glowing orange top border */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#ff6a00] shadow-[0_0_8px_rgba(255,106,0,0.5)]" />
@@ -65,7 +53,7 @@ export function SkillsSection() {
                   <div className="p-2.5 rounded-xl bg-[rgba(255,106,0,0.1)]">
                     <category.icon className="h-5 w-5 text-[#ff6a00]" />
                   </div>
-                  <h3 className="font-semibold text-[#f5ede6]">{category.title}</h3>
+                  <h2 className="font-semibold text-[#f5ede6]">{category.title}</h2>
                 </div>
 
                 <div className="flex flex-wrap gap-2">

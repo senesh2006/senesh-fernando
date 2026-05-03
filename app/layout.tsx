@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Navbar } from "@/components/navbar"
+import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import './globals.css'
 
 const inter = Inter({ 
@@ -28,7 +30,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-[#0a0705]">
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <MagneticBlobCursor />
+        {/* Subtle grain/noise texture overlay */}
+        <div className="noise-overlay" />
+        <Navbar />
+        <main className="relative z-10 pt-16">
+          {children}
+        </main>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
