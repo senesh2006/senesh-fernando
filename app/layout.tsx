@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
+import { PageTransition } from "@/components/page-transition"
 import './globals.css'
 
 const inter = Inter({ 
@@ -35,7 +36,9 @@ export default function RootLayout({
         <div className="noise-overlay" />
         <Navbar />
         <main className="relative z-10 pt-16">
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
         </main>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
