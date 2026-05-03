@@ -11,25 +11,22 @@ interface MagneticElement {
 
 export function MagneticBlobCursor() {
   const blobRef = useRef<HTMLDivElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
   
-  // Current blob position
-  const blobPos = useRef({ x: -100, y: -100 })
-  // Target position (mouse or magnetic target)
-  const targetPos = useRef({ x: -100, y: -100 })
-  // Velocity for stretching effect
-  const velocity = useRef({ x: 0, y: 0 })
-  // Previous position for velocity calculation
-  const prevPos = useRef({ x: -100, y: -100 })
+  // Use refs for all animation state to avoid re-renders
+  const state = useRef({
+    blobX: -100,
+    blobY: -100,
+    targetX: -100,
+    targetY: -100,
+    prevX: -100,
+    prevY: -100,
+    visible: false,
+    needsReset: true, // Flag to snap position on next mouse move
+  })
+  
   // Magnetic elements cache
   const magneticElements = useRef<MagneticElement[]>([])
-  // Current magnetic target
-  const magneticTarget = useRef<MagneticElement | null>(null)
-  // Track if mouse just entered to prevent size spike
-  const justEntered = useRef(false)
-  // Track if cursor is outside window
-  const isOutside = useRef(true)
   
   const updateMagneticElements = useCallback(() => {
     const elements = document.querySelectorAll('a, button, [data-magnetic], .glass-card-hover')
@@ -49,20 +46,26 @@ export function MagneticBlobCursor() {
     const hasHover = window.matchMedia("(hover: hover)").matches
     if (!hasHover) return
     
+    const blob = blobRef.current
+    if (!blob) return
+    
     const handleMouseMove = (e: MouseEvent) => {
-      const newTarget = { x: e.clientX, y: e.clientY }
+      const s = state.current
       
-      // If mouse just entered or was outside, snap position to prevent spike
-      if (justEntered.current || isOutside.current) {
-        blobPos.current = { ...newTarget }
-        prevPos.current = { ...newTarget }
-        velocity.current = { x: 0, y: 0 }
-        justEntered.current = false
-        isOutside.current = false
+      // If needs reset, snap everything to current position
+      if (s.needsReset) {
+        s.blobX = e.clientX
+        s.blobY = e.clientY
+        s.targetX = e.clientX
+        s.targetY = e.clientY
+        s.prevX = e.clientX
+        s.prevY = e.clientY
+        s.needsReset = false
       }
       
-      targetPos.current = newTarget
-      if (!isVisible) setIsVisible(true)
+      s.targetX = e.clientX
+      s.targetY = e.clientY
+      s.visible = true
       
       // Check for magnetic attraction
       let closestElement: MagneticElement | null = null
@@ -81,52 +84,44 @@ export function MagneticBlobCursor() {
       }
       
       if (closestElement) {
-        magneticTarget.current = closestElement
         setIsHovering(true)
         const pull = 1 - (closestDistance / magneticRadius)
         const pullStrength = 0.4
-        targetPos.current = {
-          x: e.clientX + (closestElement.centerX - e.clientX) * pull * pullStrength,
-          y: e.clientY + (closestElement.centerY - e.clientY) * pull * pullStrength,
-        }
+        s.targetX = e.clientX + (closestElement.centerX - e.clientX) * pull * pullStrength
+        s.targetY = e.clientY + (closestElement.centerY - e.clientY) * pull * pullStrength
       } else {
-        magneticTarget.current = null
         setIsHovering(false)
       }
     }
     
-    const handleMouseEnter = () => {
-      justEntered.current = true
-      isOutside.current = false
-      setIsVisible(true)
-    }
-    
     const handleMouseLeave = () => {
-      isOutside.current = true
-      setIsVisible(false)
-      setIsHovering(false)
-      // Reset velocity to prevent spike on re-entry
-      velocity.current = { x: 0, y: 0 }
+      state.current.visible = false
+      state.current.needsReset = true
     }
     
-    const handleScrollOrResize = () => {
-      updateMagneticElements()
+    const handleMouseEnter = () => {
+      state.current.needsReset = true
     }
     
     // Handle visibility change (tab switching)
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        setIsVisible(false)
-        isOutside.current = true
-        velocity.current = { x: 0, y: 0 }
+        state.current.visible = false
+        state.current.needsReset = true
+      } else {
+        // When becoming visible, require reset before showing cursor
+        state.current.needsReset = true
       }
     }
     
-    // Handle window blur (clicking outside browser)
+    // Handle window blur
     const handleWindowBlur = () => {
-      setIsVisible(false)
-      isOutside.current = true
-      velocity.current = { x: 0, y: 0 }
+      state.current.visible = false
+      state.current.needsReset = true
+    }
+    
+    const handleScrollOrResize = () => {
+      updateMagneticElements()
     }
     
     document.addEventListener("mousemove", handleMouseMove)
@@ -138,58 +133,49 @@ export function MagneticBlobCursor() {
     window.addEventListener("resize", handleScrollOrResize)
     
     updateMagneticElements()
-    
     const updateInterval = setInterval(updateMagneticElements, 1000)
     
     let animationId: number
-    const springStrength = 0.12
+    const springStrength = 0.15
     
     const animate = () => {
-      // Skip animation if outside window
-      if (isOutside.current) {
-        animationId = requestAnimationFrame(animate)
-        return
-      }
+      const s = state.current
       
-      // Calculate velocity with clamping
-      const rawVelX = (targetPos.current.x - blobPos.current.x) * springStrength
-      const rawVelY = (targetPos.current.y - blobPos.current.y) * springStrength
+      // Spring physics
+      const dx = s.targetX - s.blobX
+      const dy = s.targetY - s.blobY
       
-      // Clamp velocity to prevent extreme values
-      const maxVel = 50
-      velocity.current = {
-        x: Math.max(-maxVel, Math.min(maxVel, rawVelX)),
-        y: Math.max(-maxVel, Math.min(maxVel, rawVelY)),
-      }
+      s.blobX += dx * springStrength
+      s.blobY += dy * springStrength
       
-      blobPos.current.x += velocity.current.x
-      blobPos.current.y += velocity.current.y
+      // Calculate movement delta for stretch (not velocity spike)
+      const moveX = s.blobX - s.prevX
+      const moveY = s.blobY - s.prevY
       
-      // Calculate speed for stretch effect with clamping
-      const dx = blobPos.current.x - prevPos.current.x
-      const dy = blobPos.current.y - prevPos.current.y
-      const speed = Math.min(Math.sqrt(dx * dx + dy * dy), 30)
+      // Clamp the movement to prevent spikes
+      const clampedMoveX = Math.max(-15, Math.min(15, moveX))
+      const clampedMoveY = Math.max(-15, Math.min(15, moveY))
       
-      // Calculate stretch with lower max
-      const maxStretch = 1.3
-      const stretchAmount = Math.min(speed / 20, maxStretch - 1)
+      const speed = Math.sqrt(clampedMoveX * clampedMoveX + clampedMoveY * clampedMoveY)
+      
+      // Subtle stretch effect
+      const stretchAmount = Math.min(speed / 25, 0.25)
       const scaleX = 1 + stretchAmount
-      const scaleY = 1 - stretchAmount * 0.4
-      const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+      const scaleY = 1 - stretchAmount * 0.3
+      const angle = Math.atan2(clampedMoveY, clampedMoveX) * (180 / Math.PI)
       
-      if (blobRef.current) {
-        const baseSize = isHovering ? 50 : 20
-        blobRef.current.style.width = `${baseSize}px`
-        blobRef.current.style.height = `${baseSize}px`
-        blobRef.current.style.transform = `
-          translate(${blobPos.current.x}px, ${blobPos.current.y}px)
-          translate(-50%, -50%)
-          rotate(${angle}deg)
-          scale(${scaleX}, ${scaleY})
-        `
-      }
+      // Update blob style
+      blob.style.opacity = s.visible ? "1" : "0"
+      blob.style.transform = `
+        translate(${s.blobX}px, ${s.blobY}px)
+        translate(-50%, -50%)
+        rotate(${angle}deg)
+        scale(${scaleX}, ${scaleY})
+      `
       
-      prevPos.current = { ...blobPos.current }
+      s.prevX = s.blobX
+      s.prevY = s.blobY
+      
       animationId = requestAnimationFrame(animate)
     }
     
@@ -206,7 +192,7 @@ export function MagneticBlobCursor() {
       clearInterval(updateInterval)
       cancelAnimationFrame(animationId)
     }
-  }, [isVisible, updateMagneticElements])
+  }, [updateMagneticElements])
   
   if (typeof window !== "undefined" && !window.matchMedia("(hover: hover)").matches) {
     return null
@@ -224,18 +210,18 @@ export function MagneticBlobCursor() {
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999]"
         style={{
-          width: "20px",
-          height: "20px",
+          width: isHovering ? "50px" : "20px",
+          height: isHovering ? "50px" : "20px",
           background: isHovering 
             ? "radial-gradient(circle, rgba(255,106,0,0.9) 0%, rgba(255,106,0,0.6) 50%, rgba(255,106,0,0.3) 100%)"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
           borderRadius: "50%",
-          opacity: isVisible ? 1 : 0,
+          opacity: 0,
           boxShadow: isHovering 
             ? "0 0 30px rgba(255,106,0,0.6), 0 0 60px rgba(255,106,0,0.3)"
             : "0 0 15px rgba(255,106,0,0.5), 0 0 30px rgba(255,106,0,0.2)",
-          transition: "width 0.3s cubic-bezier(0.23, 1, 0.32, 1), height 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.2s ease, box-shadow 0.3s ease, opacity 0.15s ease",
-          willChange: "transform, width, height",
+          transition: "width 0.2s ease-out, height 0.2s ease-out, background 0.2s ease, box-shadow 0.2s ease, opacity 0.1s ease",
+          willChange: "transform, width, height, opacity",
         }}
       />
     </>
