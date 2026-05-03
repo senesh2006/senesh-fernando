@@ -6,10 +6,12 @@ import { SkillsSection } from "@/components/sections/skills"
 import { ProjectsSection } from "@/components/sections/projects"
 import { AchievementsSection } from "@/components/sections/achievements"
 import { ContactSection } from "@/components/sections/contact"
+import { CustomCursor } from "@/components/custom-cursor"
 
 export default function Home() {
   return (
     <>
+      <CustomCursor />
       {/* Subtle grain/noise texture overlay */}
       <div className="noise-overlay" />
       
