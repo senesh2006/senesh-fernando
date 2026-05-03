@@ -10,8 +10,11 @@ import { ContactSection } from "@/components/sections/contact"
 export default function Home() {
   return (
     <>
+      {/* Subtle grain/noise texture overlay */}
+      <div className="noise-overlay" />
+      
       <Navbar />
-      <main>
+      <main className="relative z-10">
         <HeroSection />
         <EducationSection />
         <ExperienceSection />

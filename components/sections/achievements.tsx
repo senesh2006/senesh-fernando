@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { Trophy, Medal, Award, ExternalLink, Users } from "lucide-react"
+import { Trophy, ExternalLink, Users } from "lucide-react"
 import { useInView } from "@/hooks/use-in-view"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -19,10 +19,10 @@ const achievements = [
 ]
 
 const extracurricular = [
-  { title: "Co-Founder, Carbon Wise", description: "Sustainability initiative" },
-  { title: "Organizing Committee", description: "Eclipse Sports Meet, Curtin Colombo" },
-  { title: "Organizing Committee", description: "Avurudhu Celebrations, Curtin Colombo" },
-  { title: "Member", description: "Curtin Colombo Cricket Team & Programming Club" },
+  { title: "Co-Founder, Carbon Wise" },
+  { title: "Organizing Committee - Eclipse Sports Meet" },
+  { title: "Organizing Committee - Avurudhu Celebrations" },
+  { title: "Curtin Cricket Team & Programming Club Member" },
 ]
 
 export function AchievementsSection() {
@@ -30,42 +30,39 @@ export function AchievementsSection() {
   const isInView = useInView(ref, { threshold: 0.1 })
 
   return (
-    <section id="achievements" ref={ref} className="py-24 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
+    <section id="achievements" ref={ref} className="px-4 sm:px-6 bg-[#0f0a06]">
+      <div className="max-w-[1100px] mx-auto">
         <h2 className={cn(
-          "text-3xl sm:text-4xl font-bold text-center mb-16 transition-all duration-700",
+          "text-3xl sm:text-4xl font-medium text-center mb-16 text-[#f5ede6] transition-all duration-700",
           isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           Achievements
         </h2>
 
         {/* Achievements List */}
-        <div className="space-y-4 mb-16">
-          {achievements.map((achievement, index) => {
-            const icons = [Trophy, Medal, Award]
-            const Icon = icons[index % icons.length]
-            
-            return (
-              <div
-                key={index}
-                className={cn(
-                  "glass-card glass-card-hover rounded-xl p-5 transition-all duration-500 flex items-center gap-4",
-                  isInView ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
-                )}
-                style={{ transitionDelay: `${index * 50}ms` }}
-              >
-                <div className="p-3 rounded-lg bg-primary/10 shrink-0">
-                  <Icon className="h-5 w-5 text-primary" />
+        <div className="space-y-4 mb-20">
+          {achievements.map((achievement, index) => (
+            <div
+              key={index}
+              className={cn(
+                "glass-card glass-card-hover transition-all duration-500 flex items-center gap-4",
+                isInView ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+              )}
+              style={{ transitionDelay: `${index * 50}ms` }}
+            >
+              <div className="p-5 flex items-center gap-4 flex-1">
+                <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.1)] shrink-0">
+                  <Trophy className="h-5 w-5 text-[#ff6a00]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-foreground">{achievement.title}</h3>
-                  <p className="text-sm text-muted-foreground">{achievement.issuer}</p>
+                  <h3 className="font-semibold text-[#f5ede6]">{achievement.title}</h3>
+                  <p className="text-sm text-[rgba(245,237,230,0.5)]">{achievement.issuer}</p>
                 </div>
                 {achievement.link && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="shrink-0 gap-2 text-muted-foreground hover:text-primary"
+                    className="shrink-0 gap-2 text-[rgba(245,237,230,0.5)] hover:text-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)]"
                     asChild
                   >
                     <a href={achievement.link} target="_blank" rel="noopener noreferrer">
@@ -75,13 +72,13 @@ export function AchievementsSection() {
                   </Button>
                 )}
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
 
         {/* Extra-Curricular */}
         <h3 className={cn(
-          "text-2xl font-semibold text-center mb-8 transition-all duration-700",
+          "text-2xl font-medium text-center mb-10 text-[#f5ede6] transition-all duration-700",
           isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           Extra-Curricular Activities
@@ -92,18 +89,15 @@ export function AchievementsSection() {
             <div
               key={index}
               className={cn(
-                "glass-card glass-card-hover rounded-xl p-5 transition-all duration-500 flex items-center gap-4",
+                "glass-card glass-card-hover transition-all duration-500 flex items-center gap-4 p-5",
                 isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
               style={{ transitionDelay: `${(achievements.length + index) * 50}ms` }}
             >
-              <div className="p-3 rounded-lg bg-accent/10 shrink-0">
-                <Users className="h-5 w-5 text-accent" />
+              <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.08)] shrink-0">
+                <Users className="h-5 w-5 text-[#ff6a00]" />
               </div>
-              <div>
-                <h4 className="font-semibold text-foreground">{activity.title}</h4>
-                <p className="text-sm text-muted-foreground">{activity.description}</p>
-              </div>
+              <h4 className="font-medium text-[#f5ede6]">{activity.title}</h4>
             </div>
           ))}
         </div>

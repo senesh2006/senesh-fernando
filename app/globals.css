@@ -4,44 +4,60 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.07 0.01 270);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.12 0.015 270);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.12 0.015 270);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.65 0.25 265);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.18 0.02 270);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.25 0.02 270);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.65 0.25 265);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.25 0.03 270);
-  --input: oklch(0.2 0.02 270);
-  --ring: oklch(0.65 0.25 265);
-  --chart-1: oklch(0.65 0.25 265);
-  --chart-2: oklch(0.7 0.15 180);
-  --chart-3: oklch(0.75 0.2 45);
-  --chart-4: oklch(0.6 0.2 330);
-  --chart-5: oklch(0.7 0.15 120);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.1 0.015 270);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.65 0.25 265);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.18 0.02 270);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.25 0.03 270);
-  --sidebar-ring: oklch(0.65 0.25 265);
+  /* Apple Glass Dark Orange Design System */
+  --background: #0a0705;
+  --background-alt: #0f0a06;
+  --foreground: #f5ede6;
+  --foreground-muted: rgba(245, 237, 230, 0.6);
+  
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #f5ede6;
+  --card-border: rgba(255, 120, 20, 0.15);
+  --card-border-hover: rgba(255, 120, 20, 0.4);
+  
+  --popover: rgba(255, 255, 255, 0.04);
+  --popover-foreground: #f5ede6;
+  
+  --primary: #ff6a00;
+  --primary-foreground: #0a0705;
+  
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: #f5ede6;
+  
+  --muted: rgba(255, 255, 255, 0.08);
+  --muted-foreground: rgba(245, 237, 230, 0.5);
+  
+  --accent: #ff6a00;
+  --accent-foreground: #0a0705;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #f5ede6;
+  
+  --border: rgba(255, 120, 20, 0.15);
+  --input: rgba(255, 255, 255, 0.06);
+  --ring: #ff6a00;
+  
+  --chart-1: #ff6a00;
+  --chart-2: #ff8533;
+  --chart-3: #ffa366;
+  --chart-4: #ffb380;
+  --chart-5: #ffc299;
+  
+  --radius: 1.25rem;
+  
+  --sidebar: #0a0705;
+  --sidebar-foreground: #f5ede6;
+  --sidebar-primary: #ff6a00;
+  --sidebar-primary-foreground: #0a0705;
+  --sidebar-accent: rgba(255, 106, 0, 0.1);
+  --sidebar-accent-foreground: #f5ede6;
+  --sidebar-border: rgba(255, 120, 20, 0.15);
+  --sidebar-ring: #ff6a00;
 }
 
 @theme inline {
-  --font-sans: 'Inter', 'Geist', sans-serif;
-  --font-mono: 'Geist Mono', monospace;
+  --font-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'SF Mono', 'Geist Mono', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -66,8 +82,8 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-sidebar: var(--sidebar);
@@ -86,33 +102,52 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-color: #0a0705;
   }
   html {
     scroll-behavior: smooth;
+    background-color: #0a0705;
   }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-  25% {
-    transform: translateY(-20px) translateX(10px);
-  }
-  50% {
-    transform: translateY(-10px) translateX(-10px);
-  }
-  75% {
-    transform: translateY(-30px) translateX(5px);
-  }
+/* Noise texture overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-@keyframes pulse-glow {
+/* Glass card styling */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 120, 20, 0.15);
+  border-radius: 20px;
+}
+
+.glass-card-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-card-hover:hover {
+  border-color: rgba(255, 120, 20, 0.4);
+  box-shadow: 0 0 30px rgba(255, 106, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Animations */
+@keyframes pulse-ember {
   0%, 100% {
-    opacity: 0.3;
+    opacity: 0.4;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.7;
+    transform: scale(1.05);
   }
 }
 
@@ -127,26 +162,36 @@
   }
 }
 
-.animate-float {
-  animation: float 20s ease-in-out infinite;
+@keyframes slide-indicator {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 4s ease-in-out infinite;
+.animate-pulse-ember {
+  animation: pulse-ember 8s ease-in-out infinite;
 }
 
 .animate-fade-in-up {
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
-.glass-card {
-  background: rgba(19, 19, 26, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Section spacing */
+section {
+  padding-top: 120px;
+  padding-bottom: 120px;
 }
 
-.glass-card-hover:hover {
-  background: rgba(25, 25, 35, 0.8);
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-4px);
+/* Orange glow effect */
+.glow-orange {
+  box-shadow: 0 0 20px rgba(255, 106, 0, 0.3);
+}
+
+/* Nav pill indicator */
+.nav-pill-active {
+  background: rgba(255, 106, 0, 0.2);
+  box-shadow: 0 0 12px rgba(255, 106, 0, 0.4);
 }

@@ -23,17 +23,17 @@ export function ContactSection() {
   const isInView = useInView(ref, { threshold: 0.2 })
 
   return (
-    <section id="contact" ref={ref} className="py-24 px-4 sm:px-6 bg-secondary/20">
+    <section id="contact" ref={ref} className="px-4 sm:px-6 bg-[#0a0705]">
       <div className="max-w-2xl mx-auto text-center">
         <h2 className={cn(
-          "text-3xl sm:text-4xl font-bold mb-8 transition-all duration-700",
+          "text-3xl sm:text-4xl font-medium mb-8 text-[#f5ede6] transition-all duration-700",
           isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           Get In Touch
         </h2>
 
         <p className={cn(
-          "text-muted-foreground mb-12 transition-all duration-700",
+          "text-[rgba(245,237,230,0.6)] mb-12 transition-all duration-700",
           isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )} style={{ transitionDelay: "100ms" }}>
           Open to internships, freelance work, and collaborations.
@@ -41,27 +41,27 @@ export function ContactSection() {
 
         {/* Contact Info */}
         <div className={cn(
-          "glass-card rounded-xl p-8 mb-8 transition-all duration-700",
+          "glass-card p-8 mb-10 transition-all duration-700",
           isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )} style={{ transitionDelay: "200ms" }}>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
             {contactInfo.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-center gap-3"
+                className="flex items-center gap-3"
               >
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <item.icon className="h-5 w-5 text-primary" />
+                <div className="p-2.5 rounded-xl bg-[rgba(255,106,0,0.1)]">
+                  <item.icon className="h-5 w-5 text-[#ff6a00]" />
                 </div>
                 {item.href ? (
                   <a
                     href={item.href}
-                    className="text-foreground hover:text-primary transition-colors"
+                    className="text-[#f5ede6] hover:text-[#ff6a00] transition-colors text-sm sm:text-base"
                   >
                     {item.label}
                   </a>
                 ) : (
-                  <span className="text-foreground">{item.label}</span>
+                  <span className="text-[#f5ede6] text-sm sm:text-base">{item.label}</span>
                 )}
               </div>
             ))}
@@ -78,7 +78,7 @@ export function ContactSection() {
               key={index}
               variant="outline"
               size="lg"
-              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all"
+              className="gap-2 bg-transparent border-[rgba(255,120,20,0.2)] text-[#f5ede6] hover:border-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)] hover:text-[#ff6a00] transition-all rounded-xl"
               asChild
             >
               <a href={link.href} target="_blank" rel="noopener noreferrer">
@@ -91,7 +91,7 @@ export function ContactSection() {
 
         {/* Footer */}
         <p className={cn(
-          "mt-16 text-sm text-muted-foreground transition-all duration-700",
+          "mt-20 text-sm text-[rgba(245,237,230,0.4)] transition-all duration-700",
           isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )} style={{ transitionDelay: "400ms" }}>
           Designed & Built by Peter Senesh Fernando
