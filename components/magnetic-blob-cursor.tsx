@@ -13,7 +13,6 @@ export function MagneticBlobCursor() {
   const blobRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)
   
-  // Use refs for all animation state to avoid re-renders
   const state = useRef({
     blobX: -100,
     blobY: -100,
@@ -22,10 +21,9 @@ export function MagneticBlobCursor() {
     prevX: -100,
     prevY: -100,
     visible: false,
-    needsReset: true, // Flag to snap position on next mouse move
+    needsReset: true,
   })
   
-  // Magnetic elements cache
   const magneticElements = useRef<MagneticElement[]>([])
   
   const updateMagneticElements = useCallback(() => {
@@ -42,7 +40,6 @@ export function MagneticBlobCursor() {
   }, [])
   
   useEffect(() => {
-    // Check if device supports hover
     const hasHover = window.matchMedia("(hover: hover)").matches
     if (!hasHover) return
     
@@ -52,7 +49,6 @@ export function MagneticBlobCursor() {
     const handleMouseMove = (e: MouseEvent) => {
       const s = state.current
       
-      // If needs reset, snap everything to current position
       if (s.needsReset) {
         s.blobX = e.clientX
         s.blobY = e.clientY
@@ -67,7 +63,6 @@ export function MagneticBlobCursor() {
       s.targetY = e.clientY
       s.visible = true
       
-      // Check for magnetic attraction
       let closestElement: MagneticElement | null = null
       let closestDistance = Infinity
       const magneticRadius = 80
@@ -103,18 +98,15 @@ export function MagneticBlobCursor() {
       state.current.needsReset = true
     }
     
-    // Handle visibility change (tab switching)
     const handleVisibilityChange = () => {
       if (document.hidden) {
         state.current.visible = false
         state.current.needsReset = true
       } else {
-        // When becoming visible, require reset before showing cursor
         state.current.needsReset = true
       }
     }
     
-    // Handle window blur
     const handleWindowBlur = () => {
       state.current.visible = false
       state.current.needsReset = true
@@ -141,30 +133,25 @@ export function MagneticBlobCursor() {
     const animate = () => {
       const s = state.current
       
-      // Spring physics
       const dx = s.targetX - s.blobX
       const dy = s.targetY - s.blobY
       
       s.blobX += dx * springStrength
       s.blobY += dy * springStrength
       
-      // Calculate movement delta for stretch (not velocity spike)
       const moveX = s.blobX - s.prevX
       const moveY = s.blobY - s.prevY
       
-      // Clamp the movement to prevent spikes
       const clampedMoveX = Math.max(-15, Math.min(15, moveX))
       const clampedMoveY = Math.max(-15, Math.min(15, moveY))
       
       const speed = Math.sqrt(clampedMoveX * clampedMoveX + clampedMoveY * clampedMoveY)
       
-      // Subtle stretch effect
       const stretchAmount = Math.min(speed / 25, 0.25)
       const scaleX = 1 + stretchAmount
       const scaleY = 1 - stretchAmount * 0.3
       const angle = Math.atan2(clampedMoveY, clampedMoveX) * (180 / Math.PI)
       
-      // Update blob style
       blob.style.opacity = s.visible ? "1" : "0"
       blob.style.transform = `
         translate(${s.blobX}px, ${s.blobY}px)
@@ -213,14 +200,15 @@ export function MagneticBlobCursor() {
           width: isHovering ? "50px" : "20px",
           height: isHovering ? "50px" : "20px",
           background: isHovering 
-            ? "radial-gradient(circle, rgba(255,106,0,0.9) 0%, rgba(255,106,0,0.6) 50%, rgba(255,106,0,0.3) 100%)"
+            ? "transparent"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
+          border: isHovering ? "2px solid #ff6a00" : "none",
           borderRadius: "50%",
           opacity: 0,
           boxShadow: isHovering 
-            ? "0 0 30px rgba(255,106,0,0.6), 0 0 60px rgba(255,106,0,0.3)"
+            ? "0 0 20px rgba(255,106,0,0.4), 0 0 40px rgba(255,106,0,0.2), inset 0 0 20px rgba(255,106,0,0.1)"
             : "0 0 15px rgba(255,106,0,0.5), 0 0 30px rgba(255,106,0,0.2)",
-          transition: "width 0.2s ease-out, height 0.2s ease-out, background 0.2s ease, box-shadow 0.2s ease, opacity 0.1s ease",
+          transition: "width 0.2s ease-out, height 0.2s ease-out, background 0.2s ease, box-shadow 0.2s ease, opacity 0.1s ease, border 0.2s ease",
           willChange: "transform, width, height, opacity",
         }}
       />
