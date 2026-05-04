@@ -1,10 +1,16 @@
 import { neon } from "@neondatabase/serverless"
 import { NextResponse } from "next/server"
 
-const sql = neon(process.env.DATABASE_URL!)
+function getDbClient() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not configured")
+  }
+  return neon(process.env.DATABASE_URL)
+}
 
 export async function GET() {
   try {
+    const sql = getDbClient()
     const recommendations = await sql`
       SELECT id, name, role, company, message, created_at 
       FROM recommendations 
@@ -22,6 +28,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const sql = getDbClient()
     const body = await request.json()
     const { name, role, company, message } = body
 
