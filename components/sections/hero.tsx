@@ -20,27 +20,59 @@ const stats = [
 export function HeroSection() {
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+      {/* Floating orbs with continuous movement */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Large moving orb 1 */}
+        <div 
+          className="absolute w-[600px] h-[600px] rounded-full animate-float-slow"
+          style={{
+            top: "10%",
+            left: "60%",
+            background: "radial-gradient(circle, rgba(255,106,0,0.2) 0%, rgba(255,106,0,0.05) 40%, transparent 70%)",
+          }}
+        />
+        {/* Large moving orb 2 */}
+        <div 
+          className="absolute w-[500px] h-[500px] rounded-full animate-float-medium"
+          style={{
+            top: "50%",
+            left: "10%",
+            background: "radial-gradient(circle, rgba(255,140,50,0.15) 0%, rgba(255,140,50,0.03) 40%, transparent 70%)",
+          }}
+        />
+        {/* Medium moving orb */}
+        <div 
+          className="absolute w-[400px] h-[400px] rounded-full animate-float-fast"
+          style={{
+            top: "70%",
+            left: "70%",
+            background: "radial-gradient(circle, rgba(255,80,0,0.12) 0%, transparent 60%)",
+          }}
+        />
+        {/* Small accent orbs */}
+        <div 
+          className="absolute w-[200px] h-[200px] rounded-full animate-float-reverse"
+          style={{
+            top: "20%",
+            left: "20%",
+            background: "radial-gradient(circle, rgba(255,106,0,0.25) 0%, transparent 70%)",
+          }}
+        />
+        <div 
+          className="absolute w-[150px] h-[150px] rounded-full animate-float-diagonal"
+          style={{
+            top: "80%",
+            left: "40%",
+            background: "radial-gradient(circle, rgba(255,150,80,0.2) 0%, transparent 70%)",
+          }}
+        />
+      </div>
+
       {/* Deep orange ember glow - center radial */}
       <div 
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full animate-pulse-ember pointer-events-none"
         style={{
           background: "radial-gradient(circle, rgba(255,106,0,0.25) 0%, rgba(255,106,0,0.1) 30%, rgba(255,106,0,0.02) 60%, transparent 80%)",
-        }}
-      />
-      
-      {/* Secondary glow orbs */}
-      <div 
-        className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full animate-pulse-ember pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, rgba(255,106,0,0.15) 0%, transparent 70%)",
-          animationDelay: "4s"
-        }}
-      />
-      <div 
-        className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full animate-pulse-ember pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, rgba(255,140,50,0.12) 0%, transparent 70%)",
-          animationDelay: "2s"
         }}
       />
 
