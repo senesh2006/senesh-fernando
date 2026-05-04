@@ -11,6 +11,7 @@ interface MagneticElement {
 
 export function MagneticBlobCursor() {
   const blobRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLSpanElement>(null)
   const [isHovering, setIsHovering] = useState(false)
   const [cursorText, setCursorText] = useState("")
   
@@ -23,6 +24,7 @@ export function MagneticBlobCursor() {
     prevY: -100,
     visible: false,
     needsReset: true,
+    currentAngle: 0,
   })
   
   const magneticElements = useRef<MagneticElement[]>([])
@@ -194,6 +196,8 @@ export function MagneticBlobCursor() {
       const scaleY = 1 - stretchAmount * 0.3
       const angle = Math.atan2(clampedMoveY, clampedMoveX) * (180 / Math.PI)
       
+      s.currentAngle = angle
+      
       blob.style.opacity = s.visible ? "1" : "0"
       blob.style.transform = `
         translate(${s.blobX}px, ${s.blobY}px)
@@ -201,6 +205,11 @@ export function MagneticBlobCursor() {
         rotate(${angle}deg)
         scale(${scaleX}, ${scaleY})
       `
+      
+      // Counter-rotate text to keep it upright
+      if (textRef.current) {
+        textRef.current.style.transform = `rotate(${-angle}deg)`
+      }
       
       s.prevX = s.blobX
       s.prevY = s.blobY
@@ -255,13 +264,13 @@ export function MagneticBlobCursor() {
         }}
       >
         <span
+          ref={textRef}
           className="text-[11px] font-semibold tracking-wider uppercase"
           style={{
             color: "#ff6a00",
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.15s ease",
             textShadow: "0 0 10px rgba(255,106,0,0.5)",
-            transform: "rotate(0deg)", // Counter-rotate to keep text upright
           }}
         >
           {cursorText}
