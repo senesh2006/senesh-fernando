@@ -1,8 +1,16 @@
 "use client"
 
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { Mail, Linkedin, Globe, Github, GraduationCap, MapPin, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { VisitorCounter } from "@/components/visitor-counter"
+import { GitHubActivity } from "@/components/github-activity"
+
+const Hero3D = dynamic(() => import("@/components/hero-3d").then(mod => mod.Hero3D), {
+  ssr: false,
+  loading: () => null,
+})
 
 const socialLinks = [
   { icon: Mail, label: "Email", href: "mailto:seneshfernando55@gmail.com" },
@@ -20,6 +28,9 @@ const stats = [
 export function HeroSection() {
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+      {/* 3D Background */}
+      <Hero3D />
+      
       {/* Floating orbs with continuous movement */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Large moving orb 1 */}
@@ -134,6 +145,16 @@ export function HeroSection() {
               <ArrowRight className="h-5 w-5" />
             </Link>
           </Button>
+
+          {/* Visitor Counter */}
+          <div className="mt-12 flex justify-center">
+            <VisitorCounter />
+          </div>
+        </div>
+
+        {/* GitHub Activity Widget */}
+        <div className="mt-12 w-full max-w-md mx-auto animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+          <GitHubActivity />
         </div>
       </div>
     </section>

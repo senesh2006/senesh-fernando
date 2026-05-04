@@ -1,6 +1,7 @@
 "use client"
 
 import { Code, Server, Cog, BarChart3, Lightbulb } from "lucide-react"
+import { TechStackChart } from "@/components/tech-stack-chart"
 
 const skillCategories = [
   {
@@ -34,9 +35,21 @@ export function SkillsSection() {
   return (
     <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-[#f5ede6] animate-fade-in-up">
           Skills
         </h1>
+        <p className="text-center text-[rgba(245,237,230,0.6)] mb-12 max-w-2xl mx-auto animate-fade-in-up">
+          Technologies and tools I work with
+        </p>
+
+        {/* Tech Stack Chart */}
+        <div className="mb-16 animate-fade-in-up">
+          <TechStackChart />
+        </div>
+
+        <h2 className="text-2xl font-medium text-center mb-8 text-[#f5ede6] animate-fade-in-up">
+          Skill Categories
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {skillCategories.map((category, index) => (
