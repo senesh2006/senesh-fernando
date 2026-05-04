@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Quote, Send, User, Briefcase, Star, Loader2 } from "lucide-react"
+import { Quote, Send, User, Briefcase, Star, Loader2, LayoutGrid, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { TestimonialCarousel } from "@/components/testimonial-carousel"
 
 interface Recommendation {
   id: string
@@ -28,6 +29,7 @@ export function RecommendationsSection() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<"carousel" | "grid">("carousel")
 
   // Fetch recommendations from API
   useEffect(() => {
@@ -91,8 +93,8 @@ export function RecommendationsSection() {
           What colleagues and mentors say about working with me
         </p>
 
-        {/* Add Recommendation Button */}
-        <div className="flex justify-center mb-12 animate-fade-in-up">
+        {/* Actions */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12 animate-fade-in-up">
           <Button
             onClick={() => setShowForm(!showForm)}
             className="gap-2 bg-[#ff6a00] text-white hover:bg-[#e55f00] transition-all rounded-xl px-6 py-5"
@@ -101,6 +103,27 @@ export function RecommendationsSection() {
             <Star className="h-4 w-4" />
             {showForm ? "Close Form" : "Leave a Recommendation"}
           </Button>
+          
+          {recommendations.length > 0 && (
+            <div className="flex gap-2 p-1 glass-card rounded-xl">
+              <Button
+                variant="ghost"
+                onClick={() => setViewMode("carousel")}
+                className={`gap-2 rounded-lg px-4 ${viewMode === "carousel" ? "bg-[rgba(255,106,0,0.2)] text-[#ff6a00]" : "text-[#f5ede6]"}`}
+              >
+                <Play className="h-4 w-4" />
+                Carousel
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setViewMode("grid")}
+                className={`gap-2 rounded-lg px-4 ${viewMode === "grid" ? "bg-[rgba(255,106,0,0.2)] text-[#ff6a00]" : "text-[#f5ede6]"}`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Grid
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Success Message */}
@@ -205,40 +228,46 @@ export function RecommendationsSection() {
           </div>
         )}
 
-        {/* Recommendations Grid */}
+        {/* Testimonials Display */}
         {!isLoading && recommendations.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {recommendations.map((rec, index) => (
-              <div 
-                key={rec.id}
-                className="glass-card p-6 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <Quote className="h-8 w-8 text-[#ff6a00] mb-4 opacity-50" />
-                <p className="text-[rgba(245,237,230,0.8)] leading-relaxed mb-6 italic">
-                  &quot;{rec.message}&quot;
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[rgba(255,106,0,0.2)] flex items-center justify-center flex-shrink-0">
-                    <span className="text-[#ff6a00] font-semibold text-lg">
-                      {rec.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </span>
+          <>
+            {viewMode === "carousel" ? (
+              <TestimonialCarousel testimonials={recommendations} autoPlayInterval={5000} />
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {recommendations.map((rec, index) => (
+                  <div 
+                    key={rec.id}
+                    className="glass-card p-6 animate-fade-in-up"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <Quote className="h-8 w-8 text-[#ff6a00] mb-4 opacity-50" />
+                    <p className="text-[rgba(245,237,230,0.8)] leading-relaxed mb-6 italic">
+                      &quot;{rec.message}&quot;
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-[rgba(255,106,0,0.2)] flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#ff6a00] font-semibold text-lg">
+                          {rec.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-[#f5ede6] truncate">{rec.name}</h3>
+                        {(rec.role || rec.company) && (
+                          <p className="text-sm text-[rgba(245,237,230,0.5)] truncate">
+                            {rec.role}{rec.role && rec.company && ' at '}{rec.company}
+                          </p>
+                        )}
+                      </div>
+                      <span className="text-xs text-[rgba(245,237,230,0.4)] flex-shrink-0">
+                        {formatDate(rec.created_at)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-[#f5ede6] truncate">{rec.name}</h3>
-                    {(rec.role || rec.company) && (
-                      <p className="text-sm text-[rgba(245,237,230,0.5)] truncate">
-                        {rec.role}{rec.role && rec.company && ' at '}{rec.company}
-                      </p>
-                    )}
-                  </div>
-                  <span className="text-xs text-[rgba(245,237,230,0.4)] flex-shrink-0">
-                    {formatDate(rec.created_at)}
-                  </span>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </section>

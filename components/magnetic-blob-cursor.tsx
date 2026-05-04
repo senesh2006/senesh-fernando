@@ -248,8 +248,8 @@ export function MagneticBlobCursor() {
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
         style={{
-          width: isHovering ? "70px" : "20px",
-          height: isHovering ? "70px" : "20px",
+          width: isHovering ? "42px" : "20px",
+          height: isHovering ? "42px" : "20px",
           background: isHovering 
             ? "transparent"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
@@ -265,12 +265,13 @@ export function MagneticBlobCursor() {
       >
         <span
           ref={textRef}
-          className="text-[11px] font-semibold tracking-wider uppercase"
+          className="text-[7px] font-medium tracking-[0.12em] lowercase"
           style={{
             color: "#ff6a00",
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.15s ease",
-            textShadow: "0 0 10px rgba(255,106,0,0.5)",
+            fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
+            letterSpacing: "0.08em",
           }}
         >
           {cursorText}
