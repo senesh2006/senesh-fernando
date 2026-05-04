@@ -265,12 +265,13 @@ export function MagneticBlobCursor() {
       >
         <span
           ref={textRef}
-          className="text-[8px] font-semibold tracking-wider uppercase"
+          className="text-[7px] font-medium tracking-[0.12em] lowercase"
           style={{
             color: "#ff6a00",
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.15s ease",
-            textShadow: "0 0 10px rgba(255,106,0,0.5)",
+            fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
+            letterSpacing: "0.08em",
           }}
         >
           {cursorText}
