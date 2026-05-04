@@ -12,6 +12,7 @@ interface MagneticElement {
 export function MagneticBlobCursor() {
   const blobRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)
+  const [cursorText, setCursorText] = useState("")
   
   const state = useRef({
     blobX: -100,
@@ -27,7 +28,7 @@ export function MagneticBlobCursor() {
   const magneticElements = useRef<MagneticElement[]>([])
   
   const updateMagneticElements = useCallback(() => {
-    const elements = document.querySelectorAll('a, button, [data-magnetic], .glass-card-hover')
+    const elements = document.querySelectorAll('a, button, [data-magnetic], .glass-card-hover, .project-card, input, textarea, select')
     magneticElements.current = Array.from(elements).map(el => {
       const rect = el.getBoundingClientRect()
       return {
@@ -63,6 +64,10 @@ export function MagneticBlobCursor() {
       s.targetY = e.clientY
       s.visible = true
       
+      // Check what element we're hovering over for cursor text
+      const target = e.target as HTMLElement
+      const interactive = target.closest('a, button, [role="button"], .project-card, input, textarea, select')
+      
       let closestElement: MagneticElement | null = null
       let closestDistance = Infinity
       const magneticRadius = 80
@@ -78,14 +83,51 @@ export function MagneticBlobCursor() {
         }
       }
       
-      if (closestElement) {
+      if (closestElement || interactive) {
         setIsHovering(true)
-        const pull = 1 - (closestDistance / magneticRadius)
-        const pullStrength = 0.4
-        s.targetX = e.clientX + (closestElement.centerX - e.clientX) * pull * pullStrength
-        s.targetY = e.clientY + (closestElement.centerY - e.clientY) * pull * pullStrength
+        
+        // Determine cursor text based on element type
+        const el = interactive || closestElement?.element
+        if (el) {
+          if (el.classList.contains('project-card')) {
+            setCursorText("View")
+          } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            setCursorText("Type")
+          } else if (el.tagName === 'SELECT') {
+            setCursorText("Select")
+          } else if (el.tagName === 'A') {
+            const isExternal = el.getAttribute('target') === '_blank'
+            const isNav = el.closest('nav')
+            if (isExternal) {
+              setCursorText("Open")
+            } else if (isNav) {
+              setCursorText("Go")
+            } else {
+              setCursorText("View")
+            }
+          } else if (el.tagName === 'BUTTON' || el.getAttribute('role') === 'button') {
+            const buttonText = el.textContent?.toLowerCase() || ''
+            if (buttonText.includes('submit') || buttonText.includes('send')) {
+              setCursorText("Send")
+            } else if (buttonText.includes('close') || buttonText.includes('cancel')) {
+              setCursorText("Close")
+            } else {
+              setCursorText("Click")
+            }
+          } else {
+            setCursorText("View")
+          }
+        }
+        
+        if (closestElement) {
+          const pull = 1 - (closestDistance / magneticRadius)
+          const pullStrength = 0.4
+          s.targetX = e.clientX + (closestElement.centerX - e.clientX) * pull * pullStrength
+          s.targetY = e.clientY + (closestElement.centerY - e.clientY) * pull * pullStrength
+        }
       } else {
         setIsHovering(false)
+        setCursorText("")
       }
     }
     
@@ -195,10 +237,10 @@ export function MagneticBlobCursor() {
       
       <div
         ref={blobRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
         style={{
-          width: isHovering ? "50px" : "20px",
-          height: isHovering ? "50px" : "20px",
+          width: isHovering ? "70px" : "20px",
+          height: isHovering ? "70px" : "20px",
           background: isHovering 
             ? "transparent"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
@@ -211,7 +253,20 @@ export function MagneticBlobCursor() {
           transition: "width 0.2s ease-out, height 0.2s ease-out, background 0.2s ease, box-shadow 0.2s ease, opacity 0.1s ease, border 0.2s ease",
           willChange: "transform, width, height, opacity",
         }}
-      />
+      >
+        <span
+          className="text-[11px] font-semibold tracking-wider uppercase"
+          style={{
+            color: "#ff6a00",
+            opacity: isHovering && cursorText ? 1 : 0,
+            transition: "opacity 0.15s ease",
+            textShadow: "0 0 10px rgba(255,106,0,0.5)",
+            transform: "rotate(0deg)", // Counter-rotate to keep text upright
+          }}
+        >
+          {cursorText}
+        </span>
+      </div>
     </>
   )
 }
