@@ -33,12 +33,12 @@ const skillCategories = [
 
 export function SkillsSection() {
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-[#f5ede6] animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-foreground animate-fade-in-up">
           Skills
         </h1>
-        <p className="text-center text-[rgba(245,237,230,0.6)] mb-12 max-w-2xl mx-auto animate-fade-in-up">
+        <p className="text-center text-foreground-muted mb-12 max-w-2xl mx-auto animate-fade-in-up">
           Technologies and tools I work with
         </p>
 
@@ -47,7 +47,7 @@ export function SkillsSection() {
           <TechStackChart />
         </div>
 
-        <h2 className="text-2xl font-medium text-center mb-8 text-[#f5ede6] animate-fade-in-up">
+        <h2 className="text-2xl font-medium text-center mb-8 text-foreground animate-fade-in-up">
           Skill Categories
         </h2>
 
@@ -59,21 +59,21 @@ export function SkillsSection() {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Glowing orange top border */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#ff6a00] shadow-[0_0_8px_rgba(255,106,0,0.5)]" />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary shadow-[0_0_8px_rgba(255,106,0,0.5)]" />
               
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2.5 rounded-xl bg-[rgba(255,106,0,0.1)]">
-                    <category.icon className="h-5 w-5 text-[#ff6a00]" />
+                  <div className="p-2.5 rounded-xl bg-primary/10">
+                    <category.icon className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="font-semibold text-[#f5ede6]">{category.title}</h2>
+                  <h2 className="font-semibold text-foreground">{category.title}</h2>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
                   {category.skills.map((skill, skillIndex) => (
                     <span
                       key={skillIndex}
-                      className="px-3 py-1.5 rounded-full text-sm bg-[rgba(255,106,0,0.08)] text-[rgba(245,237,230,0.8)] border border-[rgba(255,106,0,0.15)] hover:bg-[rgba(255,106,0,0.15)] transition-colors"
+                      className="px-3 py-1.5 rounded-full text-sm bg-primary/5 text-foreground/80 border border-primary/10 hover:bg-primary/15 transition-colors"
                     >
                       {skill}
                     </span>

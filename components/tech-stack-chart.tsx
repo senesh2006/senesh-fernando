@@ -46,7 +46,7 @@ export function TechStackChart() {
 
   return (
     <div className="glass-card p-8">
-      <h3 className="text-xl font-semibold text-[#f5ede6] mb-6 text-center">
+      <h3 className="text-xl font-semibold text-foreground mb-6 text-center">
         Tech Proficiency
       </h3>
 
@@ -59,8 +59,8 @@ export function TechStackChart() {
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium transition-all",
               activeCategory === cat
-                ? "bg-[#ff6a00] text-white"
-                : "bg-[rgba(255,255,255,0.04)] text-[rgba(245,237,230,0.6)] hover:bg-[rgba(255,106,0,0.1)] hover:text-[#ff6a00]"
+                ? "bg-primary text-white"
+                : "bg-white/5 text-foreground-muted hover:bg-primary/10 hover:text-primary"
             )}
           >
             {cat}
@@ -80,21 +80,21 @@ export function TechStackChart() {
             <div className="flex items-center justify-between mb-1.5">
               <span className={cn(
                 "text-sm font-medium transition-colors",
-                hoveredSkill === skill.name ? "text-[#ff6a00]" : "text-[#f5ede6]"
+                hoveredSkill === skill.name ? "text-primary" : "text-foreground"
               )}>
                 {skill.name}
               </span>
-              <span className="text-xs text-[rgba(245,237,230,0.5)]">
+              <span className="text-xs text-foreground-muted/80">
                 {skill.level}%
               </span>
             </div>
-            <div className="h-2 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
+            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-500",
                   hoveredSkill === skill.name
-                    ? "bg-[#ff6a00] shadow-[0_0_10px_rgba(255,106,0,0.5)]"
-                    : "bg-gradient-to-r from-[#ff6a00] to-[#ff8533]"
+                    ? "bg-primary shadow-[0_0_10px_rgba(255,106,0,0.5)]"
+                    : "bg-gradient-to-r from-primary to-accent"
                 )}
                 style={{
                   width: `${skill.level}%`,
@@ -107,18 +107,18 @@ export function TechStackChart() {
       </div>
 
       {/* Legend */}
-      <div className="mt-8 pt-6 border-t border-[rgba(255,120,20,0.1)]">
-        <div className="flex justify-center gap-6 text-xs text-[rgba(245,237,230,0.4)]">
+      <div className="mt-8 pt-6 border-t border-primary/10">
+        <div className="flex justify-center gap-6 text-xs text-foreground-muted/60">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[rgba(255,106,0,0.3)]" />
+            <div className="w-3 h-3 rounded-full bg-primary/30" />
             <span>Beginner (0-40%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[rgba(255,106,0,0.6)]" />
+            <div className="w-3 h-3 rounded-full bg-primary/60" />
             <span>Intermediate (40-70%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[#ff6a00]" />
+            <div className="w-3 h-3 rounded-full bg-primary" />
             <span>Advanced (70-100%)</span>
           </div>
         </div>

@@ -23,9 +23,9 @@ const extracurricular = [
 
 export function AchievementsSection() {
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground animate-fade-in-up">
           Achievements
         </h1>
 
@@ -38,12 +38,12 @@ export function AchievementsSection() {
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="p-5 flex items-center gap-4 flex-1">
-                <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.1)] shrink-0">
-                  <Trophy className="h-5 w-5 text-[#ff6a00]" />
+                <div className="p-3 rounded-xl bg-primary/10 shrink-0">
+                  <Trophy className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-semibold text-[#f5ede6]">{achievement.title}</h2>
-                  <p className="text-sm text-[rgba(245,237,230,0.5)]">{achievement.issuer}</p>
+                  <h2 className="font-semibold text-foreground">{achievement.title}</h2>
+                  <p className="text-sm text-foreground-muted">{achievement.issuer}</p>
                 </div>
               </div>
             </div>
@@ -51,7 +51,7 @@ export function AchievementsSection() {
         </div>
 
         {/* Extra-Curricular */}
-        <h2 className="text-2xl font-medium text-center mb-10 text-[#f5ede6] animate-fade-in-up">
+        <h2 className="text-2xl font-medium text-center mb-10 text-foreground animate-fade-in-up">
           Extra-Curricular Activities
         </h2>
 
@@ -62,10 +62,10 @@ export function AchievementsSection() {
               className="glass-card glass-card-hover flex items-center gap-4 p-5 animate-fade-in-up"
               style={{ animationDelay: `${(achievements.length + index) * 50}ms` }}
             >
-              <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.08)] shrink-0">
-                <Users className="h-5 w-5 text-[#ff6a00]" />
+              <div className="p-3 rounded-xl bg-primary/8 shrink-0">
+                <Users className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="font-medium text-[#f5ede6]">{activity.title}</h3>
+              <h3 className="font-medium text-foreground">{activity.title}</h3>
             </div>
           ))}
         </div>

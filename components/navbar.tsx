@@ -24,13 +24,13 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 py-3 backdrop-blur-xl bg-[rgba(10,7,5,0.7)] border-b border-[rgba(255,120,20,0.1)]">
+    <header className="fixed top-0 left-0 right-0 z-50 py-3 backdrop-blur-xl bg-background/70 border-b border-border">
       <nav className="mx-auto max-w-[1100px] px-4 sm:px-6">
         <div className="flex items-center justify-between">
           {/* PS Monogram Logo */}
           <Link
             href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-xl bg-[rgba(255,106,0,0.15)] border border-[rgba(255,106,0,0.3)] text-[#ff6a00] font-semibold text-sm hover:bg-[rgba(255,106,0,0.25)] transition-all glow-orange"
+            className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 text-primary font-semibold text-sm hover:bg-primary/20 transition-all glow-orange"
             data-magnetic
           >
             PS

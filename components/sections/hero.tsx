@@ -33,13 +33,13 @@ export function HeroSection() {
       
       <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
         <div className="animate-fade-in-up">
-          <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-semibold tracking-tight text-[#f5ede6] mb-4 leading-tight text-balance">
+          <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-semibold tracking-tight text-foreground mb-4 leading-tight text-balance">
             Peter Senesh Fernando
           </h1>
-          <p className="text-xl sm:text-2xl text-[#ff6a00] font-medium mb-8">
+          <p className="text-xl sm:text-2xl text-primary font-medium mb-8">
             Information Technology Student & Developer
           </p>
-          <p className="max-w-2xl mx-auto text-[rgba(245,237,230,0.6)] text-base sm:text-lg leading-relaxed mb-10 text-pretty">
+          <p className="max-w-2xl mx-auto text-foreground-muted text-base sm:text-lg leading-relaxed mb-10 text-pretty">
             Motivated IT student at Curtin University Colombo with strong skills in Python, 
             data visualization, and analytical problem-solving. I build simulations, automation 
             tools, and data-driven systems — and I enjoy applying logic to extract meaning from 
@@ -51,10 +51,10 @@ export function HeroSection() {
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className="glass-card px-5 py-2.5 rounded-full flex items-center gap-2.5"
+                className="glass-card px-5 py-2.5 rounded-full flex items-center gap-2.5 border-primary/20 bg-primary/5"
               >
-                <stat.icon className="h-4 w-4 text-[#ff6a00]" />
-                <span className="text-sm text-[#f5ede6]">{stat.text}</span>
+                <stat.icon className="h-4 w-4 text-primary" />
+                <span className="text-sm text-foreground">{stat.text}</span>
               </div>
             ))}
           </div>
@@ -65,7 +65,7 @@ export function HeroSection() {
               <Button
                 key={index}
                 variant="outline"
-                className="gap-2 bg-transparent border-[rgba(255,120,20,0.2)] text-[#f5ede6] hover:border-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)] hover:text-[#ff6a00] transition-all rounded-xl px-5 py-2.5"
+                className="gap-2 bg-transparent border-primary/20 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-xl px-5 py-2.5"
                 asChild
                 data-magnetic
               >
@@ -80,7 +80,7 @@ export function HeroSection() {
           {/* Explore Button */}
           <Button
             variant="default"
-            className="gap-2 bg-[#ff6a00] text-white hover:bg-[#e55f00] transition-all rounded-xl px-8 py-6 text-base font-medium"
+            className="gap-2 bg-primary text-white hover:bg-primary/90 transition-all rounded-xl px-8 py-6 text-base font-medium shadow-[0_0_20px_rgba(255,106,0,0.3)]"
             asChild
             data-magnetic
           >

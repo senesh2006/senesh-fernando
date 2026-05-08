@@ -81,9 +81,9 @@ export function ProjectsSection() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0a0705]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground animate-fade-in-up">
           Projects
         </h1>
 
@@ -99,7 +99,7 @@ export function ProjectsSection() {
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between gap-3 mb-4">
-                    <h2 className="font-semibold text-[#f5ede6] text-lg leading-tight">{project.name}</h2>
+                    <h2 className="font-semibold text-foreground text-lg leading-tight">{project.name}</h2>
                     <span className={cn(
                       "px-2.5 py-1 rounded-md text-xs font-medium text-white shrink-0",
                       langColor
@@ -108,11 +108,11 @@ export function ProjectsSection() {
                     </span>
                   </div>
 
-                  <p className="text-[rgba(245,237,230,0.6)] text-sm leading-relaxed mb-5">
+                  <p className="text-foreground-muted text-sm leading-relaxed mb-5">
                     {project.description}
                   </p>
 
-                  <span className="text-[#ff6a00] text-sm font-medium">
+                  <span className="text-primary text-sm font-medium">
                     Click to learn more
                   </span>
                 </div>
@@ -129,26 +129,26 @@ export function ProjectsSection() {
           onClick={() => setSelectedProject(null)}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" />
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-fade-in" />
           
           {/* Modal Content */}
           <div 
-            className="relative w-full max-w-2xl glass-card p-8 animate-scale-in"
+            className="relative w-full max-w-2xl glass-card p-8 animate-scale-in bg-background/90"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setSelectedProject(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,106,0,0.2)] transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-primary/20 transition-colors"
               data-magnetic
             >
-              <X className="h-5 w-5 text-[#f5ede6]" />
+              <X className="h-5 w-5 text-foreground" />
             </button>
 
             {/* Header */}
             <div className="flex items-start gap-4 mb-6">
               <div className="flex-1">
-                <h2 className="text-2xl font-semibold text-[#f5ede6] mb-2">{selectedProject.name}</h2>
+                <h2 className="text-2xl font-semibold text-foreground mb-2">{selectedProject.name}</h2>
                 <span className={cn(
                   "inline-block px-3 py-1 rounded-md text-xs font-medium text-white",
                   languageColors[selectedProject.language] || languageColors.Python
@@ -161,10 +161,10 @@ export function ProjectsSection() {
             {/* Full Description */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <Code className="h-4 w-4 text-[#ff6a00]" />
-                <h3 className="text-sm font-medium text-[#ff6a00] uppercase tracking-wider">About</h3>
+                <Code className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-medium text-primary uppercase tracking-wider">About</h3>
               </div>
-              <p className="text-[rgba(245,237,230,0.8)] leading-relaxed">
+              <p className="text-foreground/80 leading-relaxed">
                 {selectedProject.fullDescription}
               </p>
             </div>
@@ -172,14 +172,14 @@ export function ProjectsSection() {
             {/* Skills */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-4 w-4 text-[#ff6a00]" />
-                <h3 className="text-sm font-medium text-[#ff6a00] uppercase tracking-wider">Skills Used</h3>
+                <Lightbulb className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-medium text-primary uppercase tracking-wider">Skills Used</h3>
               </div>
               <div className="flex flex-wrap gap-2">
                 {selectedProject.skills.map((skill, i) => (
                   <span 
                     key={i}
-                    className="px-3 py-1.5 rounded-full text-sm bg-[rgba(255,106,0,0.15)] text-[#ff6a00] border border-[rgba(255,106,0,0.3)]"
+                    className="px-3 py-1.5 rounded-full text-sm bg-primary/15 text-primary border border-primary/30"
                   >
                     {skill}
                   </span>
@@ -190,10 +190,10 @@ export function ProjectsSection() {
             {/* Impact */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-[#ff6a00]" />
-                <h3 className="text-sm font-medium text-[#ff6a00] uppercase tracking-wider">Impact on Me</h3>
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-medium text-primary uppercase tracking-wider">Impact on Me</h3>
               </div>
-              <p className="text-[rgba(245,237,230,0.8)] leading-relaxed">
+              <p className="text-foreground/80 leading-relaxed">
                 {selectedProject.impact}
               </p>
             </div>
@@ -202,7 +202,7 @@ export function ProjectsSection() {
             {selectedProject.sourceUrl && (
               <Button
                 variant="outline"
-                className="gap-2 bg-transparent border-[rgba(255,120,20,0.3)] text-[#f5ede6] hover:border-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)] hover:text-[#ff6a00] transition-all rounded-lg"
+                className="gap-2 bg-transparent border-primary/30 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-lg"
                 asChild
                 data-magnetic
               >

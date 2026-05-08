@@ -90,12 +90,12 @@ export function CaseStudiesSection() {
   const [expandedId, setExpandedId] = useState<string | null>(caseStudies[0]?.id || null)
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-[#f5ede6] animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-foreground animate-fade-in-up">
           Case Studies
         </h1>
-        <p className="text-center text-[rgba(245,237,230,0.6)] mb-16 max-w-2xl mx-auto animate-fade-in-up">
+        <p className="text-center text-foreground-muted mb-16 max-w-2xl mx-auto animate-fade-in-up">
           Deep dives into my most impactful projects, exploring the problems, solutions, and lessons learned
         </p>
 
@@ -105,22 +105,22 @@ export function CaseStudiesSection() {
               key={study.id}
               className={cn(
                 "glass-card overflow-hidden transition-all duration-500 animate-fade-in-up",
-                expandedId === study.id && "ring-1 ring-[rgba(255,106,0,0.3)]"
+                expandedId === study.id && "ring-1 ring-primary/30"
               )}
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Header - Always visible */}
               <button
                 onClick={() => setExpandedId(expandedId === study.id ? null : study.id)}
-                className="w-full p-6 flex items-center justify-between text-left hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                className="w-full p-6 flex items-center justify-between text-left hover:bg-white/2 transition-colors"
               >
                 <div>
-                  <h2 className="text-xl font-semibold text-[#f5ede6] mb-1">{study.title}</h2>
-                  <p className="text-[#ff6a00] text-sm">{study.subtitle}</p>
+                  <h2 className="text-xl font-semibold text-foreground mb-1">{study.title}</h2>
+                  <p className="text-primary text-sm">{study.subtitle}</p>
                 </div>
                 <ChevronDown
                   className={cn(
-                    "h-5 w-5 text-[#ff6a00] transition-transform duration-300",
+                    "h-5 w-5 text-primary transition-transform duration-300",
                     expandedId === study.id && "rotate-180"
                   )}
                 />
@@ -134,20 +134,20 @@ export function CaseStudiesSection() {
                 )}
               >
                 <div className="overflow-hidden">
-                  <div className="px-6 pb-8 pt-2 border-t border-[rgba(255,120,20,0.1)]">
+                  <div className="px-6 pb-8 pt-2 border-t border-primary/10">
                     {/* Meta info */}
-                    <div className="flex flex-wrap gap-4 mb-8 text-sm text-[rgba(245,237,230,0.5)]">
-                      <span>Timeline: <strong className="text-[#f5ede6]">{study.timeline}</strong></span>
-                      <span>Role: <strong className="text-[#f5ede6]">{study.role}</strong></span>
+                    <div className="flex flex-wrap gap-4 mb-8 text-sm text-foreground-muted">
+                      <span>Timeline: <strong className="text-foreground">{study.timeline}</strong></span>
+                      <span>Role: <strong className="text-foreground">{study.role}</strong></span>
                     </div>
 
                     {/* Problem */}
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-3">
-                        <Target className="h-5 w-5 text-[#ff6a00]" />
-                        <h3 className="font-semibold text-[#ff6a00] uppercase tracking-wider text-sm">The Problem</h3>
+                        <Target className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">The Problem</h3>
                       </div>
-                      <p className="text-[rgba(245,237,230,0.8)] leading-relaxed pl-7">
+                      <p className="text-foreground/80 leading-relaxed pl-7">
                         {study.problem}
                       </p>
                     </div>
@@ -155,10 +155,10 @@ export function CaseStudiesSection() {
                     {/* Solution */}
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-3">
-                        <Lightbulb className="h-5 w-5 text-[#ff6a00]" />
-                        <h3 className="font-semibold text-[#ff6a00] uppercase tracking-wider text-sm">The Solution</h3>
+                        <Lightbulb className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">The Solution</h3>
                       </div>
-                      <p className="text-[rgba(245,237,230,0.8)] leading-relaxed pl-7">
+                      <p className="text-foreground/80 leading-relaxed pl-7">
                         {study.solution}
                       </p>
                     </div>
@@ -166,13 +166,13 @@ export function CaseStudiesSection() {
                     {/* Results */}
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-3">
-                        <Rocket className="h-5 w-5 text-[#ff6a00]" />
-                        <h3 className="font-semibold text-[#ff6a00] uppercase tracking-wider text-sm">Results & Impact</h3>
+                        <Rocket className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">Results & Impact</h3>
                       </div>
                       <ul className="space-y-2 pl-7">
                         {study.results.map((result, i) => (
-                          <li key={i} className="flex items-start gap-2 text-[rgba(245,237,230,0.8)]">
-                            <ArrowRight className="h-4 w-4 text-[#ff6a00] mt-1 shrink-0" />
+                          <li key={i} className="flex items-start gap-2 text-foreground/80">
+                            <ArrowRight className="h-4 w-4 text-primary mt-1 shrink-0" />
                             <span>{result}</span>
                           </li>
                         ))}
@@ -181,12 +181,12 @@ export function CaseStudiesSection() {
 
                     {/* Technologies */}
                     <div className="mb-8">
-                      <h3 className="font-semibold text-[rgba(245,237,230,0.6)] text-sm mb-3">Technologies Used</h3>
+                      <h3 className="font-semibold text-foreground-muted text-sm mb-3">Technologies Used</h3>
                       <div className="flex flex-wrap gap-2">
                         {study.technologies.map((tech, i) => (
                           <span
                             key={i}
-                            className="px-3 py-1.5 rounded-full text-sm bg-[rgba(255,106,0,0.1)] text-[#ff6a00] border border-[rgba(255,106,0,0.2)]"
+                            className="px-3 py-1.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
                           >
                             {tech}
                           </span>
@@ -196,11 +196,11 @@ export function CaseStudiesSection() {
 
                     {/* Key Learnings */}
                     <div className="mb-6">
-                      <h3 className="font-semibold text-[rgba(245,237,230,0.6)] text-sm mb-3">Key Learnings</h3>
+                      <h3 className="font-semibold text-foreground-muted text-sm mb-3">Key Learnings</h3>
                       <ul className="space-y-2">
                         {study.keyLearnings.map((learning, i) => (
-                          <li key={i} className="flex items-start gap-2 text-[rgba(245,237,230,0.7)] text-sm">
-                            <span className="text-[#ff6a00]">{i + 1}.</span>
+                          <li key={i} className="flex items-start gap-2 text-foreground-muted text-sm">
+                            <span className="text-primary">{i + 1}.</span>
                             <span>{learning}</span>
                           </li>
                         ))}
@@ -211,7 +211,7 @@ export function CaseStudiesSection() {
                     {study.sourceUrl && (
                       <Button
                         variant="outline"
-                        className="gap-2 bg-transparent border-[rgba(255,120,20,0.3)] text-[#f5ede6] hover:border-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)] hover:text-[#ff6a00] transition-all rounded-lg"
+                        className="gap-2 bg-transparent border-primary/30 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-lg"
                         asChild
                         data-magnetic
                       >

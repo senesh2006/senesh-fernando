@@ -41,42 +41,46 @@ export function ContactSection() {
         body: JSON.stringify(formData),
       })
 
-      if (!response.ok) throw new Error("Failed to send")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message")
+      }
 
       setSubmitted(true)
       setFormData({ name: "", email: "", subject: "", message: "" })
       setTimeout(() => setSubmitted(false), 5000)
-    } catch {
-      setError("Failed to send message. Please try again.")
+    } catch (err: any) {
+      setError(err.message || "Failed to send message. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0a0705]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-8 text-[#f5ede6] animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-8 text-foreground animate-fade-in-up">
           Get In Touch
         </h1>
 
-        <p className="text-center text-[rgba(245,237,230,0.6)] mb-12 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+        <p className="text-center text-foreground-muted mb-12 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
           Open to internships, freelance work, and collaborations.
         </p>
 
         <div className="grid lg:grid-cols-2 gap-10">
           {/* Contact Form */}
           <div className="glass-card p-8 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <h2 className="text-xl font-semibold text-[#f5ede6] mb-6 flex items-center gap-2">
-              <Send className="h-5 w-5 text-[#ff6a00]" />
+            <h2 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+              <Send className="h-5 w-5 text-primary" />
               Send a Message
             </h2>
 
             {submitted ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
-                <h3 className="text-xl font-semibold text-[#f5ede6] mb-2">Message Sent!</h3>
-                <p className="text-[rgba(245,237,230,0.6)]">
+                <h3 className="text-xl font-semibold text-foreground mb-2">Message Sent!</h3>
+                <p className="text-foreground-muted">
                   Thank you for reaching out. I&apos;ll get back to you soon.
                 </p>
               </div>
@@ -84,58 +88,58 @@ export function ContactSection() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-sm text-[rgba(245,237,230,0.6)]">Your Name *</label>
+                    <label className="text-sm text-foreground-muted">Your Name *</label>
                     <Input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                       required
-                      className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl"
+                      className="bg-white/5 border-primary/20 text-foreground placeholder:text-foreground-muted/30 focus:border-primary rounded-xl"
                       placeholder="John Doe"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-[rgba(245,237,230,0.6)]">Your Email *</label>
+                    <label className="text-sm text-foreground-muted">Your Email *</label>
                     <Input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                       required
-                      className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl"
+                      className="bg-white/5 border-primary/20 text-foreground placeholder:text-foreground-muted/30 focus:border-primary rounded-xl"
                       placeholder="john@example.com"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-[rgba(245,237,230,0.6)]">Subject</label>
+                  <label className="text-sm text-foreground-muted">Subject</label>
                   <Input
                     type="text"
                     value={formData.subject}
                     onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                    className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl"
+                    className="bg-white/5 border-primary/20 text-foreground placeholder:text-foreground-muted/30 focus:border-primary rounded-xl"
                     placeholder="Project Inquiry"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-[rgba(245,237,230,0.6)]">Message *</label>
+                  <label className="text-sm text-foreground-muted">Message *</label>
                   <Textarea
                     value={formData.message}
                     onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                     required
                     rows={5}
-                    className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl resize-none"
+                    className="bg-white/5 border-primary/20 text-foreground placeholder:text-foreground-muted/30 focus:border-primary rounded-xl resize-none"
                     placeholder="Tell me about your project or inquiry..."
                   />
                 </div>
 
                 {error && (
-                  <p className="text-red-400 text-sm">{error}</p>
+                  <p className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20">{error}</p>
                 )}
 
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full gap-2 bg-[#ff6a00] text-white hover:bg-[#e55f00] transition-all rounded-xl px-6 py-5 disabled:opacity-50"
+                  className="w-full gap-2 bg-primary text-white hover:bg-primary/90 transition-all rounded-xl px-6 py-5 disabled:opacity-50 shadow-[0_0_20px_rgba(255,106,0,0.3)]"
                   data-magnetic
                 >
                   {isSubmitting ? (
@@ -152,23 +156,23 @@ export function ContactSection() {
           {/* Contact Info */}
           <div className="space-y-6 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
             <div className="glass-card p-8">
-              <h2 className="text-xl font-semibold text-[#f5ede6] mb-6">Contact Info</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-6">Contact Info</h2>
               <div className="space-y-5">
                 {contactInfo.map((item, index) => (
                   <div key={index} className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-[rgba(255,106,0,0.1)]">
-                      <item.icon className="h-5 w-5 text-[#ff6a00]" />
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <item.icon className="h-5 w-5 text-primary" />
                     </div>
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="text-[#f5ede6] hover:text-[#ff6a00] transition-colors"
+                        className="text-foreground hover:text-primary transition-colors"
                         data-magnetic
                       >
                         {item.label}
                       </a>
                     ) : (
-                      <span className="text-[#f5ede6]">{item.label}</span>
+                      <span className="text-foreground">{item.label}</span>
                     )}
                   </div>
                 ))}
@@ -176,14 +180,14 @@ export function ContactSection() {
             </div>
 
             <div className="glass-card p-8">
-              <h2 className="text-xl font-semibold text-[#f5ede6] mb-6">Connect</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-6">Connect</h2>
               <div className="flex gap-3">
                 {socialLinks.map((link, index) => (
                   <Button
                     key={index}
                     variant="outline"
                     size="lg"
-                    className="gap-2 bg-transparent border-[rgba(255,120,20,0.2)] text-[#f5ede6] hover:border-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)] hover:text-[#ff6a00] transition-all rounded-xl"
+                    className="gap-2 bg-transparent border-primary/20 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-xl"
                     asChild
                     data-magnetic
                   >
@@ -203,14 +207,14 @@ export function ContactSection() {
                   <div className="w-3 h-3 rounded-full bg-green-500" />
                   <div className="absolute inset-0 w-3 h-3 rounded-full bg-green-500 animate-ping" />
                 </div>
-                <span className="text-[#f5ede6]">Currently open to opportunities</span>
+                <span className="text-foreground">Currently open to opportunities</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <p className="mt-20 text-center text-sm text-[rgba(245,237,230,0.4)] animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+        <p className="mt-20 text-center text-sm text-foreground-muted/40 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
           Designed & Built by Peter Senesh Fernando
         </p>
       </div>

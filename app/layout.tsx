@@ -29,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-[#0a0705]">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en" className="bg-background">
+      <body className={`${inter.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
         <MagneticBlobCursor />
         {/* Subtle grain/noise texture overlay */}
         <div className="noise-overlay" />
