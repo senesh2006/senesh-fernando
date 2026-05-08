@@ -31,62 +31,6 @@ export function HeroSection() {
       {/* 3D Background */}
       <Hero3D />
       
-      {/* Floating orbs with continuous movement */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Large moving orb 1 */}
-        <div 
-          className="absolute w-[600px] h-[600px] rounded-full animate-float-slow"
-          style={{
-            top: "10%",
-            left: "60%",
-            background: "radial-gradient(circle, rgba(255,106,0,0.2) 0%, rgba(255,106,0,0.05) 40%, transparent 70%)",
-          }}
-        />
-        {/* Large moving orb 2 */}
-        <div 
-          className="absolute w-[500px] h-[500px] rounded-full animate-float-medium"
-          style={{
-            top: "50%",
-            left: "10%",
-            background: "radial-gradient(circle, rgba(255,140,50,0.15) 0%, rgba(255,140,50,0.03) 40%, transparent 70%)",
-          }}
-        />
-        {/* Medium moving orb */}
-        <div 
-          className="absolute w-[400px] h-[400px] rounded-full animate-float-fast"
-          style={{
-            top: "70%",
-            left: "70%",
-            background: "radial-gradient(circle, rgba(255,80,0,0.12) 0%, transparent 60%)",
-          }}
-        />
-        {/* Small accent orbs */}
-        <div 
-          className="absolute w-[200px] h-[200px] rounded-full animate-float-reverse"
-          style={{
-            top: "20%",
-            left: "20%",
-            background: "radial-gradient(circle, rgba(255,106,0,0.25) 0%, transparent 70%)",
-          }}
-        />
-        <div 
-          className="absolute w-[150px] h-[150px] rounded-full animate-float-diagonal"
-          style={{
-            top: "80%",
-            left: "40%",
-            background: "radial-gradient(circle, rgba(255,150,80,0.2) 0%, transparent 70%)",
-          }}
-        />
-      </div>
-
-      {/* Deep orange ember glow - center radial */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full animate-pulse-ember pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, rgba(255,106,0,0.25) 0%, rgba(255,106,0,0.1) 30%, rgba(255,106,0,0.02) 60%, transparent 80%)",
-        }}
-      />
-
       <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
         <div className="animate-fade-in-up">
           <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-semibold tracking-tight text-[#f5ede6] mb-4 leading-tight text-balance">

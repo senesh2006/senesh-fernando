@@ -2,70 +2,8 @@
 
 import { useRef, useMemo } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { Float, MeshDistortMaterial, Sphere, Torus, Environment } from "@react-three/drei"
+import { Environment } from "@react-three/drei"
 import * as THREE from "three"
-
-function FloatingOrb({ position, scale, speed, distort }: { 
-  position: [number, number, number]
-  scale: number
-  speed: number
-  distort: number
-}) {
-  const meshRef = useRef<THREE.Mesh>(null)
-  
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * speed * 0.3
-      meshRef.current.rotation.y = state.clock.elapsedTime * speed * 0.5
-    }
-  })
-  
-  return (
-    <Float speed={speed} rotationIntensity={0.5} floatIntensity={1}>
-      <Sphere ref={meshRef} args={[1, 64, 64]} scale={scale} position={position}>
-        <MeshDistortMaterial
-          color="#ff6a00"
-          roughness={0.2}
-          metalness={0.8}
-          distort={distort}
-          speed={2}
-          transparent
-          opacity={0.8}
-        />
-      </Sphere>
-    </Float>
-  )
-}
-
-function FloatingRing({ position, scale, speed }: {
-  position: [number, number, number]
-  scale: number
-  speed: number
-}) {
-  const meshRef = useRef<THREE.Mesh>(null)
-  
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * speed) * 0.5
-      meshRef.current.rotation.y = state.clock.elapsedTime * speed * 0.3
-      meshRef.current.rotation.z = Math.cos(state.clock.elapsedTime * speed * 0.5) * 0.3
-    }
-  })
-  
-  return (
-    <Float speed={speed * 0.5} rotationIntensity={0.3} floatIntensity={0.8}>
-      <Torus ref={meshRef} args={[1, 0.1, 16, 100]} scale={scale} position={position}>
-        <meshStandardMaterial
-          color="#ff8533"
-          roughness={0.3}
-          metalness={0.9}
-          transparent
-          opacity={0.7}
-        />
-      </Torus>
-    </Float>
-  )
-}
 
 function Particles({ count = 100 }: { count?: number }) {
   const mesh = useRef<THREE.Points>(null)
@@ -128,13 +66,6 @@ function Scene() {
       <ambientLight intensity={0.3} />
       <pointLight position={[10, 10, 10]} intensity={1} color="#ff6a00" />
       <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff8533" />
-      
-      <FloatingOrb position={[3, 1, -2]} scale={1.2} speed={1} distort={0.4} />
-      <FloatingOrb position={[-3, -1, -3]} scale={0.8} speed={1.5} distort={0.3} />
-      <FloatingOrb position={[0, 2, -4]} scale={0.5} speed={2} distort={0.5} />
-      
-      <FloatingRing position={[-2, 0.5, -1]} scale={1.5} speed={0.8} />
-      <FloatingRing position={[2.5, -1, -2]} scale={1} speed={1.2} />
       
       <Particles count={150} />
       
