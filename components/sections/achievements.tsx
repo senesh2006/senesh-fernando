@@ -1,7 +1,6 @@
 "use client"
 
-import { Trophy, ExternalLink, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Trophy, Users } from "lucide-react"
 
 const achievements = [
   { title: "2nd Place", issuer: "Codemize 2023 & 2024", link: null },
@@ -46,20 +45,6 @@ export function AchievementsSection() {
                   <h2 className="font-semibold text-[#f5ede6]">{achievement.title}</h2>
                   <p className="text-sm text-[rgba(245,237,230,0.5)]">{achievement.issuer}</p>
                 </div>
-                {achievement.link && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="shrink-0 gap-2 text-[rgba(245,237,230,0.5)] hover:text-[#ff6a00] hover:bg-[rgba(255,106,0,0.1)]"
-                    asChild
-                    data-magnetic
-                  >
-                    <a href={achievement.link} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                      <span className="hidden sm:inline">View</span>
-                    </a>
-                  </Button>
-                )}
               </div>
             </div>
           ))}
