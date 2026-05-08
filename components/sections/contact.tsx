@@ -215,7 +215,7 @@ export function ContactSection() {
 
         {/* Footer */}
         <p className="mt-20 text-center text-sm text-foreground-muted/40 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-          Designed & Built by Peter Senesh Fernando • Updated Just Now
+          Designed & Built by Peter Senesh Fernando
         </p>
       </div>
     </section>
