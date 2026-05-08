@@ -4,6 +4,7 @@ import { useState } from "react"
 import { ArrowRight, Target, Lightbulb, Rocket, ChevronDown, ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Reveal } from "@/components/reveal"
 
 interface CaseStudy {
   id: string
@@ -92,139 +93,146 @@ export function CaseStudiesSection() {
   return (
     <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-foreground animate-fade-in-up">
-          Case Studies
-        </h1>
-        <p className="text-center text-foreground-muted mb-16 max-w-2xl mx-auto animate-fade-in-up">
-          Deep dives into my most impactful projects, exploring the problems, solutions, and lessons learned
-        </p>
+        <Reveal>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-foreground">
+            Case Studies
+          </h1>
+        </Reveal>
+        <Reveal delay={100}>
+          <p className="text-center text-foreground-muted mb-16 max-w-2xl mx-auto">
+            Deep dives into my most impactful projects, exploring the problems, solutions, and lessons learned
+          </p>
+        </Reveal>
 
         <div className="space-y-6">
           {caseStudies.map((study, index) => (
-            <div
+            <Reveal
               key={study.id}
-              className={cn(
-                "glass-card overflow-hidden transition-all duration-500 animate-fade-in-up",
-                expandedId === study.id && "ring-1 ring-primary/30"
-              )}
-              style={{ animationDelay: `${index * 100}ms` }}
+              delay={index * 100}
             >
-              {/* Header - Always visible */}
-              <button
-                onClick={() => setExpandedId(expandedId === study.id ? null : study.id)}
-                className="w-full p-6 flex items-center justify-between text-left hover:bg-white/2 transition-colors"
-              >
-                <div>
-                  <h2 className="text-xl font-semibold text-foreground mb-1">{study.title}</h2>
-                  <p className="text-primary text-sm">{study.subtitle}</p>
-                </div>
-                <ChevronDown
-                  className={cn(
-                    "h-5 w-5 text-primary transition-transform duration-300",
-                    expandedId === study.id && "rotate-180"
-                  )}
-                />
-              </button>
-
-              {/* Expanded content */}
               <div
                 className={cn(
-                  "grid transition-all duration-500",
-                  expandedId === study.id ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  "glass-card overflow-hidden transition-all duration-500",
+                  expandedId === study.id && "ring-1 ring-primary/30"
                 )}
               >
-                <div className="overflow-hidden">
-                  <div className="px-6 pb-8 pt-2 border-t border-primary/10">
-                    {/* Meta info */}
-                    <div className="flex flex-wrap gap-4 mb-8 text-sm text-foreground-muted">
-                      <span>Timeline: <strong className="text-foreground">{study.timeline}</strong></span>
-                      <span>Role: <strong className="text-foreground">{study.role}</strong></span>
-                    </div>
-
-                    {/* Problem */}
-                    <div className="mb-8">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Target className="h-5 w-5 text-primary" />
-                        <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">The Problem</h3>
-                      </div>
-                      <p className="text-foreground/80 leading-relaxed pl-7">
-                        {study.problem}
-                      </p>
-                    </div>
-
-                    {/* Solution */}
-                    <div className="mb-8">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Lightbulb className="h-5 w-5 text-primary" />
-                        <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">The Solution</h3>
-                      </div>
-                      <p className="text-foreground/80 leading-relaxed pl-7">
-                        {study.solution}
-                      </p>
-                    </div>
-
-                    {/* Results */}
-                    <div className="mb-8">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Rocket className="h-5 w-5 text-primary" />
-                        <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">Results & Impact</h3>
-                      </div>
-                      <ul className="space-y-2 pl-7">
-                        {study.results.map((result, i) => (
-                          <li key={i} className="flex items-start gap-2 text-foreground/80">
-                            <ArrowRight className="h-4 w-4 text-primary mt-1 shrink-0" />
-                            <span>{result}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Technologies */}
-                    <div className="mb-8">
-                      <h3 className="font-semibold text-foreground-muted text-sm mb-3">Technologies Used</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {study.technologies.map((tech, i) => (
-                          <span
-                            key={i}
-                            className="px-3 py-1.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Key Learnings */}
-                    <div className="mb-6">
-                      <h3 className="font-semibold text-foreground-muted text-sm mb-3">Key Learnings</h3>
-                      <ul className="space-y-2">
-                        {study.keyLearnings.map((learning, i) => (
-                          <li key={i} className="flex items-start gap-2 text-foreground-muted text-sm">
-                            <span className="text-primary">{i + 1}.</span>
-                            <span>{learning}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Source link */}
-                    {study.sourceUrl && (
-                      <Button
-                        variant="outline"
-                        className="gap-2 bg-transparent border-primary/30 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-lg"
-                        asChild
-                        data-magnetic
-                      >
-                        <a href={study.sourceUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4" />
-                          View Source Code
-                        </a>
-                      </Button>
+                {/* Header - Always visible */}
+                <button
+                  onClick={() => setExpandedId(expandedId === study.id ? null : study.id)}
+                  className="w-full p-6 flex items-center justify-between text-left hover:bg-white/2 transition-colors"
+                >
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground mb-1">{study.title}</h2>
+                    <p className="text-primary text-sm">{study.subtitle}</p>
+                  </div>
+                  <ChevronDown
+                    className={cn(
+                      "h-5 w-5 text-primary transition-transform duration-300",
+                      expandedId === study.id && "rotate-180"
                     )}
+                  />
+                </button>
+
+                {/* Expanded content */}
+                <div
+                  className={cn(
+                    "grid transition-all duration-500",
+                    expandedId === study.id ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <div className="px-6 pb-8 pt-2 border-t border-primary/10">
+                      {/* Meta info */}
+                      <div className="flex flex-wrap gap-4 mb-8 text-sm text-foreground-muted">
+                        <span>Timeline: <strong className="text-foreground">{study.timeline}</strong></span>
+                        <span>Role: <strong className="text-foreground">{study.role}</strong></span>
+                      </div>
+
+                      {/* Problem */}
+                      <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Target className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">The Problem</h3>
+                        </div>
+                        <p className="text-foreground/80 leading-relaxed pl-7">
+                          {study.problem}
+                        </p>
+                      </div>
+
+                      {/* Solution */}
+                      <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Lightbulb className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">The Solution</h3>
+                        </div>
+                        <p className="text-foreground/80 leading-relaxed pl-7">
+                          {study.solution}
+                        </p>
+                      </div>
+
+                      {/* Results */}
+                      <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Rocket className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold text-primary uppercase tracking-wider text-sm">Results & Impact</h3>
+                        </div>
+                        <ul className="space-y-2 pl-7">
+                          {study.results.map((result, i) => (
+                            <li key={i} className="flex items-start gap-2 text-foreground/80">
+                              <ArrowRight className="h-4 w-4 text-primary mt-1 shrink-0" />
+                              <span>{result}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Technologies */}
+                      <div className="mb-8">
+                        <h3 className="font-semibold text-foreground-muted text-sm mb-3">Technologies Used</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {study.technologies.map((tech, i) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Key Learnings */}
+                      <div className="mb-6">
+                        <h3 className="font-semibold text-foreground-muted text-sm mb-3">Key Learnings</h3>
+                        <ul className="space-y-2">
+                          {study.keyLearnings.map((learning, i) => (
+                            <li key={i} className="flex items-start gap-2 text-foreground-muted text-sm">
+                              <span className="text-primary">{i + 1}.</span>
+                              <span>{learning}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Source link */}
+                      {study.sourceUrl && (
+                        <Button
+                          variant="outline"
+                          className="gap-2 bg-transparent border-primary/30 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-lg"
+                          asChild
+                          data-magnetic
+                        >
+                          <a href={study.sourceUrl} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                            View Source Code
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

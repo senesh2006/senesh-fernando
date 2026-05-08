@@ -4,6 +4,7 @@ import { useState } from "react"
 import { ExternalLink, X, Code, Lightbulb, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Reveal } from "@/components/reveal"
 
 interface Project {
   name: string
@@ -83,40 +84,45 @@ export function ProjectsSection() {
   return (
     <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground animate-fade-in-up">
-          Projects
-        </h1>
+        <Reveal>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground">
+            Projects
+          </h1>
+        </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, index) => {
             const langColor = languageColors[project.language] || languageColors.Python
             return (
-              <div
+              <Reveal
                 key={index}
-                onClick={() => setSelectedProject(project)}
-                className="glass-card glass-card-hover animate-fade-in-up cursor-pointer"
-                style={{ animationDelay: `${index * 100}ms` }}
+                delay={index * 100}
               >
-                <div className="p-6">
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <h2 className="font-semibold text-foreground text-lg leading-tight">{project.name}</h2>
-                    <span className={cn(
-                      "px-2.5 py-1 rounded-md text-xs font-medium text-white shrink-0",
-                      langColor
-                    )}>
-                      {project.language}
+                <div
+                  onClick={() => setSelectedProject(project)}
+                  className="glass-card glass-card-hover cursor-pointer h-full"
+                >
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <h2 className="font-semibold text-foreground text-lg leading-tight">{project.name}</h2>
+                      <span className={cn(
+                        "px-2.5 py-1 rounded-md text-xs font-medium text-white shrink-0",
+                        langColor
+                      )}>
+                        {project.language}
+                      </span>
+                    </div>
+
+                    <p className="text-foreground-muted text-sm leading-relaxed mb-5">
+                      {project.description}
+                    </p>
+
+                    <span className="text-primary text-sm font-medium">
+                      Click to learn more
                     </span>
                   </div>
-
-                  <p className="text-foreground-muted text-sm leading-relaxed mb-5">
-                    {project.description}
-                  </p>
-
-                  <span className="text-primary text-sm font-medium">
-                    Click to learn more
-                  </span>
                 </div>
-              </div>
+              </Reveal>
             )
           })}
         </div>
