@@ -1,14 +1,19 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { PageTransition } from "@/components/page-transition"
 import './globals.css'
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: '--font-inter'
+const geistSans = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+})
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
 })
 
 export const metadata: Metadata = {
@@ -30,10 +35,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className={`${inter.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
         <MagneticBlobCursor />
         {/* Subtle grain/noise texture overlay */}
         <div className="noise-overlay" />
+        <div className="grid-background" />
         <Navbar />
         <main className="relative z-10 pt-16">
           <PageTransition>

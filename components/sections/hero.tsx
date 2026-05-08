@@ -58,10 +58,10 @@ export function HeroSection() {
       
       <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
         <div className="animate-spring-up">
-          <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-semibold tracking-tight text-foreground mb-4 leading-tight text-balance min-h-[1.2em]">
-            {typedName}<span className="animate-pulse text-primary">|</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-[72px] font-bold tracking-tight mb-4 leading-tight text-balance min-h-[1.2em] bg-clip-text text-transparent bg-gradient-to-b from-[#f5ede6] to-[rgba(245,237,230,0.7)]">
+            {typedName}<span className="animate-pulse text-primary ml-1">|</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-primary font-medium mb-8 animate-fade-in" style={{ animationDelay: "1500ms", opacity: 0, animationFillMode: "forwards" }}>
+          <p className="text-xl sm:text-2xl text-primary font-semibold mb-8 animate-fade-in tracking-tight" style={{ animationDelay: "1500ms", opacity: 0, animationFillMode: "forwards" }}>
             Information Technology Student & Developer
           </p>
           <p className="max-w-2xl mx-auto text-foreground-muted text-base sm:text-lg leading-relaxed mb-10 text-pretty">
