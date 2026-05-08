@@ -28,13 +28,18 @@ export function Navbar() {
       <nav className="mx-auto max-w-[1100px] px-4 sm:px-6">
         <div className="flex items-center justify-between">
           {/* PS Monogram Logo */}
-          <Link
-            href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 text-primary font-semibold text-sm hover:bg-primary/20 transition-all glow-orange"
-            data-magnetic
-          >
-            PS
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 text-primary font-semibold text-sm hover:bg-primary/20 transition-all glow-orange"
+              data-magnetic
+            >
+              PS
+            </Link>
+            <span className="hidden sm:block text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 font-mono">
+              v1.0.4-pixelify
+            </span>
+          </div>
 
           {/* Desktop Navigation */}
           <ul className="hidden md:flex items-center gap-1">
