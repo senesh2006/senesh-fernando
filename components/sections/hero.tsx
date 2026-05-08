@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { Mail, Linkedin, Globe, Github, GraduationCap, MapPin, Zap, ArrowRight } from "lucide-react"
@@ -11,6 +12,28 @@ const Hero3D = dynamic(() => import("@/components/hero-3d").then(mod => mod.Hero
   ssr: false,
   loading: () => null,
 })
+
+function useTypewriter(text: string, speed: number = 100, delay: number = 500) {
+  const [displayText, setDisplayText] = useState("")
+  const [isStarted, setIsStarted] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsStarted(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  useEffect(() => {
+    if (!isStarted) return
+    if (displayText.length < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText(text.slice(0, displayText.length + 1))
+      }, speed)
+      return () => clearTimeout(timeout)
+    }
+  }, [displayText, text, speed, isStarted])
+
+  return displayText
+}
 
 const socialLinks = [
   { icon: Mail, label: "Email", href: "mailto:seneshfernando55@gmail.com" },
@@ -26,17 +49,19 @@ const stats = [
 ]
 
 export function HeroSection() {
+  const typedName = useTypewriter("Peter Senesh Fernando", 80)
+
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
       {/* 3D Background */}
       <Hero3D />
       
       <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
-        <div className="animate-fade-in-up">
-          <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-semibold tracking-tight text-foreground mb-4 leading-tight text-balance">
-            Peter Senesh Fernando
+        <div className="animate-spring-up">
+          <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-semibold tracking-tight text-foreground mb-4 leading-tight text-balance min-h-[1.2em]">
+            {typedName}<span className="animate-pulse text-primary">|</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-primary font-medium mb-8">
+          <p className="text-xl sm:text-2xl text-primary font-medium mb-8 animate-fade-in" style={{ animationDelay: "1500ms", opacity: 0, animationFillMode: "forwards" }}>
             Information Technology Student & Developer
           </p>
           <p className="max-w-2xl mx-auto text-foreground-muted text-base sm:text-lg leading-relaxed mb-10 text-pretty">
