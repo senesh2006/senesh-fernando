@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono, Pixelify_Sans } from 'next/font/google'
+import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
@@ -21,6 +22,22 @@ const pixelifySans = Pixelify_Sans({
   variable: '--font-pixelify',
 })
 
+const offBit = localFont({
+  src: [
+    {
+      path: '../public/fonts/OffBit-Regular.woff',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/OffBit-Bold.woff',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-offbit',
+})
+
 export const metadata: Metadata = {
   title: 'Peter Senesh Fernando | IT Student & Developer',
   description: 'Portfolio of Peter Senesh Fernando - Information Technology Student at Curtin University Colombo. Skilled in Python, data visualization, and analytical problem-solving.',
@@ -40,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${pixelifySans.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${pixelifySans.variable} ${offBit.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
         <MagneticBlobCursor />
         {/* Subtle grain/noise texture overlay */}
         <div className="noise-overlay" />
