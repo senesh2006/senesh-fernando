@@ -39,13 +39,13 @@ const offBit = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'Peter Senesh Fernando | IT Student & Developer',
-  description: 'Portfolio of Peter Senesh Fernando - Information Technology Student at Curtin University Colombo. Skilled in Python, data visualization, and analytical problem-solving.',
-  keywords: ['Peter Senesh Fernando', 'IT Student', 'Developer', 'Python', 'Curtin University Colombo', 'Portfolio'],
-  authors: [{ name: 'Peter Senesh Fernando' }],
+  title: 'PETER SENESH FERNANDO | IT Student & Developer',
+  description: 'Portfolio of PETER SENESH FERNANDO - Information Technology Student at Curtin University Colombo. Skilled in Python, data visualization, and analytical problem-solving.',
+  keywords: ['PETER SENESH FERNANDO', 'IT Student', 'Developer', 'Python', 'Curtin University Colombo', 'Portfolio'],
+  authors: [{ name: 'PETER SENESH FERNANDO' }],
   openGraph: {
-    title: 'Peter Senesh Fernando | IT Student & Developer',
-    description: 'Portfolio of Peter Senesh Fernando - Information Technology Student at Curtin University Colombo.',
+    title: 'PETER SENESH FERNANDO | IT Student & Developer',
+    description: 'Portfolio of PETER SENESH FERNANDO - Information Technology Student at Curtin University Colombo.',
     type: 'website',
   },
 }

@@ -49,7 +49,7 @@ const stats = [
 ]
 
 export function HeroSection() {
-  const typedName = useTypewriter("Peter Senesh Fernando", 80)
+  const typedName = useTypewriter("PETER SENESH FERNANDO", 80)
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">

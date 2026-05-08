@@ -229,7 +229,7 @@ export function ContactSection() {
         {/* Footer */}
         <Reveal delay={600}>
           <p className="mt-20 text-center text-sm text-foreground-muted/40">
-            Designed & Built by Peter Senesh Fernando
+            Designed & Built by PETER SENESH FERNANDO
           </p>
         </Reveal>
       </div>

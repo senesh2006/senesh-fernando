@@ -1,8 +1,8 @@
 import { AchievementsSection } from "@/components/sections/achievements"
 
 export const metadata = {
-  title: 'Achievements | Peter Senesh Fernando',
-  description: 'Awards, certifications, and achievements of Peter Senesh Fernando.',
+  title: 'Achievements | PETER SENESH FERNANDO',
+  description: 'Awards, certifications, and achievements of PETER SENESH FERNANDO.',
 }
 
 export default function AchievementsPage() {

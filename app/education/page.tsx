@@ -1,8 +1,8 @@
 import { EducationSection } from "@/components/sections/education"
 
 export const metadata = {
-  title: 'Education | Peter Senesh Fernando',
-  description: 'Academic background and qualifications of Peter Senesh Fernando.',
+  title: 'Education | PETER SENESH FERNANDO',
+  description: 'Academic background and qualifications of PETER SENESH FERNANDO.',
 }
 
 export default function EducationPage() {
