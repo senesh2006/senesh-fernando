@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Pixelify_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
@@ -14,6 +14,11 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
+})
+
+const pixelifySans = Pixelify_Sans({
+  subsets: ['latin'],
+  variable: '--font-pixelify',
 })
 
 export const metadata: Metadata = {
@@ -35,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${pixelifySans.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
         <MagneticBlobCursor />
         {/* Subtle grain/noise texture overlay */}
         <div className="noise-overlay" />
