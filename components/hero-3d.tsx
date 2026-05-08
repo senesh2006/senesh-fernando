@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { Environment } from "@react-three/drei"
+import { Environment, Float } from "@react-three/drei"
 import * as THREE from "three"
 
 function Particles({ count = 100 }: { count?: number }) {
@@ -30,6 +30,10 @@ function Particles({ count = 100 }: { count?: number }) {
     if (mesh.current) {
       mesh.current.rotation.y = state.clock.elapsedTime * 0.02
       mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.05) * 0.1
+      
+      // Minimal interaction with mouse
+      mesh.current.position.x = THREE.MathUtils.lerp(mesh.current.position.x, state.mouse.x * 0.5, 0.05)
+      mesh.current.position.y = THREE.MathUtils.lerp(mesh.current.position.y, state.mouse.y * 0.5, 0.05)
     }
   })
   
@@ -53,10 +57,41 @@ function Particles({ count = 100 }: { count?: number }) {
         size={0.05}
         vertexColors
         transparent
-        opacity={0.6}
+        opacity={0.4}
         sizeAttenuation
       />
     </points>
+  )
+}
+
+function InteractiveWireframe() {
+  const meshRef = useRef<THREE.Mesh>(null)
+  
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.1
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.15
+      
+      // Follow mouse subtly
+      meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, state.mouse.x * 2, 0.03)
+      meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, state.mouse.y * 2, 0.03)
+    }
+  })
+  
+  return (
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+      <mesh ref={meshRef}>
+        <icosahedronGeometry args={[1, 1]} />
+        <meshStandardMaterial 
+          color="#ff6a00" 
+          wireframe 
+          transparent 
+          opacity={0.15} 
+          emissive="#ff6a00"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+    </Float>
   )
 }
 
@@ -67,7 +102,8 @@ function Scene() {
       <pointLight position={[10, 10, 10]} intensity={1} color="#ff6a00" />
       <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff8533" />
       
-      <Particles count={150} />
+      <InteractiveWireframe />
+      <Particles count={200} />
       
       <Environment preset="night" />
     </>
