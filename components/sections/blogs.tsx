@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Reveal } from "@/components/reveal"
-import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle } from "lucide-react"
+import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Share2, Link as LinkIcon, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface BlogEntry {
@@ -31,6 +31,7 @@ export function BlogsSection() {
   const [error, setError] = useState<string | null>(null)
   const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
   const [isMounted, setIsMounted] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
@@ -61,6 +62,18 @@ export function BlogsSection() {
     } catch (e) {
       return ""
     }
+  }
+
+  const handleShareLinkedIn = (blog: BlogEntry) => {
+    const url = window.location.href
+    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+    window.open(shareUrl, '_blank', 'width=600,height=600')
+  }
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000)
   }
 
   return (
@@ -207,40 +220,54 @@ export function BlogsSection() {
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-white/10">
-                <div className="flex items-center gap-4">
-                  {selectedBlog.github_url && (
-                    <a 
-                      href={selectedBlog.github_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
-                      data-magnetic
+                <div className="flex flex-wrap items-center gap-4">
+                  {/* Share Section */}
+                  <div className="flex items-center gap-2 pr-4 border-r border-white/10">
+                    <span className="text-[10px] text-foreground-muted uppercase tracking-widest font-bold">Share:</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleShareLinkedIn(selectedBlog)}
+                      className="h-8 w-8 p-0 text-foreground-muted hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-lg"
+                      title="Share on LinkedIn"
                     >
-                      <Github className="h-5 w-5" /> GitHub
-                    </a>
-                  )}
-                  {selectedBlog.linkedin_url && (
-                    <a 
-                      href={selectedBlog.linkedin_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
-                      data-magnetic
+                      <Linkedin className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyLink}
+                      className="h-8 w-8 p-0 text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                      title="Copy Link"
                     >
-                      <Linkedin className="h-5 w-5" /> LinkedIn
-                    </a>
-                  )}
-                  {selectedBlog.other_url && (
-                    <a 
-                      href={selectedBlog.other_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
-                      data-magnetic
-                    >
-                      <ExternalLink className="h-5 w-5" /> Live Link
-                    </a>
-                  )}
+                      {linkCopied ? <CheckCircle className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    {selectedBlog.github_url && (
+                      <a 
+                        href={selectedBlog.github_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
+                        data-magnetic
+                      >
+                        <Github className="h-5 w-5" /> GitHub
+                      </a>
+                    )}
+                    {selectedBlog.linkedin_url && (
+                      <a 
+                        href={selectedBlog.linkedin_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
+                        data-magnetic
+                      >
+                        <Linkedin className="h-5 w-5" /> Original Post
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
