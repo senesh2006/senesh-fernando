@@ -167,11 +167,26 @@ export function ContactSection() {
                 <h2 className="text-xl font-semibold text-foreground mb-6">Contact Info</h2>
                 <div className="space-y-5">
                   {contactInfo.map((item, index) => (
-                    <div key={index} className="flex items-center gap-4">
-                      <div className="p-3 rounded-xl bg-primary/10">
+                    <div key={index} className="flex items-center gap-4 group">
+                      <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                         <item.icon className="h-5 w-5 text-primary" />
                       </div>
-                      {item.href ? (
+                      {item.icon === Mail ? (
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-1">
+                          <a href={item.href!} className="text-foreground hover:text-primary transition-colors" data-magnetic>
+                            {item.label}
+                          </a>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCopyEmail}
+                            className="h-7 text-xs px-2 bg-white/5 border-primary/20 hover:bg-primary/20 hover:border-primary/50 text-foreground-muted"
+                          >
+                            {copied ? <CheckCircle className="h-3 w-3 mr-1 text-green-500" /> : null}
+                            {copied ? "Copied!" : "Copy"}
+                          </Button>
+                        </div>
+                      ) : item.href ? (
                         <a
                           href={item.href}
                           className="text-foreground hover:text-primary transition-colors"

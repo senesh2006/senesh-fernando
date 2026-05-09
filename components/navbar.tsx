@@ -36,6 +36,13 @@ export function Navbar() {
             >
               PS
             </Link>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/20 border border-border/30 backdrop-blur-md">
+              <div className="relative flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping opacity-75" />
+              </div>
+              <span className="text-[10px] text-foreground-muted tracking-wider uppercase font-medium">Available for work</span>
+            </div>
           </div>
 
           {/* Desktop Navigation */}

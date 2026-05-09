@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { PageTransition } from "@/components/page-transition"
+import { EasterEgg } from "@/components/easter-egg"
 import './globals.css'
 
 const offBit = localFont({
@@ -43,6 +44,7 @@ export default function RootLayout({
     <html lang="en" className="bg-background">
       <body className={`${offBit.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
         <MagneticBlobCursor />
+        <EasterEgg />
         {/* Subtle grain/noise texture overlay */}
         <div className="noise-overlay" />
         <div className="grid-background" />
