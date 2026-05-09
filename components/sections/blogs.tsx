@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Reveal } from "@/components/reveal"
-import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Share2, Link as LinkIcon, CheckCircle } from "lucide-react"
+import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 interface BlogEntry {
   id: string
@@ -25,13 +26,14 @@ const iconMap: Record<string, any> = {
   "Next.js": Code2,
 }
 
-export function BlogsSection() {
+export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
   const [blogs, setBlogs] = useState<BlogEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setIsMounted(true)
@@ -43,7 +45,16 @@ export function BlogsSection() {
           throw new Error(data.error || "Failed to fetch from API")
         }
         const data = await response.json()
-        setBlogs(Array.isArray(data) ? data : [])
+        const blogList = Array.isArray(data) ? data : []
+        setBlogs(blogList)
+
+        // If an ID is provided via props (from dynamic route), open that blog automatically
+        if (autoOpenId) {
+          const blogToOpen = blogList.find((b: BlogEntry) => b.id === autoOpenId)
+          if (blogToOpen) {
+            setSelectedBlog(blogToOpen)
+          }
+        }
       } catch (e: any) {
         console.error("Fetch error:", e)
         setError(e.message || "Failed to load blogs")
@@ -52,7 +63,7 @@ export function BlogsSection() {
       }
     }
     fetchBlogs()
-  }, [])
+  }, [autoOpenId])
 
   const formatDate = (dateString: string) => {
     if (!isMounted) return ""
@@ -64,14 +75,27 @@ export function BlogsSection() {
     }
   }
 
+  const handleBlogClick = (blog: BlogEntry) => {
+    setSelectedBlog(blog)
+    // Update URL without refreshing the page to support sharing the specific link
+    window.history.pushState(null, '', `/blogs/${blog.id}`)
+  }
+
+  const closePortal = () => {
+    setSelectedBlog(null)
+    // Restore the base /blogs URL
+    window.history.pushState(null, '', '/blogs')
+  }
+
   const handleShareLinkedIn = (blog: BlogEntry) => {
-    const url = window.location.href
+    const url = `${window.location.origin}/blogs/${blog.id}`
     const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
     window.open(shareUrl, '_blank', 'width=600,height=600')
   }
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
+  const handleCopyLink = (blog: BlogEntry) => {
+    const url = `${window.location.origin}/blogs/${blog.id}`
+    navigator.clipboard.writeText(url)
     setLinkCopied(true)
     setTimeout(() => setLinkCopied(false), 2000)
   }
@@ -116,7 +140,7 @@ export function BlogsSection() {
                 <Reveal key={entry.id} delay={index * 100}>
                   <div 
                     className="glass-card h-full flex flex-col glass-card-hover group overflow-hidden cursor-pointer"
-                    onClick={() => setSelectedBlog(entry)}
+                    onClick={() => handleBlogClick(entry)}
                   >
                     {/* Blog Image */}
                     {entry.image_url && (
@@ -175,7 +199,7 @@ export function BlogsSection() {
         {selectedBlog && (
           <div 
             className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6"
-            onClick={() => setSelectedBlog(null)}
+            onClick={closePortal}
           >
             <div className="absolute inset-0 bg-black/90 backdrop-blur-md animate-fade-in" />
             
@@ -184,7 +208,7 @@ export function BlogsSection() {
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                onClick={() => setSelectedBlog(null)}
+                onClick={closePortal}
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-primary/20 transition-colors z-10"
                 data-magnetic
               >
@@ -221,8 +245,8 @@ export function BlogsSection() {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-white/10">
                 <div className="flex flex-wrap items-center gap-4">
-                  {/* Share Section */}
-                  <div className="flex items-center gap-2 pr-4 border-r border-white/10">
+                   {/* Share Section */}
+                   <div className="flex items-center gap-2 pr-4 border-r border-white/10">
                     <span className="text-[10px] text-foreground-muted uppercase tracking-widest font-bold">Share:</span>
                     <Button
                       variant="ghost"
@@ -236,7 +260,7 @@ export function BlogsSection() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={handleCopyLink}
+                      onClick={() => handleCopyLink(selectedBlog)}
                       className="h-8 w-8 p-0 text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-lg"
                       title="Copy Link"
                     >
@@ -265,6 +289,17 @@ export function BlogsSection() {
                         data-magnetic
                       >
                         <Linkedin className="h-5 w-5" /> Original Post
+                      </a>
+                    )}
+                    {selectedBlog.other_url && (
+                      <a 
+                        href={selectedBlog.other_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
+                        data-magnetic
+                      >
+                        <ExternalLink className="h-5 w-5" /> Live Link
                       </a>
                     )}
                   </div>
