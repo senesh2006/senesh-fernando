@@ -28,6 +28,7 @@ export function BlogsSection() {
   const [blogs, setBlogs] = useState<BlogEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
 
   useEffect(() => {
     async function fetchBlogs() {
@@ -82,7 +83,10 @@ export function BlogsSection() {
               const Icon = iconMap[entry.category] || BookOpen
               return (
                 <Reveal key={entry.id} delay={index * 100}>
-                  <div className="glass-card h-full flex flex-col glass-card-hover group overflow-hidden">
+                  <div 
+                    className="glass-card h-full flex flex-col glass-card-hover group overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedBlog(entry)}
+                  >
                     {/* Blog Image */}
                     {entry.image_url && (
                       <div className="relative h-48 w-full overflow-hidden">
@@ -112,50 +116,126 @@ export function BlogsSection() {
                         </div>
                       </div>
 
-                      <p className="text-sm text-foreground-muted leading-relaxed mb-6 flex-1 whitespace-pre-wrap">
+                      <p className="text-sm text-foreground-muted leading-relaxed mb-6 line-clamp-3">
                         {entry.content}
                       </p>
 
-                      <div className="flex items-center justify-between mt-auto pt-6 border-t border-border/30">
-                        <div className="flex gap-3">
-                          {entry.github_url && (
-                            <a href={entry.github_url} target="_blank" rel="noopener noreferrer" className="text-foreground-muted hover:text-primary transition-colors">
-                              <Github className="h-4 w-4" />
-                            </a>
-                          )}
-                          {entry.linkedin_url && (
-                            <a href={entry.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-foreground-muted hover:text-primary transition-colors">
-                              <Linkedin className="h-4 w-4" />
-                            </a>
-                          )}
-                          {entry.other_url && (
-                            <a href={entry.other_url} target="_blank" rel="noopener noreferrer" className="text-foreground-muted hover:text-primary transition-colors">
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          )}
-                        </div>
+                      <div className="mt-auto flex items-center justify-between">
+                        <Button 
+                          variant="ghost" 
+                          className="p-0 h-auto text-primary hover:text-primary/80 hover:bg-transparent font-medium flex items-center gap-2 group/btn"
+                        >
+                          View Blog <ExternalLink className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
                         <span className="text-[10px] text-foreground-muted font-mono">
                           {formatDate(entry.created_at)}
                         </span>
                       </div>
-
-                      {entry.tags && entry.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {entry.tags.map((tag, tagIndex) => (
-                            <span 
-                              key={tagIndex}
-                              className="text-[9px] px-2 py-0.5 rounded-md bg-white/5 text-foreground-muted border border-border/50 font-mono"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
                 </Reveal>
               )
             })}
+          </div>
+        )}
+
+        {/* Blog Detail Modal */}
+        {selectedBlog && (
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6"
+            onClick={() => setSelectedBlog(null)}
+          >
+            <div className="absolute inset-0 bg-black/90 backdrop-blur-md animate-fade-in" />
+            
+            <div 
+              className="relative w-full max-w-3xl glass-card max-h-full overflow-y-auto animate-scale-in p-6 sm:p-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedBlog(null)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-primary/20 transition-colors z-10"
+                data-magnetic
+              >
+                <X className="h-5 w-5 text-foreground" />
+              </button>
+
+              {selectedBlog.image_url && (
+                <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden mb-8 border border-white/10">
+                  <img 
+                    src={selectedBlog.image_url} 
+                    alt={selectedBlog.title}
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                </div>
+              )}
+
+              <div className="mb-8">
+                <span className="text-xs text-primary uppercase tracking-[0.3em] font-bold block mb-3">
+                  {selectedBlog.category}
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-bold text-foreground leading-tight">
+                  {selectedBlog.title}
+                </h2>
+                <p className="text-xs text-foreground-muted font-mono mt-4">
+                  Published on {formatDate(selectedBlog.created_at)}
+                </p>
+              </div>
+
+              <div className="prose prose-invert max-w-none mb-10">
+                <p className="text-foreground/90 text-lg leading-relaxed whitespace-pre-wrap font-sans">
+                  {selectedBlog.content}
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-white/10">
+                <div className="flex items-center gap-4">
+                  {selectedBlog.github_url && (
+                    <a 
+                      href={selectedBlog.github_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
+                      data-magnetic
+                    >
+                      <Github className="h-5 w-5" /> GitHub
+                    </a>
+                  )}
+                  {selectedBlog.linkedin_url && (
+                    <a 
+                      href={selectedBlog.linkedin_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
+                      data-magnetic
+                    >
+                      <Linkedin className="h-5 w-5" /> LinkedIn
+                    </a>
+                  )}
+                  {selectedBlog.other_url && (
+                    <a 
+                      href={selectedBlog.other_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
+                      data-magnetic
+                    >
+                      <ExternalLink className="h-5 w-5" /> Live Link
+                    </a>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedBlog.tags && selectedBlog.tags.map((tag, i) => (
+                    <span 
+                      key={i}
+                      className="px-3 py-1 rounded-full text-[10px] bg-primary/10 text-primary border border-primary/20 font-mono"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
