@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Reveal } from "@/components/reveal"
+import { useSound } from "@/hooks/use-sound"
 
 const contactInfo = [
   { icon: Mail, label: "seneshfernando55@gmail.com", href: "mailto:seneshfernando55@gmail.com" },
@@ -29,11 +30,21 @@ export function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const { playClick, playBlip } = useSound()
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText("seneshfernando55@gmail.com")
+    setCopied(true)
+    playClick()
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
+    playBlip()
 
     try {
       const response = await fetch("/api/contact", {
