@@ -36,7 +36,7 @@ const projects: Project[] = [
     fullDescription: "A financial analysis tool that fetches real-time market data, performs technical analysis, and generates actionable insights for investment decisions. Features include trend detection, volatility analysis, and portfolio tracking.",
     skills: ["Python", "APIs", "Data Analysis", "Pandas", "yFinance"],
     impact: "Strengthened my data pipeline skills and taught me to handle real-time data streams while building practical tools that solve real problems.",
-    image: "https://images.unsplash.com/photo-1611974714851-48206139d731?q=80&w=1000&auto=format&fit=crop" // Financial Data/Neon
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000" // Business/Data
   },
   {
     name: "Temporal Analysis of DC Comics Trends",
@@ -56,7 +56,7 @@ const projects: Project[] = [
     fullDescription: "A hospital resource management system that optimizes bed allocation, staff scheduling, and equipment utilization using advanced data structures and algorithms. Implements priority queues and graph algorithms for optimal resource distribution.",
     skills: ["Python", "DSA", "Queue Systems", "Graph Algorithms", "Optimization"],
     impact: "Taught me how algorithmic thinking can directly impact real-world healthcare efficiency and resource allocation.",
-    image: "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=1000&auto=format&fit=crop" // Medical Tech/Grid
+    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=1000" // Healthcare/Tech
   },
   {
     name: "Escape",
