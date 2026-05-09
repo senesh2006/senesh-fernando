@@ -29,8 +29,10 @@ export function BlogsSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     async function fetchBlogs() {
       try {
         const response = await fetch("/api/blogs")
@@ -48,8 +50,13 @@ export function BlogsSection() {
   }, [])
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+    if (!isMounted) return ""
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+    } catch (e) {
+      return ""
+    }
   }
 
   return (
