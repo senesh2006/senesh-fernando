@@ -14,6 +14,7 @@ interface Project {
   fullDescription: string
   skills: string[]
   impact: string
+  image: string
 }
 
 const projects: Project[] = [
@@ -25,6 +26,7 @@ const projects: Project[] = [
     fullDescription: "A comprehensive ecosystem simulation modeling bee behavior patterns, foraging algorithms, and environmental interactions. The project implements swarm intelligence principles and visualizes complex collective behavior.",
     skills: ["Python", "OOP", "Simulation", "Matplotlib", "Algorithm Design"],
     impact: "Deepened my understanding of emergent behavior in complex systems and improved my ability to translate real-world phenomena into computational models.",
+    image: "https://images.unsplash.com/photo-1558486012-817176f84c6d?q=80&w=1000&auto=format&fit=crop" // Cyber Bee/Nature
   },
   {
     name: "Personal Finance Insight Tool",
@@ -34,6 +36,7 @@ const projects: Project[] = [
     fullDescription: "A financial analysis tool that fetches real-time market data, performs technical analysis, and generates actionable insights for investment decisions. Features include trend detection, volatility analysis, and portfolio tracking.",
     skills: ["Python", "APIs", "Data Analysis", "Pandas", "yFinance"],
     impact: "Strengthened my data pipeline skills and taught me to handle real-time data streams while building practical tools that solve real problems.",
+    image: "https://images.unsplash.com/photo-1611974714851-48206139d731?q=80&w=1000&auto=format&fit=crop" // Financial Data/Neon
   },
   {
     name: "Temporal Analysis of DC Comics Trends",
@@ -43,6 +46,7 @@ const projects: Project[] = [
     fullDescription: "An exploratory data analysis project examining character appearances, diversity representation, and publication trends in DC Comics over decades. Utilized statistical methods to uncover patterns in comic book publishing.",
     skills: ["Python", "Pandas", "Data Visualization", "Statistical Analysis", "Jupyter"],
     impact: "Enhanced my ability to extract meaningful insights from large datasets and communicate findings through compelling visualizations.",
+    image: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=1000&auto=format&fit=crop" // Comic/Art
   },
   {
     name: "Critical Care Optimization System",
@@ -52,6 +56,7 @@ const projects: Project[] = [
     fullDescription: "A hospital resource management system that optimizes bed allocation, staff scheduling, and equipment utilization using advanced data structures and algorithms. Implements priority queues and graph algorithms for optimal resource distribution.",
     skills: ["Python", "DSA", "Queue Systems", "Graph Algorithms", "Optimization"],
     impact: "Taught me how algorithmic thinking can directly impact real-world healthcare efficiency and resource allocation.",
+    image: "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=1000&auto=format&fit=crop" // Medical Tech/Grid
   },
   {
     name: "Escape",
@@ -61,6 +66,7 @@ const projects: Project[] = [
     fullDescription: "A terminal-based adventure game featuring procedurally generated mazes, dynamic flood mechanics, trap systems, and a full undo/redo system implemented with linked lists. Demonstrates low-level programming concepts and memory management.",
     skills: ["C", "Linked Lists", "Memory Management", "Game Logic", "Terminal Graphics"],
     impact: "Solidified my understanding of pointers, manual memory management, and the importance of clean code architecture in complex systems.",
+    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop" // Hacker/Code/Cyber
   },
   {
     name: "Python Pipeline Web Crawler",
@@ -70,6 +76,7 @@ const projects: Project[] = [
     fullDescription: "A scalable web crawling system with modular pipeline architecture, rate limiting, and intelligent URL management. Features concurrent processing and data extraction capabilities.",
     skills: ["Python", "Web Scraping", "Queues", "BeautifulSoup", "Async Programming"],
     impact: "Improved my understanding of concurrent programming patterns and building robust, fault-tolerant data collection systems.",
+    image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1000&auto=format&fit=crop" // Network/Spider
   },
 ]
 
@@ -100,9 +107,20 @@ export function ProjectsSection() {
               >
                 <div
                   onClick={() => setSelectedProject(project)}
-                  className="glass-card glass-card-hover cursor-pointer h-full"
+                  className="glass-card glass-card-hover cursor-pointer h-full overflow-hidden flex flex-col"
                 >
-                  <div className="p-6">
+                  {/* Project Image */}
+                  <div className="relative h-48 w-full overflow-hidden group/img">
+                    <img 
+                      src={project.image} 
+                      alt={project.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110 opacity-60"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050302] via-transparent to-transparent opacity-80" />
+                    <div className="absolute inset-0 bg-primary/10 group-hover/img:bg-transparent transition-colors" />
+                  </div>
+
+                  <div className="p-6 flex-1 flex flex-col">
                     <div className="flex items-start justify-between gap-3 mb-4">
                       <h2 className="font-semibold text-foreground text-lg leading-tight">{project.name}</h2>
                       <span className={cn(
@@ -113,12 +131,12 @@ export function ProjectsSection() {
                       </span>
                     </div>
 
-                    <p className="text-foreground-muted text-sm leading-relaxed mb-5">
+                    <p className="text-foreground-muted text-sm leading-relaxed mb-5 flex-1">
                       {project.description}
                     </p>
 
-                    <span className="text-primary text-sm font-medium">
-                      Click to learn more
+                    <span className="text-primary text-sm font-medium flex items-center gap-2">
+                      Details <ExternalLink className="h-3 w-3" />
                     </span>
                   </div>
                 </div>
@@ -152,11 +170,18 @@ export function ProjectsSection() {
             </button>
 
             {/* Header */}
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-1">
+            <div className="flex flex-col md:flex-row gap-6 mb-8">
+              <div className="w-full md:w-1/2 h-48 rounded-xl overflow-hidden border border-primary/20">
+                <img 
+                  src={selectedProject.image} 
+                  alt={selectedProject.name}
+                  className="w-full h-full object-cover opacity-70"
+                />
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
                 <h2 className="text-2xl font-semibold text-foreground mb-2">{selectedProject.name}</h2>
                 <span className={cn(
-                  "inline-block px-3 py-1 rounded-md text-xs font-medium text-white",
+                  "inline-block px-3 py-1 rounded-md text-xs font-medium text-white w-fit",
                   languageColors[selectedProject.language] || languageColors.Python
                 )}>
                   {selectedProject.language}
