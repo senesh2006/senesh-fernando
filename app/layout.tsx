@@ -1,26 +1,10 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Pixelify_Sans } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { PageTransition } from "@/components/page-transition"
 import './globals.css'
-
-const geistSans = Geist({
-  subsets: ['latin'],
-  variable: '--font-geist-sans',
-})
-
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
-})
-
-const pixelifySans = Pixelify_Sans({
-  subsets: ['latin'],
-  variable: '--font-pixelify',
-})
 
 const offBit = localFont({
   src: [
@@ -57,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${pixelifySans.variable} ${offBit.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
+      <body className={`${offBit.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
         <MagneticBlobCursor />
         {/* Subtle grain/noise texture overlay */}
         <div className="noise-overlay" />

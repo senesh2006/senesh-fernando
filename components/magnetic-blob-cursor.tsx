@@ -270,7 +270,7 @@ export function MagneticBlobCursor() {
             color: "#ff6a00",
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.15s ease",
-            fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
+            fontFamily: "var(--font-offbit), ui-sans-serif, system-ui",
             letterSpacing: "0.08em",
           }}
         >
