@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Send, Loader2, BookOpen, Plus, Tag, Layers } from "lucide-react"
+import { Send, Loader2, BookOpen, Plus, Tag, Layers, Image as ImageIcon, Github, Linkedin, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,8 +10,13 @@ export default function BlogAdminPage() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    category: "Frontend",
+    category: "",
+    customCategory: "",
     tags: "",
+    image_url: "",
+    github_url: "",
+    linkedin_url: "",
+    other_url: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -22,8 +27,17 @@ export default function BlogAdminPage() {
     setIsSubmitting(true)
     setError(null)
 
+    const category = formData.category === "Other" ? formData.customCategory : formData.category
+    
+    if (!category) {
+      setError("Please specify a category")
+      setIsSubmitting(false)
+      return
+    }
+
     const payload = {
       ...formData,
+      category,
       tags: formData.tags.split(",").map(t => t.trim()).filter(t => t !== ""),
     }
 
@@ -37,7 +51,17 @@ export default function BlogAdminPage() {
       if (!response.ok) throw new Error("Failed to create blog post")
 
       setSubmitted(true)
-      setFormData({ title: "", content: "", category: "Frontend", tags: "" })
+      setFormData({ 
+        title: "", 
+        content: "", 
+        category: "", 
+        customCategory: "", 
+        tags: "",
+        image_url: "",
+        github_url: "",
+        linkedin_url: "",
+        other_url: ""
+      })
       setTimeout(() => setSubmitted(false), 3000)
     } catch (err: any) {
       setError(err.message || "Something went wrong")
@@ -48,19 +72,20 @@ export default function BlogAdminPage() {
 
   return (
     <div className="min-h-screen bg-[#050302] p-8 font-sans">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
             <Plus className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Blog Admin</h1>
-            <p className="text-foreground-muted text-sm">Create a new technical blog post</p>
+            <p className="text-foreground-muted text-sm">Create a new technical blog post with visuals and links</p>
           </div>
         </div>
 
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Title */}
             <div className="space-y-2">
               <label className="text-sm text-foreground-muted flex items-center gap-2">
                 <BookOpen className="h-4 w-4" /> Title
@@ -75,21 +100,36 @@ export default function BlogAdminPage() {
               />
             </div>
 
+            {/* Category and Tags */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm text-foreground-muted flex items-center gap-2">
                   <Layers className="h-4 w-4" /> Category
                 </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full bg-[#0a0705] border border-primary/20 text-foreground p-2 rounded-xl focus:border-primary outline-none"
-                >
-                  <option value="Frontend">Frontend</option>
-                  <option value="UX">UX</option>
-                  <option value="System Programming">System Programming</option>
-                  <option value="Next.js">Next.js</option>
-                </select>
+                <div className="space-y-2">
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full bg-[#0a0705] border border-primary/20 text-foreground p-2 rounded-xl focus:border-primary outline-none"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Frontend">Frontend</option>
+                    <option value="UX">UX</option>
+                    <option value="System Programming">System Programming</option>
+                    <option value="Next.js">Next.js</option>
+                    <option value="Other">Other (Type below)</option>
+                  </select>
+                  {formData.category === "Other" && (
+                    <Input
+                      type="text"
+                      value={formData.customCategory}
+                      onChange={(e) => setFormData(prev => ({ ...prev, customCategory: e.target.value }))}
+                      required
+                      className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
+                      placeholder="Type your category..."
+                    />
+                  )}
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm text-foreground-muted flex items-center gap-2">
@@ -105,6 +145,59 @@ export default function BlogAdminPage() {
               </div>
             </div>
 
+            {/* Visuals and Socials */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm text-foreground-muted flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" /> Image URL
+                </label>
+                <Input
+                  type="url"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
+                  placeholder="https://images.unsplash.com/..."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-foreground-muted flex items-center gap-2">
+                  <Github className="h-4 w-4" /> GitHub Project URL
+                </label>
+                <Input
+                  type="url"
+                  value={formData.github_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, github_url: e.target.value }))}
+                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
+                  placeholder="https://github.com/..."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-foreground-muted flex items-center gap-2">
+                  <Linkedin className="h-4 w-4" /> LinkedIn Post URL
+                </label>
+                <Input
+                  type="url"
+                  value={formData.linkedin_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, linkedin_url: e.target.value }))}
+                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
+                  placeholder="https://linkedin.com/posts/..."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-foreground-muted flex items-center gap-2">
+                  <Globe className="h-4 w-4" /> Other Social / Live Link
+                </label>
+                <Input
+                  type="url"
+                  value={formData.other_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, other_url: e.target.value }))}
+                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
+                  placeholder="https://twitter.com/..."
+                />
+              </div>
+            </div>
+
+            {/* Content */}
             <div className="space-y-2">
               <label className="text-sm text-foreground-muted">Content (Markdown supported)</label>
               <Textarea

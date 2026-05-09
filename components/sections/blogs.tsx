@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Reveal } from "@/components/reveal"
-import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen } from "lucide-react"
+import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink } from "lucide-react"
 
 interface BlogEntry {
   id: string
@@ -10,6 +10,10 @@ interface BlogEntry {
   content: string
   category: string
   tags: string[]
+  image_url: string | null
+  github_url: string | null
+  linkedin_url: string | null
+  other_url: string | null
   created_at: string
 }
 
@@ -73,44 +77,80 @@ export function BlogsSection() {
              No blog posts yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {blogs.map((entry, index) => {
               const Icon = iconMap[entry.category] || BookOpen
               return (
                 <Reveal key={entry.id} delay={index * 100}>
-                  <div className="glass-card p-6 h-full flex flex-col glass-card-hover group">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-medium block mb-1">
-                            {entry.category}
-                          </span>
-                          <h2 className="text-lg font-semibold text-foreground leading-tight">
-                            {entry.title}
-                          </h2>
+                  <div className="glass-card h-full flex flex-col glass-card-hover group overflow-hidden">
+                    {/* Blog Image */}
+                    {entry.image_url && (
+                      <div className="relative h-48 w-full overflow-hidden">
+                        <img 
+                          src={entry.image_url} 
+                          alt={entry.title}
+                          className="w-full h-full object-cover opacity-60 transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050302] via-transparent to-transparent opacity-80" />
+                      </div>
+                    )}
+
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-medium block mb-1">
+                              {entry.category}
+                            </span>
+                            <h2 className="text-xl font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">
+                              {entry.title}
+                            </h2>
+                          </div>
                         </div>
                       </div>
-                      <span className="text-[10px] text-foreground-muted font-mono whitespace-nowrap">
-                        {formatDate(entry.created_at)}
-                      </span>
-                    </div>
 
-                    <p className="text-sm text-foreground-muted leading-relaxed mb-6 flex-1 whitespace-pre-wrap">
-                      {entry.content}
-                    </p>
+                      <p className="text-sm text-foreground-muted leading-relaxed mb-6 flex-1 whitespace-pre-wrap">
+                        {entry.content}
+                      </p>
 
-                    <div className="flex flex-wrap gap-2 pt-4 border-t border-border/30">
-                      {entry.tags && entry.tags.map((tag, tagIndex) => (
-                        <span 
-                          key={tagIndex}
-                          className="text-[9px] px-2 py-0.5 rounded-md bg-white/5 text-foreground-muted border border-border/50 font-mono"
-                        >
-                          #{tag}
+                      <div className="flex items-center justify-between mt-auto pt-6 border-t border-border/30">
+                        <div className="flex gap-3">
+                          {entry.github_url && (
+                            <a href={entry.github_url} target="_blank" rel="noopener noreferrer" className="text-foreground-muted hover:text-primary transition-colors">
+                              <Github className="h-4 w-4" />
+                            </a>
+                          )}
+                          {entry.linkedin_url && (
+                            <a href={entry.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-foreground-muted hover:text-primary transition-colors">
+                              <Linkedin className="h-4 w-4" />
+                            </a>
+                          )}
+                          {entry.other_url && (
+                            <a href={entry.other_url} target="_blank" rel="noopener noreferrer" className="text-foreground-muted hover:text-primary transition-colors">
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-foreground-muted font-mono">
+                          {formatDate(entry.created_at)}
                         </span>
-                      ))}
+                      </div>
+
+                      {entry.tags && entry.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {entry.tags.map((tag, tagIndex) => (
+                            <span 
+                              key={tagIndex}
+                              className="text-[9px] px-2 py-0.5 rounded-md bg-white/5 text-foreground-muted border border-border/50 font-mono"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Reveal>

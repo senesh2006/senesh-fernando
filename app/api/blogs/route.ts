@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const sql = getDbClient()
     const blogs = await sql`
-      SELECT id, title, content, category, tags, created_at 
+      SELECT id, title, content, category, tags, image_url, github_url, linkedin_url, other_url, created_at 
       FROM blogs 
       ORDER BY created_at DESC
     `
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   try {
     const sql = getDbClient()
     const body = await request.json()
-    const { title, content, category, tags } = body
+    const { title, content, category, tags, image_url, github_url, linkedin_url, other_url } = body
 
     if (!title || !content || !category) {
       return NextResponse.json(
@@ -40,9 +40,9 @@ export async function POST(request: Request) {
     }
 
     const result = await sql`
-      INSERT INTO blogs (title, content, category, tags)
-      VALUES (${title}, ${content}, ${category}, ${tags || []})
-      RETURNING id, title, content, category, tags, created_at
+      INSERT INTO blogs (title, content, category, tags, image_url, github_url, linkedin_url, other_url)
+      VALUES (${title}, ${content}, ${category}, ${tags || []}, ${image_url || null}, ${github_url || null}, ${linkedin_url || null}, ${other_url || null})
+      RETURNING id, title, content, category, tags, image_url, github_url, linkedin_url, other_url, created_at
     `
 
     return NextResponse.json(result[0], { status: 201 })
