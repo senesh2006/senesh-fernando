@@ -36,9 +36,6 @@ export function Navbar() {
             >
               PS
             </Link>
-            <span className="hidden sm:block text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 font-mono">
-              v1.0.4-pixelify
-            </span>
           </div>
 
           {/* Desktop Navigation */}
