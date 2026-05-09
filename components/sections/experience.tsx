@@ -1,52 +1,107 @@
 "use client"
 
-import { Briefcase } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Reveal } from "@/components/reveal"
+import { Briefcase, Loader2, AlertCircle } from "lucide-react"
 
-const skills = ["Python", "C", "DSA", "Mentoring"]
+interface Experience {
+  id: string
+  role: string
+  company: string
+  duration: string
+  description: string
+  achievements: string[]
+}
 
 export function ExperienceSection() {
-  return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0a0705]">
-      <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
-          Experience
-        </h1>
+  const [experiences, setExperiences] = useState<Experience[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-        <div className="glass-card glass-card-hover animate-fade-in-up" style={{ animationDelay: "150ms" }}>
-          <div className="p-8 flex flex-col sm:flex-row gap-6">
-            <div className="p-4 rounded-xl bg-[rgba(255,106,0,0.1)] shrink-0 self-start hidden sm:block">
-              <Briefcase className="h-8 w-8 text-[#ff6a00]" />
-            </div>
-            <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                <h2 className="text-xl font-semibold text-[#f5ede6]">
-                  Freelance Tutor & Mentor
-                </h2>
-                <span className="text-sm text-[rgba(245,237,230,0.5)] px-3 py-1 rounded-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,120,20,0.15)]">
-                  August 2025 - Present
-                </span>
-              </div>
-              <p className="text-[#ff6a00] font-medium mb-4">
-                Curtin University Colombo
-              </p>
-              <p className="text-[rgba(245,237,230,0.6)] leading-relaxed mb-6">
-                Tutored engineering and computer science students in programming fundamentals, 
-                C, and data structures and algorithms — leading to improved understanding and 
-                project completion.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1.5 rounded-full text-sm bg-[rgba(255,106,0,0.1)] text-[#ff6a00] border border-[rgba(255,106,0,0.2)]"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
+  useEffect(() => {
+    async function fetchExperience() {
+      try {
+        const response = await fetch("/api/experience")
+        if (!response.ok) throw new Error("Failed to fetch")
+        const data = await response.json()
+        setExperiences(data)
+      } catch (err) {
+        console.error(err)
+        setError("Failed to load experience")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchExperience()
+  }, [])
+
+  return (
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
+      <div className="max-w-[1100px] mx-auto">
+        <Reveal>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground">
+            Experience
+          </h1>
+        </Reveal>
+
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
+        ) : error ? (
+          <div className="text-center text-red-400 py-10 flex flex-col items-center gap-2">
+            <AlertCircle />
+            <span>{error}</span>
           </div>
-        </div>
+        ) : experiences.length === 0 ? (
+          <div className="text-center text-foreground-muted py-20">No experience added yet.</div>
+        ) : (
+          <div className="space-y-12">
+            {experiences.map((exp, index) => (
+              <Reveal
+                key={exp.id}
+                delay={index * 100}
+              >
+                <div className="glass-card p-8 group relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                  
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                          <Briefcase className="h-5 w-5" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                          {exp.role}
+                        </h2>
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
+                        <span className="text-primary font-medium">{exp.company}</span>
+                        <span className="text-foreground-muted text-sm px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                          {exp.duration}
+                        </span>
+                      </div>
+
+                      <p className="text-foreground/80 leading-relaxed mb-6">
+                        {exp.description}
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {exp.achievements && exp.achievements.map((achievement, i) => (
+                          <div key={i} className="flex items-start gap-3">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40 mt-2 shrink-0" />
+                            <p className="text-sm text-foreground-muted leading-relaxed italic">
+                              {achievement}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

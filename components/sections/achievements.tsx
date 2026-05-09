@@ -1,28 +1,38 @@
 "use client"
 
-import { Trophy, Users } from "lucide-react"
+import { useState, useEffect } from "react"
 import { Reveal } from "@/components/reveal"
+import { Award, Loader2, AlertCircle } from "lucide-react"
 
-const achievements = [
-  { title: "2nd Place", issuer: "Codemize 2023 & 2024", link: null },
-  { title: "Pitch to a VC Challenge", issuer: "TetrVerse x Tetr College of Business", link: "#" },
-  { title: "Lovable AI Challenge", issuer: "Tetr College of Business", link: "#" },
-  { title: "Red Hat System Administration I (RH124)", issuer: "Ver. 9.3", link: "#" },
-  { title: "Red Hat System Administration II (RH134)", issuer: "Ver. 9.3", link: "#" },
-  { title: "Agile Project Management", issuer: "HP Life", link: "#" },
-  { title: "Introduction to Cybersecurity Awareness", issuer: "HP Life", link: "#" },
-  { title: "Data Science and Analytics", issuer: "HP Life", link: "#" },
-  { title: "Startup Hackathon Participation", issuer: "Tetr College of Business", link: null },
-]
-
-const extracurricular = [
-  { title: "Co-Founder, Carbon Wise" },
-  { title: "Organizing Committee - Eclipse Sports Meet" },
-  { title: "Organizing Committee - Avurudhu Celebrations" },
-  { title: "Curtin Cricket Team & Programming Club Member" },
-]
+interface Achievement {
+  id: string
+  title: string
+  description: string
+  date: string
+}
 
 export function AchievementsSection() {
+  const [achievements, setAchievements] = useState<Achievement[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchAchievements() {
+      try {
+        const response = await fetch("/api/achievements")
+        if (!response.ok) throw new Error("Failed to fetch")
+        const data = await response.json()
+        setAchievements(data)
+      } catch (err) {
+        console.error(err)
+        setError("Failed to load achievements")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchAchievements()
+  }, [])
+
   return (
     <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
@@ -32,50 +42,45 @@ export function AchievementsSection() {
           </h1>
         </Reveal>
 
-        {/* Achievements List */}
-        <div className="space-y-4 mb-20">
-          {achievements.map((achievement, index) => (
-            <Reveal
-              key={index}
-              delay={index * 50}
-            >
-              <div className="glass-card glass-card-hover flex items-center gap-4">
-                <div className="p-5 flex items-center gap-4 flex-1">
-                  <div className="p-3 rounded-xl bg-primary/10 shrink-0">
-                    <Trophy className="h-5 w-5 text-primary" />
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
+        ) : error ? (
+          <div className="text-center text-red-400 py-10 flex flex-col items-center gap-2">
+            <AlertCircle />
+            <span>{error}</span>
+          </div>
+        ) : achievements.length === 0 ? (
+          <div className="text-center text-foreground-muted py-20">No achievements added yet.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {achievements.map((achievement, index) => (
+              <Reveal
+                key={achievement.id}
+                delay={index * 100}
+              >
+                <div className="glass-card p-8 h-full flex flex-col hover:border-primary/40 transition-colors">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="p-3 rounded-xl bg-primary/10 text-primary shrink-0">
+                      <Award className="h-6 w-6" />
+                    </div>
+                    <span className="text-foreground-muted text-xs font-mono uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                      {achievement.date}
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="font-semibold text-foreground">{achievement.title}</h2>
-                    <p className="text-sm text-foreground-muted">{achievement.issuer}</p>
+                  
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-foreground mb-4">
+                      {achievement.title}
+                    </h2>
+                    <p className="text-foreground/70 leading-relaxed text-sm">
+                      {achievement.description}
+                    </p>
                   </div>
                 </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        {/* Extra-Curricular */}
-        <Reveal delay={200}>
-          <h2 className="text-2xl font-medium text-center mb-10 text-foreground">
-            Extra-Curricular Activities
-          </h2>
-        </Reveal>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {extracurricular.map((activity, index) => (
-            <Reveal
-              key={index}
-              delay={index * 100}
-            >
-              <div className="glass-card glass-card-hover flex items-center gap-4 p-5">
-                <div className="p-3 rounded-xl bg-primary/8 shrink-0">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-medium text-foreground">{activity.title}</h3>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+              </Reveal>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

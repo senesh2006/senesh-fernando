@@ -1,98 +1,87 @@
 "use client"
 
-import { Code, Server, Cog, BarChart3, Lightbulb } from "lucide-react"
-import { TechStackChart } from "@/components/tech-stack-chart"
+import { useState, useEffect } from "react"
 import { Reveal } from "@/components/reveal"
+import { Code, Server, Database, Layout, Loader2, AlertCircle } from "lucide-react"
 
-const skillCategories = [
-  {
-    icon: Code,
-    title: "Programming Languages",
-    skills: ["Python", "C", "SQL", "YAML"],
-  },
-  {
-    icon: Server,
-    title: "OS & Administration",
-    skills: ["RedHat", "Bash Scripting"],
-  },
-  {
-    icon: Cog,
-    title: "Software Engineering",
-    skills: ["DSA", "Git", "Agile"],
-  },
-  {
-    icon: BarChart3,
-    title: "Data Science & Analytics",
-    skills: ["Pandas", "NumPy", "Matplotlib", "Excel", "Jupyter", "Time Series", "Pipelining"],
-  },
-  {
-    icon: Lightbulb,
-    title: "Emerging & Soft Skills",
-    skills: ["Prompt Engineering", "Creative Pitching", "Leadership"],
-  },
-]
+interface SkillCategory {
+  id: string
+  category: string
+  skill_list: string[]
+}
 
 export function SkillsSection() {
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchSkills() {
+      try {
+        const response = await fetch("/api/skills")
+        if (!response.ok) throw new Error("Failed to fetch")
+        const data = await response.json()
+        setSkillCategories(data)
+      } catch (err) {
+        console.error(err)
+        setError("Failed to load skills")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchSkills()
+  }, [])
+
   return (
     <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
         <Reveal>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-foreground">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground">
             Skills
           </h1>
         </Reveal>
-        
-        <Reveal delay={100}>
-          <p className="text-center text-foreground-muted mb-12 max-w-2xl mx-auto">
-            Technologies and tools I work with
-          </p>
-        </Reveal>
 
-        {/* Tech Stack Chart */}
-        <Reveal delay={200} className="mb-16">
-          <TechStackChart />
-        </Reveal>
-
-        <Reveal delay={300}>
-          <h2 className="text-2xl font-medium text-center mb-8 text-foreground">
-            Skill Categories
-          </h2>
-        </Reveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category, index) => (
-            <Reveal
-              key={index}
-              delay={index * 100}
-              className="h-full"
-            >
-              <div className="glass-card glass-card-hover relative overflow-hidden h-full">
-                {/* Glowing orange top border */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary shadow-[0_0_8px_rgba(255,106,0,0.5)]" />
-                
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="p-2.5 rounded-xl bg-primary/10">
-                      <category.icon className="h-5 w-5 text-primary" />
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
+        ) : error ? (
+          <div className="text-center text-red-400 py-10 flex flex-col items-center gap-2">
+            <AlertCircle />
+            <span>{error}</span>
+          </div>
+        ) : skillCategories.length === 0 ? (
+          <div className="text-center text-foreground-muted py-20">No skills added yet.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {skillCategories.map((skillGroup, index) => (
+              <Reveal
+                key={skillGroup.id}
+                delay={index * 100}
+              >
+                <div className="glass-card p-6 h-full hover:border-primary/40 transition-colors group">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                      <Code className="h-5 w-5" />
                     </div>
-                    <h2 className="font-semibold text-foreground">{category.title}</h2>
+                    <h2 className="font-bold text-foreground text-sm uppercase tracking-widest">
+                      {skillGroup.category}
+                    </h2>
                   </div>
-
+                  
                   <div className="flex flex-wrap gap-2">
-                    {category.skills.map((skill, skillIndex) => (
-                      <span
-                        key={skillIndex}
-                        className="px-3 py-1.5 rounded-full text-sm bg-primary/5 text-foreground/80 border border-primary/10 hover:bg-primary/15 transition-colors"
+                    {skillGroup.skill_list && skillGroup.skill_list.map((skill, i) => (
+                      <span 
+                        key={i}
+                        className="px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 text-foreground-muted hover:text-primary hover:border-primary/30 transition-all cursor-default"
                       >
                         {skill}
                       </span>
                     ))}
                   </div>
                 </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+              </Reveal>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

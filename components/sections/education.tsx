@@ -1,71 +1,93 @@
 "use client"
 
-import { GraduationCap, BookOpen } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Reveal } from "@/components/reveal"
+import { GraduationCap, Loader2, AlertCircle } from "lucide-react"
 
-const education = [
-  {
-    icon: GraduationCap,
-    institution: "Curtin University Colombo",
-    qualification: "Bachelor of Information Technology",
-    details: "2nd Year, 75 CWA",
-    period: "2024 - Present",
-  },
-  {
-    icon: BookOpen,
-    institution: "Cambridge A Levels",
-    qualification: "Computer Science, Business Studies, Accounting",
-    details: "Advanced Level Certification",
-    period: "2021 - 2023",
-  },
-]
+interface Education {
+  id: string
+  degree: string
+  institution: string
+  duration: string
+  description: string | null
+}
 
 export function EducationSection() {
+  const [educationList, setEducationList] = useState<Education[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchEducation() {
+      try {
+        const response = await fetch("/api/education")
+        if (!response.ok) throw new Error("Failed to fetch")
+        const data = await response.json()
+        setEducationList(data)
+      } catch (err) {
+        console.error(err)
+        setError("Failed to load education")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchEducation()
+  }, [])
+
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0f0a06]">
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-[#f5ede6] animate-fade-in-up">
-          Education
-        </h1>
+        <Reveal>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground">
+            Education
+          </h1>
+        </Reveal>
 
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-[#ff6a00] via-[rgba(255,106,0,0.3)] to-transparent hidden sm:block" />
-
-          <div className="space-y-8">
-            {education.map((item, index) => (
-              <div
-                key={index}
-                className="relative animate-fade-in-up"
-                style={{ animationDelay: `${index * 150}ms` }}
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
+        ) : error ? (
+          <div className="text-center text-red-400 py-10 flex flex-col items-center gap-2">
+            <AlertCircle />
+            <span>{error}</span>
+          </div>
+        ) : educationList.length === 0 ? (
+          <div className="text-center text-foreground-muted py-20">No education entries found.</div>
+        ) : (
+          <div className="max-w-3xl mx-auto space-y-8">
+            {educationList.map((edu, index) => (
+              <Reveal
+                key={edu.id}
+                delay={index * 100}
               >
-                {/* Timeline dot */}
-                <div className="absolute left-6 top-8 w-4 h-4 rounded-full bg-[#ff6a00] border-4 border-[#0f0a06] hidden sm:block shadow-[0_0_12px_rgba(255,106,0,0.5)]" />
-
-                <div className="glass-card glass-card-hover sm:ml-16 relative overflow-hidden">
-                  {/* Left orange accent line */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff6a00]" />
+                <div className="glass-card p-8 flex flex-col sm:flex-row sm:items-start gap-6 border-l-2 border-primary/20 hover:border-primary transition-colors">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary shrink-0">
+                    <GraduationCap className="h-6 w-6" />
+                  </div>
                   
-                  <div className="p-6 pl-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                      <h2 className="text-lg font-semibold text-[#f5ede6]">
-                        {item.institution}
-                      </h2>
-                      <span className="text-sm text-[rgba(245,237,230,0.5)] shrink-0">
-                        {item.period}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground">
+                          {edu.degree}
+                        </h2>
+                        <p className="text-primary font-medium mt-1">{edu.institution}</p>
+                      </div>
+                      <span className="text-foreground-muted text-sm px-3 py-1 rounded-full bg-white/5 border border-white/10 shrink-0 self-start">
+                        {edu.duration}
                       </span>
                     </div>
-                    <p className="text-[#ff6a00] font-medium mb-1">
-                      {item.qualification}
-                    </p>
-                    <p className="text-sm text-[rgba(245,237,230,0.6)]">
-                      {item.details}
-                    </p>
+
+                    {edu.description && (
+                      <p className="text-foreground/70 leading-relaxed text-sm">
+                        {edu.description}
+                      </p>
+                    )}
                   </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
-        </div>
+        )}
       </div>
     </section>
   )
