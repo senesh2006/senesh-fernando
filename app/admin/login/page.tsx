@@ -10,13 +10,20 @@ import { ShieldCheck, AlertCircle, Github } from "lucide-react"
 const allowedUsername =
   process.env.NEXT_PUBLIC_GITHUB_ALLOWED_USERNAME ?? "senesh2006"
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "https://senesh.dev")
+
+const githubCallbackUrl = `${siteUrl.replace(/\/$/, "")}/api/auth/callback/github`
+
 const errorMessages: Record<string, string> = {
   Configuration:
     "Auth is not configured. Add GITHUB_ID, GITHUB_SECRET, and NEXTAUTH_SECRET in your environment variables.",
   AccessDenied: `Access denied. Only @${allowedUsername} can sign in.`,
-  OAuthSignin: "Could not start GitHub sign-in. Check your OAuth credentials.",
+  OAuthSignin:
+    "Could not start GitHub sign-in. Check your OAuth credentials and callback URL.",
   OAuthCallback:
-    "GitHub sign-in callback failed. Verify NEXTAUTH_URL matches your site URL.",
+    "GitHub sign-in callback failed. Make sure your GitHub OAuth app uses the callback URL shown below.",
   Default: "Sign-in failed. Please try again.",
 }
 
@@ -58,6 +65,13 @@ function LoginForm() {
           Allowed account:{" "}
           <span className="text-primary">@{allowedUsername}</span>
         </p>
+
+        <div className="mt-6 rounded-xl border border-white/5 bg-white/5 p-4 text-left">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-foreground-muted mb-2">
+            GitHub OAuth callback URL
+          </p>
+          <code className="block break-all text-xs text-primary">{githubCallbackUrl}</code>
+        </div>
 
         <p className="mt-4 text-[10px] text-foreground-muted/50 uppercase tracking-[0.2em]">
           Secure Portfolio CMS

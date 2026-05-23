@@ -1,8 +1,11 @@
 import NextAuth from "next-auth"
 import GitHubProvider from "next-auth/providers/github"
+import { getAuthBaseUrl } from "@/lib/auth-url"
 
 const allowedUsername =
   process.env.GITHUB_ALLOWED_USERNAME ?? "senesh2006"
+
+process.env.NEXTAUTH_URL = getAuthBaseUrl()
 
 const handler = NextAuth({
   providers: [
