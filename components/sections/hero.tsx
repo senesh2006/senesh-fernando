@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
+import { motion } from "motion/react"
 import { Mail, Linkedin, Globe, Github, GraduationCap, MapPin, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { VisitorCounter } from "@/components/visitor-counter"
 import { GitHubActivity } from "@/components/github-activity"
+import { RetroGrid } from "@/registry/magicui/retro-grid"
+import { LandingLoader } from "@/components/landing-loader"
 
 const Hero3D = dynamic(() => import("@/components/hero-3d").then(mod => mod.Hero3D), {
   ssr: false,
@@ -48,84 +51,141 @@ const stats = [
   { icon: Zap, text: "75 CWA" },
 ]
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 120, damping: 18 },
+  },
+}
+
 export function HeroSection() {
-  const typedName = useTypewriter("PETER SENESH FERNANDO", 80)
+  const typedName = useTypewriter("PETER SENESH FERNANDO", 80, 900)
 
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
-      {/* 3D Background */}
-      <Hero3D />
-      
-      <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
-        <div className="animate-spring-up">
-          <h1 className="text-4xl sm:text-5xl lg:text-[72px] font-bold tracking-tight mb-4 leading-tight text-balance min-h-[1.2em] bg-clip-text text-transparent bg-gradient-to-b from-[#f5ede6] to-[rgba(245,237,230,0.7)]">
-            {typedName}<span className="animate-pulse text-primary ml-1">|</span>
-          </h1>
-          <p className="text-xl sm:text-2xl text-primary font-semibold mb-8 animate-fade-in tracking-tight" style={{ animationDelay: "1500ms", opacity: 0, animationFillMode: "forwards" }}>
-            Information Technology Student & Developer
-          </p>
-          <p className="max-w-2xl mx-auto text-foreground-muted text-base sm:text-lg leading-relaxed mb-10 text-pretty">
-            Motivated IT student at Curtin University Colombo with strong skills in Python, 
-            data visualization, and analytical problem-solving. I build simulations, automation 
-            tools, and data-driven systems — and I enjoy applying logic to extract meaning from 
-            complex data.
-          </p>
+    <>
+      <LandingLoader />
 
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
+      <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+        {/* Retro Grid Background */}
+        <div className="absolute inset-0 z-0">
+          <RetroGrid
+            className="h-full w-full"
+            angle={65}
+            cellSize={60}
+            opacity={0.35}
+            lightLineColor="rgba(255, 106, 0, 0.15)"
+            darkLineColor="rgba(255, 106, 0, 0.25)"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
+        </div>
+
+        {/* 3D Background Layer */}
+        <Hero3D />
+
+        <motion.div
+          className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={itemVariants}>
+            <h1 className="text-4xl sm:text-5xl lg:text-[72px] font-bold tracking-tight mb-4 leading-tight text-balance min-h-[1.2em]">
+              <span className="bg-linear-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text text-transparent">
+                {typedName}
+              </span>
+              <span className="animate-pulse text-primary ml-1">|</span>
+            </h1>
+          </motion.div>
+
+          <motion.p
+            variants={itemVariants}
+            className="text-xl sm:text-2xl text-primary font-semibold mb-8 tracking-tight"
+          >
+            Information Technology Student & Developer
+          </motion.p>
+
+          <motion.p
+            variants={itemVariants}
+            className="max-w-2xl mx-auto text-foreground-muted text-base sm:text-lg leading-relaxed mb-10 text-pretty"
+          >
+            Motivated IT student at Curtin University Colombo with strong skills in Python,
+            data visualization, and analytical problem-solving. I build simulations, automation
+            tools, and data-driven systems — and I enjoy applying logic to extract meaning from
+            complex data.
+          </motion.p>
+
+          <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-3 mb-12">
             {stats.map((stat, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="glass-card px-5 py-2.5 rounded-full flex items-center gap-2.5 border-primary/20 bg-primary/5"
+                whileHover={{ scale: 1.05, y: -2 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="glass-card px-5 py-2.5 rounded-full flex items-center gap-2.5 border-primary/20 bg-primary/5 backdrop-blur-xl"
               >
                 <stat.icon className="h-4 w-4 text-primary" />
                 <span className="text-sm text-foreground">{stat.text}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          {/* Social Links */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
+          <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-3 mb-12">
             {socialLinks.map((link, index) => (
-              <Button
+              <motion.div
                 key={index}
-                variant="outline"
-                className="gap-2 bg-transparent border-primary/20 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-xl px-5 py-2.5"
-                asChild
-                data-magnetic
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <a href={link.href} target="_blank" rel="noopener noreferrer">
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </a>
-              </Button>
+                <Button
+                  variant="outline"
+                  className="gap-2 bg-background/40 backdrop-blur-md border-primary/20 text-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-all rounded-xl px-5 py-2.5"
+                  asChild
+                  data-magnetic
+                >
+                  <a href={link.href} target="_blank" rel="noopener noreferrer">
+                    <link.icon className="h-4 w-4" />
+                    {link.label}
+                  </a>
+                </Button>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          {/* Explore Button */}
-          <Button
-            variant="default"
-            className="gap-2 bg-primary text-white hover:bg-primary/90 transition-all rounded-xl px-8 py-6 text-base font-medium shadow-[0_0_20px_rgba(255,106,0,0.3)]"
-            asChild
-            data-magnetic
-          >
-            <Link href="/education">
-              Explore My Journey
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </Button>
+          <motion.div variants={itemVariants}>
+            <Button
+              variant="default"
+              className="gap-2 bg-primary text-white hover:bg-primary/90 transition-all rounded-xl px-8 py-6 text-base font-medium shadow-[0_0_30px_rgba(255,106,0,0.4)] hover:shadow-[0_0_50px_rgba(255,106,0,0.5)]"
+              asChild
+              data-magnetic
+            >
+              <Link href="/education">
+                Explore My Journey
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+          </motion.div>
 
-          {/* Visitor Counter */}
-          <div className="mt-12 flex justify-center">
+          <motion.div variants={itemVariants} className="mt-12 flex justify-center">
             <VisitorCounter />
-          </div>
-        </div>
+          </motion.div>
 
-        {/* GitHub Activity Widget */}
-        <div className="mt-12 w-full max-w-md mx-auto animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-          <GitHubActivity />
-        </div>
-      </div>
-    </section>
+          <motion.div
+            variants={itemVariants}
+            className="mt-12 w-full max-w-md mx-auto"
+          >
+            <GitHubActivity />
+          </motion.div>
+        </motion.div>
+      </section>
+    </>
   )
 }

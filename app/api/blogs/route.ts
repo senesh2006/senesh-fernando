@@ -11,10 +11,21 @@ function getDbClient() {
 export async function GET() {
   try {
     const sql = getDbClient()
+    await sql`
+      CREATE TABLE IF NOT EXISTS blog_views (
+        blog_id TEXT PRIMARY KEY,
+        views INTEGER NOT NULL DEFAULT 0,
+        last_updated TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
     const blogs = await sql`
-      SELECT id, title, content, category, tags, image_url, github_url, linkedin_url, other_url, created_at 
-      FROM blogs 
-      ORDER BY created_at DESC
+      SELECT 
+        b.id, b.title, b.content, b.category, b.tags, b.image_url, 
+        b.github_url, b.linkedin_url, b.other_url, b.created_at,
+        COALESCE(bv.views, 0) AS views
+      FROM blogs b
+      LEFT JOIN blog_views bv ON bv.blog_id = b.id::text
+      ORDER BY b.created_at DESC
     `
     return NextResponse.json(blogs)
   } catch (error) {

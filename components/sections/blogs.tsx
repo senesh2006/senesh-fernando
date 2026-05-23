@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion } from "motion/react"
 import { Reveal } from "@/components/reveal"
-import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
+import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Link as LinkIcon, CheckCircle, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { AvatarGroup } from "@/registry/magicui/avatar-group"
+import { getBlogLikers } from "@/lib/blog-likers"
 
 interface BlogEntry {
   id: string
@@ -17,6 +19,7 @@ interface BlogEntry {
   linkedin_url: string | null
   other_url: string | null
   created_at: string
+  views: number
 }
 
 const iconMap: Record<string, any> = {
@@ -33,7 +36,6 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
   const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
-  const router = useRouter()
 
   useEffect(() => {
     setIsMounted(true)
@@ -45,10 +47,11 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
           throw new Error(data.error || "Failed to fetch from API")
         }
         const data = await response.json()
-        const blogList = Array.isArray(data) ? data : []
+        const blogList = Array.isArray(data)
+          ? data.map((b: BlogEntry) => ({ ...b, views: b.views ?? 0 }))
+          : []
         setBlogs(blogList)
 
-        // If an ID is provided via props (from dynamic route), open that blog automatically
         if (autoOpenId) {
           const blogToOpen = blogList.find((b: BlogEntry) => b.id === autoOpenId)
           if (blogToOpen) {
@@ -77,8 +80,7 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
 
   const handleBlogClick = (blog: BlogEntry) => {
     setSelectedBlog(blog)
-    // Update URL without refreshing the page to support sharing the specific link
-    window.history.pushState(null, '', `/blogs/${blog.id}`)
+    window.history.pushState(null, "", `/blogs/${blog.id}`)
   }
 
   const closePortal = () => {
@@ -99,6 +101,34 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
     setLinkCopied(true)
     setTimeout(() => setLinkCopied(false), 2000)
   }
+
+  const trackBlogView = async (blogId: string) => {
+    const sessionKey = `blog_view_${blogId}`
+    if (sessionStorage.getItem(sessionKey)) return
+
+    try {
+      const response = await fetch(`/api/blogs/${blogId}/views`, { method: "POST" })
+      if (!response.ok) return
+
+      const data = await response.json()
+      const views = data.views ?? 0
+      sessionStorage.setItem(sessionKey, "true")
+
+      setBlogs(prev =>
+        prev.map(b => (b.id === blogId ? { ...b, views } : b))
+      )
+      setSelectedBlog(prev =>
+        prev?.id === blogId ? { ...prev, views } : prev
+      )
+    } catch {
+      // silently fail — display existing count
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedBlog) return
+    trackBlogView(selectedBlog.id)
+  }, [selectedBlog?.id])
 
   return (
     <section className="min-h-screen px-4 sm:px-6 py-20 bg-background">
@@ -138,9 +168,11 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
               const Icon = iconMap[entry.category] || BookOpen
               return (
                 <Reveal key={entry.id} delay={index * 100}>
-                  <div 
+                  <motion.div
                     className="glass-card h-full flex flex-col glass-card-hover group overflow-hidden cursor-pointer"
                     onClick={() => handleBlogClick(entry)}
+                    whileHover={{ y: -4 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 22 }}
                   >
                     {/* Blog Image */}
                     {entry.image_url && (
@@ -176,19 +208,35 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
                         {entry.content}
                       </p>
 
-                      <div className="mt-auto flex items-center justify-between">
-                        <Button 
-                          variant="ghost" 
+                      <div className="mt-auto pt-4 border-t border-white/5">
+                        <div className="flex items-center justify-between gap-4 mb-4">
+                          <div className="flex items-center gap-3">
+                            <AvatarGroup
+                              avatars={getBlogLikers(entry.id)}
+                              max={4}
+                              totalCount={entry.views}
+                              size="sm"
+                            />
+                            <div className="flex items-center gap-1.5 text-foreground-muted">
+                              <Heart className="h-3 w-3 text-primary fill-primary/30" />
+                              <span className="text-[11px] font-medium">
+                                {entry.views.toLocaleString()} {entry.views === 1 ? "like" : "likes"}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] text-foreground-muted font-mono shrink-0">
+                            {formatDate(entry.created_at)}
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
                           className="p-0 h-auto text-primary hover:text-primary/80 hover:bg-transparent font-medium flex items-center gap-2 group/btn"
                         >
                           View Blog <ExternalLink className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
-                        <span className="text-[10px] text-foreground-muted font-mono">
-                          {formatDate(entry.created_at)}
-                        </span>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </Reveal>
               )
             })}
@@ -244,7 +292,23 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-white/10">
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <AvatarGroup
+                      avatars={getBlogLikers(selectedBlog.id, 5)}
+                      max={5}
+                      totalCount={selectedBlog.views}
+                      size="md"
+                    />
+                    <div className="flex items-center gap-1.5 text-foreground-muted">
+                      <Heart className="h-4 w-4 text-primary fill-primary/30" />
+                      <span className="text-sm font-medium">
+                        {selectedBlog.views.toLocaleString()} {selectedBlog.views === 1 ? "person likes" : "people like"} this
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4">
                    {/* Share Section */}
                    <div className="flex items-center gap-2 pr-4 border-r border-white/10">
                     <span className="text-[10px] text-foreground-muted uppercase tracking-widest font-bold">Share:</span>
@@ -302,6 +366,7 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
                         <ExternalLink className="h-5 w-5" /> Live Link
                       </a>
                     )}
+                  </div>
                   </div>
                 </div>
 

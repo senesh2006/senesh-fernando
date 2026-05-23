@@ -163,9 +163,68 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Accordion animations */
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.25s ease-out;
+}
+
+/* Shimmer text effect */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 106, 0, 0.6) 0%,
+    rgba(255, 211, 25, 1) 50%,
+    rgba(255, 106, 0, 0.6) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Scale-in for modals */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Modern glass card glow on hover */
 .glass-card-hover:hover {
   border-color: var(--card-border-hover);
-  box-shadow: 0 0 40px rgba(255, 106, 0, 0.15), inset 0 0 20px rgba(255, 106, 0, 0.08);
+  box-shadow:
+    0 0 40px rgba(255, 106, 0, 0.15),
+    inset 0 0 20px rgba(255, 106, 0, 0.08),
+    0 20px 40px rgba(0, 0, 0, 0.4);
   transform: translateY(-6px) scale(1.01);
   background: rgba(255, 106, 0, 0.06);
 }

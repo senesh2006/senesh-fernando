@@ -7,6 +7,31 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Reveal } from "@/components/reveal"
 import { useSound } from "@/hooks/use-sound"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+
+const faqItems = [
+  {
+    question: "Are you open to internships or freelance work?",
+    answer: "Yes — I'm actively looking for internships, part-time roles, and freelance projects in web development, data analysis, and automation.",
+  },
+  {
+    question: "What's your typical response time?",
+    answer: "I usually respond within 24–48 hours. For urgent inquiries, email works best.",
+  },
+  {
+    question: "What kind of projects do you enjoy?",
+    answer: "Data-driven apps, Python automation, simulations, and clean frontend experiences with modern UI animations.",
+  },
+  {
+    question: "Can we collaborate on a university or open-source project?",
+    answer: "Absolutely. I'm always interested in collaborating on technical projects, hackathons, and open-source contributions.",
+  },
+]
 
 const contactInfo = [
   { icon: Mail, label: "seneshfernando55@gmail.com", href: "mailto:seneshfernando55@gmail.com" },
@@ -247,6 +272,29 @@ export function ContactSection() {
                   </div>
                   <span className="text-foreground">Currently open to opportunities</span>
                 </div>
+              </div>
+            </Reveal>
+
+            {/* FAQ Accordion */}
+            <Reveal delay={550}>
+              <div className="glass-card p-8">
+                <h2 className="text-xl font-semibold text-foreground mb-6">FAQ</h2>
+                <Accordion type="single" collapsible className="w-full">
+                  {faqItems.map((item, index) => (
+                    <AccordionItem
+                      key={index}
+                      value={`faq-${index}`}
+                      className="border-white/10"
+                    >
+                      <AccordionTrigger className="text-left text-foreground hover:text-primary hover:no-underline">
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-foreground-muted leading-relaxed">
+                        {item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             </Reveal>
           </div>
