@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { signIn } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import { Reveal } from "@/components/reveal"
@@ -9,12 +9,6 @@ import { ShieldCheck, AlertCircle, Github } from "lucide-react"
 
 const allowedUsername =
   process.env.NEXT_PUBLIC_GITHUB_ALLOWED_USERNAME ?? "senesh2006"
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (typeof window !== "undefined" ? window.location.origin : "https://senesh.dev")
-
-const githubCallbackUrl = `${siteUrl.replace(/\/$/, "")}/api/auth/callback/github`
 
 const errorMessages: Record<string, string> = {
   Configuration:
@@ -29,10 +23,18 @@ const errorMessages: Record<string, string> = {
 
 function LoginForm() {
   const searchParams = useSearchParams()
+  const [githubCallbackUrl, setGithubCallbackUrl] = useState("")
   const errorKey = searchParams.get("error")
   const errorMessage = errorKey
     ? (errorMessages[errorKey] ?? errorMessages.Default)
     : null
+
+  useEffect(() => {
+    const base =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+      window.location.origin
+    setGithubCallbackUrl(`${base}/api/auth/callback/github`)
+  }, [])
 
   return (
     <Reveal>

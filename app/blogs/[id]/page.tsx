@@ -2,6 +2,7 @@ import { Metadata, ResolvingMetadata } from "next"
 import { BlogsSection } from "@/components/sections/blogs"
 import { notFound } from "next/navigation"
 import { getDocument } from "@/lib/firestore"
+import { getAuthBaseUrl } from "@/lib/auth-url"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -32,7 +33,7 @@ export async function generateMetadata(
     openGraph: {
       title: String(blog.title),
       description: String(blog.content).substring(0, 160),
-      url: `https://senesh.dev/blogs/${id}`,
+      url: `${getAuthBaseUrl()}/blogs/${id}`,
       siteName: "PETER SENESH FERNANDO Portfolio",
       images: blog.image_url
         ? [String(blog.image_url), ...previousImages]
