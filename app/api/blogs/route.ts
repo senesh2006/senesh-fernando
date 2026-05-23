@@ -1,47 +1,40 @@
-import { neon } from "@neondatabase/serverless"
 import { NextResponse } from "next/server"
-
-function getDbClient() {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not configured")
-  }
-  return neon(process.env.DATABASE_URL)
-}
+import {
+  createDocument,
+  deleteDocument,
+  getDocument,
+  listCollection,
+  sortByDateDesc,
+  updateDocument,
+} from "@/lib/firestore"
 
 export async function GET() {
   try {
-    const sql = getDbClient()
-    await sql`
-      CREATE TABLE IF NOT EXISTS blog_views (
-        blog_id TEXT PRIMARY KEY,
-        views INTEGER NOT NULL DEFAULT 0,
-        last_updated TIMESTAMPTZ DEFAULT NOW()
-      )
-    `
-    const blogs = await sql`
-      SELECT 
-        b.id, b.title, b.content, b.category, b.tags, b.image_url, 
-        b.github_url, b.linkedin_url, b.other_url, b.created_at,
-        COALESCE(bv.views, 0) AS views
-      FROM blogs b
-      LEFT JOIN blog_views bv ON bv.blog_id = b.id::text
-      ORDER BY b.created_at DESC
-    `
-    return NextResponse.json(blogs)
+    const blogs = await listCollection("blogs", sortByDateDesc)
+    const withViews = blogs.map((blog) => ({
+      ...blog,
+      views: Number(blog.views ?? 0),
+    }))
+    return NextResponse.json(withViews)
   } catch (error) {
     console.error("Failed to fetch blogs:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch blogs" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch blogs" }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const sql = getDbClient()
     const body = await request.json()
-    const { title, content, category, tags, image_url, github_url, linkedin_url, other_url } = body
+    const {
+      title,
+      content,
+      category,
+      tags,
+      image_url,
+      github_url,
+      linkedin_url,
+      other_url,
+    } = body
 
     if (!title || !content || !category) {
       return NextResponse.json(
@@ -50,27 +43,39 @@ export async function POST(request: Request) {
       )
     }
 
-    const result = await sql`
-      INSERT INTO blogs (title, content, category, tags, image_url, github_url, linkedin_url, other_url)
-      VALUES (${title}, ${content}, ${category}, ${tags || []}, ${image_url || null}, ${github_url || null}, ${linkedin_url || null}, ${other_url || null})
-      RETURNING id, title, content, category, tags, image_url, github_url, linkedin_url, other_url, created_at
-    `
+    const blog = await createDocument("blogs", {
+      title,
+      content,
+      category,
+      tags: tags || [],
+      image_url: image_url || null,
+      github_url: github_url || null,
+      linkedin_url: linkedin_url || null,
+      other_url: other_url || null,
+      views: 0,
+    })
 
-    return NextResponse.json(result[0], { status: 201 })
+    return NextResponse.json(blog, { status: 201 })
   } catch (error) {
     console.error("Failed to create blog:", error)
-    return NextResponse.json(
-      { error: "Failed to create blog" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to create blog" }, { status: 500 })
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const sql = getDbClient()
     const body = await request.json()
-    const { id, title, content, category, tags, image_url, github_url, linkedin_url, other_url } = body
+    const {
+      id,
+      title,
+      content,
+      category,
+      tags,
+      image_url,
+      github_url,
+      linkedin_url,
+      other_url,
+    } = body
 
     if (!id || !title || !content || !category) {
       return NextResponse.json(
@@ -79,37 +84,31 @@ export async function PUT(request: Request) {
       )
     }
 
-    const result = await sql`
-      UPDATE blogs 
-      SET title = ${title}, 
-          content = ${content}, 
-          category = ${category}, 
-          tags = ${tags || []}, 
-          image_url = ${image_url || null}, 
-          github_url = ${github_url || null}, 
-          linkedin_url = ${linkedin_url || null}, 
-          other_url = ${other_url || null}
-      WHERE id = ${id}
-      RETURNING id, title, content, category, tags, image_url, github_url, linkedin_url, other_url, created_at
-    `
-
-    if (result.length === 0) {
+    const existing = await getDocument("blogs", id)
+    if (!existing) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 })
     }
 
-    return NextResponse.json(result[0])
+    const blog = await updateDocument("blogs", id, {
+      title,
+      content,
+      category,
+      tags: tags || [],
+      image_url: image_url || null,
+      github_url: github_url || null,
+      linkedin_url: linkedin_url || null,
+      other_url: other_url || null,
+    })
+
+    return NextResponse.json(blog)
   } catch (error) {
     console.error("Failed to update blog:", error)
-    return NextResponse.json(
-      { error: "Failed to update blog" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to update blog" }, { status: 500 })
   }
 }
 
 export async function DELETE(request: Request) {
   try {
-    const sql = getDbClient()
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
 
@@ -117,14 +116,14 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 })
     }
 
-    await sql`DELETE FROM blogs WHERE id = ${id}`
+    const deleted = await deleteDocument("blogs", id)
+    if (!deleted) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 })
+    }
 
     return NextResponse.json({ message: "Blog deleted successfully" })
   } catch (error) {
     console.error("Failed to delete blog:", error)
-    return NextResponse.json(
-      { error: "Failed to delete blog" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to delete blog" }, { status: 500 })
   }
 }

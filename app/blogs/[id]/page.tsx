@@ -1,16 +1,14 @@
-import { neon } from "@neondatabase/serverless"
-import { Metadata, ResolvingMetadata } from 'next'
+import { Metadata, ResolvingMetadata } from "next"
 import { BlogsSection } from "@/components/sections/blogs"
-import { notFound } from 'next/navigation'
+import { notFound } from "next/navigation"
+import { getDocument } from "@/lib/firestore"
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
 async function getBlog(id: string) {
-  const sql = neon(process.env.DATABASE_URL!)
-  const blogs = await sql`SELECT * FROM blogs WHERE id = ${id}`
-  return blogs[0]
+  return getDocument("blogs", id)
 }
 
 export async function generateMetadata(
@@ -22,7 +20,7 @@ export async function generateMetadata(
 
   if (!blog) {
     return {
-      title: 'Blog Not Found',
+      title: "Blog Not Found",
     }
   }
 
@@ -30,21 +28,23 @@ export async function generateMetadata(
 
   return {
     title: `${blog.title} | PETER SENESH FERNANDO`,
-    description: blog.content.substring(0, 160),
+    description: String(blog.content).substring(0, 160),
     openGraph: {
-      title: blog.title,
-      description: blog.content.substring(0, 160),
-      url: `https://senesh.dev/blogs/${id}`, // Update with your actual domain
-      siteName: 'PETER SENESH FERNANDO Portfolio',
-      images: blog.image_url ? [blog.image_url, ...previousImages] : previousImages,
-      type: 'article',
-      publishedTime: blog.created_at,
+      title: String(blog.title),
+      description: String(blog.content).substring(0, 160),
+      url: `https://senesh.dev/blogs/${id}`,
+      siteName: "PETER SENESH FERNANDO Portfolio",
+      images: blog.image_url
+        ? [String(blog.image_url), ...previousImages]
+        : previousImages,
+      type: "article",
+      publishedTime: String(blog.created_at ?? ""),
     },
     twitter: {
-      card: 'summary_large_image',
-      title: blog.title,
-      description: blog.content.substring(0, 160),
-      images: blog.image_url ? [blog.image_url] : [],
+      card: "summary_large_image",
+      title: String(blog.title),
+      description: String(blog.content).substring(0, 160),
+      images: blog.image_url ? [String(blog.image_url)] : [],
     },
   }
 }
@@ -57,6 +57,5 @@ export default async function BlogPostPage({ params }: Props) {
     notFound()
   }
 
-  // We reuse the BlogsSection but it will handle showing the modal for this specific blog
   return <BlogsSection autoOpenId={id} />
 }

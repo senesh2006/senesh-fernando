@@ -14,6 +14,7 @@ import {
   Plus
 } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 const stats = [
   { label: "Total Blogs", icon: BookOpen, href: "/admin/blogs", key: "blogs" },

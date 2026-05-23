@@ -1,11 +1,16 @@
-import { getDbClient } from "@/lib/db"
 import { NextResponse } from "next/server"
+import {
+  createDocument,
+  deleteDocument,
+  listCollection,
+  sortByOrderThenDate,
+  updateDocument,
+} from "@/lib/firestore"
 
 export async function GET() {
   try {
-    const sql = getDbClient()
-    const result = await sql`SELECT * FROM achievements ORDER BY order_index ASC, created_at DESC`
-    return NextResponse.json(result)
+    const achievements = await listCollection("achievements", sortByOrderThenDate)
+    return NextResponse.json(achievements)
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch achievements" }, { status: 500 })
   }
@@ -13,14 +18,14 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const sql = getDbClient()
     const { title, description, date, order_index } = await request.json()
-    const result = await sql`
-      INSERT INTO achievements (title, description, date, order_index)
-      VALUES (${title}, ${description}, ${date}, ${order_index || 0})
-      RETURNING *
-    `
-    return NextResponse.json(result[0], { status: 201 })
+    const achievement = await createDocument("achievements", {
+      title,
+      description,
+      date,
+      order_index: order_index || 0,
+    })
+    return NextResponse.json(achievement, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: "Failed to create achievement" }, { status: 500 })
   }
@@ -28,15 +33,17 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const sql = getDbClient()
     const { id, title, description, date, order_index } = await request.json()
-    const result = await sql`
-      UPDATE achievements 
-      SET title = ${title}, description = ${description}, date = ${date}, order_index = ${order_index || 0}
-      WHERE id = ${id}
-      RETURNING *
-    `
-    return NextResponse.json(result[0])
+    const achievement = await updateDocument("achievements", id, {
+      title,
+      description,
+      date,
+      order_index: order_index || 0,
+    })
+    if (!achievement) {
+      return NextResponse.json({ error: "Achievement not found" }, { status: 404 })
+    }
+    return NextResponse.json(achievement)
   } catch (error) {
     return NextResponse.json({ error: "Failed to update achievement" }, { status: 500 })
   }
@@ -44,10 +51,11 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const sql = getDbClient()
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
-    await sql`DELETE FROM achievements WHERE id = ${id}`
+    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 })
+
+    await deleteDocument("achievements", id)
     return NextResponse.json({ message: "Achievement deleted" })
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete achievement" }, { status: 500 })

@@ -1,25 +1,24 @@
 import { NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { FieldValue } from "firebase-admin/firestore"
+import { getFirestoreDb } from "@/lib/firebase-admin"
 
-function getDbClient() {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not configured")
-  }
-  return neon(process.env.DATABASE_URL)
-}
+const VISITOR_DOC_ID = "global"
 
 export async function GET() {
   try {
-    const sql = getDbClient()
-    const result = await sql`SELECT total_views, unique_visitors FROM visitor_stats WHERE id = 1`
-    
-    if (result.length === 0) {
+    const doc = await getFirestoreDb()
+      .collection("visitor_stats")
+      .doc(VISITOR_DOC_ID)
+      .get()
+
+    if (!doc.exists) {
       return NextResponse.json({ totalViews: 0, uniqueVisitors: 0 })
     }
-    
+
+    const data = doc.data()!
     return NextResponse.json({
-      totalViews: result[0].total_views,
-      uniqueVisitors: result[0].unique_visitors,
+      totalViews: Number(data.total_views ?? 0),
+      uniqueVisitors: Number(data.unique_visitors ?? 0),
     })
   } catch (error) {
     console.error("Failed to fetch visitor stats:", error)
@@ -29,32 +28,30 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const sql = getDbClient()
-    
-    // Increment total views
-    const result = await sql`
-      UPDATE visitor_stats 
-      SET total_views = total_views + 1, last_updated = NOW()
-      WHERE id = 1
-      RETURNING total_views, unique_visitors
-    `
-    
-    if (result.length === 0) {
-      // Create initial row if it doesn't exist
-      const newResult = await sql`
-        INSERT INTO visitor_stats (id, total_views, unique_visitors)
-        VALUES (1, 1, 1)
-        RETURNING total_views, unique_visitors
-      `
-      return NextResponse.json({
-        totalViews: newResult[0].total_views,
-        uniqueVisitors: newResult[0].unique_visitors,
+    const ref = getFirestoreDb().collection("visitor_stats").doc(VISITOR_DOC_ID)
+    const existing = await ref.get()
+
+    if (!existing.exists) {
+      await ref.set({
+        total_views: 1,
+        unique_visitors: 1,
+        last_updated: FieldValue.serverTimestamp(),
       })
+
+      return NextResponse.json({ totalViews: 1, uniqueVisitors: 1 })
     }
-    
+
+    await ref.update({
+      total_views: FieldValue.increment(1),
+      last_updated: FieldValue.serverTimestamp(),
+    })
+
+    const updated = await ref.get()
+    const data = updated.data()!
+
     return NextResponse.json({
-      totalViews: result[0].total_views,
-      uniqueVisitors: result[0].unique_visitors,
+      totalViews: Number(data.total_views ?? 0),
+      uniqueVisitors: Number(data.unique_visitors ?? 0),
     })
   } catch (error) {
     console.error("Failed to update visitor stats:", error)
