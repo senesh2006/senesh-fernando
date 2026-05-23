@@ -1,11 +1,18 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { PageTransition } from "@/components/page-transition"
 import { EasterEgg } from "@/components/easter-egg"
+import { MaintenanceScreen } from "@/components/maintenance-screen"
 import './globals.css'
+
+function isMaintenanceMode(pathname: string) {
+  if (process.env.MAINTENANCE_MODE !== "true") return false
+  return !pathname.startsWith("/admin") && !pathname.startsWith("/api/auth")
+}
 
 const offBit = localFont({
   src: [
@@ -35,11 +42,24 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const pathname = (await headers()).get("x-pathname") ?? ""
+  const maintenance = isMaintenanceMode(pathname)
+
+  if (maintenance) {
+    return (
+      <html lang="en" className="bg-background">
+        <body className={`${offBit.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
+          <MaintenanceScreen />
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="en" className="bg-background">
       <body className={`${offBit.variable} font-sans antialiased text-foreground selection:bg-primary/30 selection:text-primary`}>
