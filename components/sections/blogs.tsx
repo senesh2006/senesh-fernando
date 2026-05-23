@@ -3,10 +3,15 @@
 import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import { Reveal } from "@/components/reveal"
-import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Link as LinkIcon, CheckCircle, Heart } from "lucide-react"
+import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AvatarGroup } from "@/registry/magicui/avatar-group"
 import { getBlogLikers } from "@/lib/blog-likers"
+import {
+  BlogLikeButton,
+  getLikedBlogIds,
+  markBlogLiked,
+} from "@/components/blog-like-button"
 
 interface BlogEntry {
   id: string
@@ -36,6 +41,12 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
   const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
+  const [likingId, setLikingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLikedIds(getLikedBlogIds())
+  }, [])
 
   useEffect(() => {
     setIsMounted(true)
@@ -102,33 +113,30 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
     setTimeout(() => setLinkCopied(false), 2000)
   }
 
-  const trackBlogView = async (blogId: string) => {
-    const sessionKey = `blog_view_${blogId}`
-    if (sessionStorage.getItem(sessionKey)) return
+  const handleLike = async (blogId: string) => {
+    if (likedIds.has(blogId) || likingId === blogId) return
 
+    setLikingId(blogId)
     try {
       const response = await fetch(`/api/blogs/${blogId}/views`, { method: "POST" })
       if (!response.ok) return
 
       const data = await response.json()
-      const views = data.views ?? 0
-      sessionStorage.setItem(sessionKey, "true")
-
-      setBlogs(prev =>
-        prev.map(b => (b.id === blogId ? { ...b, views } : b))
+      const likes = data.views ?? 0
+      markBlogLiked(blogId)
+      setLikedIds((prev) => new Set(prev).add(blogId))
+      setBlogs((prev) =>
+        prev.map((b) => (b.id === blogId ? { ...b, views: likes } : b))
       )
-      setSelectedBlog(prev =>
-        prev?.id === blogId ? { ...prev, views } : prev
+      setSelectedBlog((prev) =>
+        prev?.id === blogId ? { ...prev, views: likes } : prev
       )
     } catch {
-      // silently fail — display existing count
+      // keep UI unchanged on failure
+    } finally {
+      setLikingId(null)
     }
   }
-
-  useEffect(() => {
-    if (!selectedBlog) return
-    trackBlogView(selectedBlog.id)
-  }, [selectedBlog?.id])
 
   return (
     <section className="min-h-screen px-4 sm:px-6 py-20 bg-background">
@@ -217,12 +225,13 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
                               totalCount={entry.views}
                               size="sm"
                             />
-                            <div className="flex items-center gap-1.5 text-foreground-muted">
-                              <Heart className="h-3 w-3 text-primary fill-primary/30" />
-                              <span className="text-[11px] font-medium">
-                                {entry.views.toLocaleString()} {entry.views === 1 ? "like" : "likes"}
-                              </span>
-                            </div>
+                            <BlogLikeButton
+                              blogId={entry.id}
+                              likes={entry.views}
+                              isLiked={likedIds.has(entry.id)}
+                              isLoading={likingId === entry.id}
+                              onLike={handleLike}
+                            />
                           </div>
                           <span className="text-[10px] text-foreground-muted font-mono shrink-0">
                             {formatDate(entry.created_at)}
@@ -293,19 +302,24 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-white/10">
                 <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <AvatarGroup
                       avatars={getBlogLikers(selectedBlog.id, 5)}
                       max={5}
                       totalCount={selectedBlog.views}
                       size="md"
                     />
-                    <div className="flex items-center gap-1.5 text-foreground-muted">
-                      <Heart className="h-4 w-4 text-primary fill-primary/30" />
-                      <span className="text-sm font-medium">
-                        {selectedBlog.views.toLocaleString()} {selectedBlog.views === 1 ? "person likes" : "people like"} this
-                      </span>
-                    </div>
+                    <BlogLikeButton
+                      blogId={selectedBlog.id}
+                      likes={selectedBlog.views}
+                      isLiked={likedIds.has(selectedBlog.id)}
+                      isLoading={likingId === selectedBlog.id}
+                      size="md"
+                      onLike={handleLike}
+                    />
+                    <span className="text-sm text-foreground-muted">
+                      {likedIds.has(selectedBlog.id) ? "Thanks for the like!" : "Enjoyed this? Leave a like"}
+                    </span>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4">

@@ -8,7 +8,7 @@ import { Mail, Linkedin, Globe, Github, GraduationCap, MapPin, Zap, ArrowRight }
 import { Button } from "@/components/ui/button"
 import { VisitorCounter } from "@/components/visitor-counter"
 import { GitHubActivity } from "@/components/github-activity"
-import { RetroGrid } from "@/registry/magicui/retro-grid"
+import { ScrollVelocityBackground } from "@/components/scroll-velocity-marquee"
 import { LandingLoader } from "@/components/landing-loader"
 
 const Hero3D = dynamic(() => import("@/components/hero-3d").then(mod => mod.Hero3D), {
@@ -75,19 +75,8 @@ export function HeroSection() {
     <>
       <LandingLoader />
 
-      <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
-        {/* Retro Grid Background */}
-        <div className="absolute inset-0 z-0">
-          <RetroGrid
-            className="h-full w-full"
-            angle={65}
-            cellSize={60}
-            opacity={0.35}
-            lightLineColor="rgba(255, 106, 0, 0.15)"
-            darkLineColor="rgba(255, 106, 0, 0.25)"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
-        </div>
+      <section id="about" className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+        <ScrollVelocityBackground />
 
         {/* 3D Background Layer */}
         <Hero3D />

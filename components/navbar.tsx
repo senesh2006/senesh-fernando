@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useSound } from "@/hooks/use-sound"
 
 const navItems = [
-  { label: "About", href: "/" },
+  { label: "About", href: "/#about" },
   { label: "Education", href: "/education" },
   { label: "Experience", href: "/experience" },
   { label: "Skills", href: "/skills" },
@@ -64,7 +64,10 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <ul className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href
+              const isActive =
+                item.href === "/#about"
+                  ? pathname === "/"
+                  : pathname === item.href
               return (
                 <li key={item.href}>
                   <Link
@@ -122,7 +125,10 @@ export function Navbar() {
           <div className="md:hidden mt-4 pb-4 glass-card rounded-xl p-4">
             <ul className="flex flex-col gap-2">
               {navItems.map((item) => {
-                const isActive = pathname === item.href
+                const isActive =
+                  item.href === "/#about"
+                    ? pathname === "/"
+                    : pathname === item.href
                 return (
                   <li key={item.href}>
                     <Link
