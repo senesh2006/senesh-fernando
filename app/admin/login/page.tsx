@@ -30,10 +30,19 @@ function LoginForm() {
     : null
 
   useEffect(() => {
-    const base =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      window.location.origin
-    setGithubCallbackUrl(`${base}/api/auth/callback/github`)
+    fetch("/api/auth/debug")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.githubCallbackUrl) {
+          setGithubCallbackUrl(data.githubCallbackUrl)
+        }
+      })
+      .catch(() => {
+        const base =
+          process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+          window.location.origin
+        setGithubCallbackUrl(`${base}/api/auth/callback/github`)
+      })
   }, [])
 
   return (
@@ -72,7 +81,13 @@ function LoginForm() {
           <p className="text-[10px] uppercase tracking-[0.2em] text-foreground-muted mb-2">
             GitHub OAuth callback URL
           </p>
-          <code className="block break-all text-xs text-primary">{githubCallbackUrl}</code>
+          <code className="block break-all text-xs text-primary">
+            {githubCallbackUrl || "Loading..."}
+          </code>
+          <p className="mt-3 text-[11px] leading-relaxed text-foreground-muted">
+            Paste this exact URL into your GitHub OAuth app under Authorization
+            callback URL.
+          </p>
         </div>
 
         <p className="mt-4 text-[10px] text-foreground-muted/50 uppercase tracking-[0.2em]">
