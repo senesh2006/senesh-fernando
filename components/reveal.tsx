@@ -13,24 +13,27 @@ export function Reveal({ children, className = "", delay = 0 }: RevealProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          observer.unobserve(entry.target)
+          observer.disconnect()
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: "80px 0px" }
     )
 
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
+    observer.observe(el)
+
+    // Fallback so sections never stay invisible if the observer fails
+    const fallback = window.setTimeout(() => setIsVisible(true), 600)
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current)
-      }
+      observer.disconnect()
+      window.clearTimeout(fallback)
     }
   }, [])
 

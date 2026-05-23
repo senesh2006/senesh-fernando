@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import dynamic from "next/dynamic"
 import { motion } from "motion/react"
 import { Mail, Linkedin, Globe, Github, GraduationCap, MapPin, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -10,11 +9,6 @@ import { VisitorCounter } from "@/components/visitor-counter"
 import { GitHubActivity } from "@/components/github-activity"
 import { ScrollVelocityBackground } from "@/components/scroll-velocity-marquee"
 import { LandingLoader } from "@/components/landing-loader"
-
-const Hero3D = dynamic(() => import("@/components/hero-3d").then(mod => mod.Hero3D), {
-  ssr: false,
-  loading: () => null,
-})
 
 function useTypewriter(text: string, speed: number = 100, delay: number = 500) {
   const [displayText, setDisplayText] = useState("")
@@ -77,9 +71,6 @@ export function HeroSection() {
 
       <section id="about" className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
         <ScrollVelocityBackground />
-
-        {/* 3D Background Layer */}
-        <Hero3D />
 
         <motion.div
           className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 text-center"
