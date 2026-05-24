@@ -1,16 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "motion/react"
+import { Loader2, AlertCircle } from "lucide-react"
 import { Reveal } from "@/components/reveal"
 import { SectionHeader } from "@/components/editorial/section-header"
-import { Code, Server, Database, Layout, Loader2, AlertCircle } from "lucide-react"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 
 interface SkillCategory {
   id: string
@@ -18,12 +11,38 @@ interface SkillCategory {
   skill_list: string[]
 }
 
-const categoryIcons: Record<string, typeof Code> = {
-  Languages: Code,
-  Frontend: Layout,
-  Backend: Server,
-  Database: Database,
-}
+const fallbackSkills: SkillCategory[] = [
+  {
+    id: "languages",
+    category: "Languages",
+    skill_list: ["TypeScript", "JavaScript", "Python", "SQL"],
+  },
+  {
+    id: "frontend",
+    category: "Frontend",
+    skill_list: ["React", "Next.js", "Tailwind CSS", "HTML / CSS"],
+  },
+  {
+    id: "backend",
+    category: "Backend",
+    skill_list: ["Node.js", "REST APIs", "Firebase", "Firestore"],
+  },
+  {
+    id: "ai",
+    category: "AI / ML",
+    skill_list: ["Google Gemini", "Anthropic API", "Prompt Engineering"],
+  },
+  {
+    id: "tools",
+    category: "Tools",
+    skill_list: ["Cursor", "Git / GitHub", "Figma", "VS Code"],
+  },
+  {
+    id: "learning",
+    category: "Currently learning",
+    skill_list: ["System Design", "DevOps", "Rust"],
+  },
+]
 
 export function SkillsSection() {
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([])
@@ -36,10 +55,10 @@ export function SkillsSection() {
         const response = await fetch("/api/skills")
         if (!response.ok) throw new Error("Failed to fetch")
         const data = await response.json()
-        setSkillCategories(data)
-      } catch (err) {
-        console.error(err)
+        setSkillCategories(Array.isArray(data) && data.length > 0 ? data : fallbackSkills)
+      } catch {
         setError("Failed to load skills")
+        setSkillCategories(fallbackSkills)
       } finally {
         setIsLoading(false)
       }
@@ -47,81 +66,39 @@ export function SkillsSection() {
     fetchSkills()
   }, [])
 
+  const groups = skillCategories.length > 0 ? skillCategories : fallbackSkills
+
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
-      <div className="max-w-[860px] mx-auto">
-        <SectionHeader
-          kicker="Toolkit"
-          title="Skills"
-          description="Expand each category to explore my technical toolkit."
-        />
+    <section id="skills">
+      <div className="container">
+        <SectionHeader num="02" title="Skills" />
 
         {isLoading ? (
-          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
-        ) : error ? (
-          <div className="text-center text-red-400 py-10 flex flex-col items-center gap-2">
-            <AlertCircle />
-            <span>{error}</span>
+          <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-primary" />
           </div>
-        ) : skillCategories.length === 0 ? (
-          <div className="text-center text-foreground-muted py-20">No skills added yet.</div>
         ) : (
-          <Reveal delay={100}>
-            <Accordion
-              type="single"
-              collapsible
-              defaultValue={skillCategories[0]?.id}
-              className="space-y-3"
-            >
-              {skillCategories.map((skillGroup, index) => {
-                const Icon = categoryIcons[skillGroup.category] || Code
-                return (
-                  <motion.div
-                    key={skillGroup.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.08, duration: 0.4 }}
-                  >
-                    <AccordionItem
-                      value={skillGroup.id}
-                      className="glass-card border border-primary/10 rounded-2xl px-6 overflow-hidden data-[state=open]:border-primary/30 data-[state=open]:shadow-[0_0_30px_rgba(255,106,0,0.08)] transition-all duration-300"
-                    >
-                      <AccordionTrigger className="hover:no-underline py-5">
-                        <div className="flex items-center gap-4">
-                          <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <div className="text-left">
-                            <span className="font-bold text-foreground text-base">
-                              {skillGroup.category}
-                            </span>
-                            <p className="text-xs text-foreground-muted mt-0.5">
-                              {skillGroup.skill_list?.length ?? 0} skills
-                            </p>
-                          </div>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="pb-5">
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          {skillGroup.skill_list?.map((skill, i) => (
-                            <motion.span
-                              key={i}
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: i * 0.03 }}
-                              className="px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 text-foreground-muted hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-default"
-                            >
-                              {skill}
-                            </motion.span>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </motion.div>
-                )
-              })}
-            </Accordion>
+          <Reveal>
+            {error && (
+              <p className="text-sm text-red-400 mb-4 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </p>
+            )}
+            <div className="skills-grid">
+              {groups.map((skillGroup) => (
+                <div key={skillGroup.id} className="skill-group">
+                  <div className="skill-group-label">{skillGroup.category}</div>
+                  <div className="skill-tags">
+                    {skillGroup.skill_list?.map((skill) => (
+                      <span key={skill} className="skill-tag">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </Reveal>
         )}
       </div>

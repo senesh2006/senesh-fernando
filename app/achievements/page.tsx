@@ -1,10 +1,5 @@
-import { AchievementsSection } from "@/components/sections/achievements"
-
-export const metadata = {
-  title: 'Achievements | PETER SENESH FERNANDO',
-  description: 'Awards, certifications, and achievements of PETER SENESH FERNANDO.',
-}
+import { redirect } from "next/navigation"
 
 export default function AchievementsPage() {
-  return <AchievementsSection />
+  redirect("/#about")
 }

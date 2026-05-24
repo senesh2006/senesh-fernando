@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Loader2, AlertCircle } from "lucide-react"
 import { Reveal } from "@/components/reveal"
 import { SectionHeader } from "@/components/editorial/section-header"
-import { Briefcase, Loader2, AlertCircle } from "lucide-react"
 
 interface Experience {
   id: string
@@ -11,8 +11,26 @@ interface Experience {
   company: string
   duration: string
   description: string
-  achievements: string[]
 }
+
+const fallbackExperience: Experience[] = [
+  {
+    id: "buildathon",
+    role: "Competitor — Buildathon",
+    company: "Cursor 24hr Buildathon",
+    duration: "May 2026\n24 hours",
+    description:
+      "Built SoloScale from scratch in 24 hours with a team of three. Designed the full-stack architecture, Firestore schema, and Gemini AI integration pipeline. Placed 20th overall and 3rd in the Google Gemini track.",
+  },
+  {
+    id: "undergrad",
+    role: "Undergraduate Student",
+    company: "University — Sri Lanka",
+    duration: "Ongoing",
+    description:
+      "Studying towards a degree while building real projects on the side. Focused on full-stack development, AI integrations, and software architecture. Learning by building, shipping, and breaking things.",
+  },
+]
 
 export function ExperienceSection() {
   const [experiences, setExperiences] = useState<Experience[]>([])
@@ -25,10 +43,10 @@ export function ExperienceSection() {
         const response = await fetch("/api/experience")
         if (!response.ok) throw new Error("Failed to fetch")
         const data = await response.json()
-        setExperiences(data)
-      } catch (err) {
-        console.error(err)
+        setExperiences(Array.isArray(data) && data.length > 0 ? data : fallbackExperience)
+      } catch {
         setError("Failed to load experience")
+        setExperiences(fallbackExperience)
       } finally {
         setIsLoading(false)
       }
@@ -36,68 +54,45 @@ export function ExperienceSection() {
     fetchExperience()
   }, [])
 
+  const items = experiences.length > 0 ? experiences : fallbackExperience
+
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
-      <div className="max-w-[860px] mx-auto">
-        <SectionHeader kicker="Career" title="Experience" />
+    <section id="experience">
+      <div className="container">
+        <SectionHeader num="04" title="Experience" />
 
         {isLoading ? (
-          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
-        ) : error ? (
-          <div className="text-center text-red-400 py-10 flex flex-col items-center gap-2">
-            <AlertCircle />
-            <span>{error}</span>
+          <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-primary" />
           </div>
-        ) : experiences.length === 0 ? (
-          <div className="text-center text-foreground-muted py-20">No experience added yet.</div>
         ) : (
-          <div className="space-y-12">
-            {experiences.map((exp, index) => (
-              <Reveal
-                key={exp.id}
-                delay={index * 100}
-              >
-                <div className="glass-card p-8 group relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                  
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
-                          <Briefcase className="h-5 w-5" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                          {exp.role}
-                        </h2>
-                      </div>
-                      
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
-                        <span className="text-primary font-medium">{exp.company}</span>
-                        <span className="text-foreground-muted text-sm px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                          {exp.duration}
-                        </span>
-                      </div>
-
-                      <p className="text-foreground/80 leading-relaxed mb-6">
-                        {exp.description}
-                      </p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {exp.achievements && exp.achievements.map((achievement, i) => (
-                          <div key={i} className="flex items-start gap-3">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40 mt-2 shrink-0" />
-                            <p className="text-sm text-foreground-muted leading-relaxed italic">
-                              {achievement}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+          <Reveal>
+            {error && (
+              <p className="text-sm text-red-400 mb-4 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </p>
+            )}
+            <div className="exp-list">
+              {items.map((exp) => (
+                <div key={exp.id} className="exp-item">
+                  <div className="exp-period">
+                    {exp.duration.split("\n").map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i < exp.duration.split("\n").length - 1 && <br />}
+                      </span>
+                    ))}
+                  </div>
+                  <div>
+                    <div className="exp-role">{exp.role}</div>
+                    <div className="exp-org">{exp.company}</div>
+                    <div className="exp-desc">{exp.description}</div>
                   </div>
                 </div>
-              </Reveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </Reveal>
         )}
       </div>
     </section>

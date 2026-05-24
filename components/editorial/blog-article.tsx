@@ -78,7 +78,7 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen pt-20">
       <header className="editorial-hero border-b border-paper-3">
         <div className="editorial-hero-inner max-w-[860px] mx-auto px-4 sm:px-8 py-16 sm:py-24">
           <Link
@@ -86,7 +86,7 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
             className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-foreground-muted hover:text-primary transition-colors mb-10"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            All blogs
+            All posts
           </Link>
 
           <p className="editorial-kicker mb-6">
@@ -105,7 +105,7 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
             </div>
             <div>
               <span className="editorial-meta-label">Author</span>
-              <span className="editorial-meta-val">Peter Senesh Fernando</span>
+              <span className="editorial-meta-val">Senesh</span>
             </div>
           </div>
 
@@ -209,10 +209,10 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
 
         <footer className="editorial-footer mt-12">
           <span className="font-mono text-[10px] tracking-[0.1em] text-foreground-muted">
-            PETER SENESH FERNANDO
+            Senesh
           </span>
-          <Link href="/blogs" className="editorial-footer-link">
-            More writing →
+          <Link href="/#blog" className="editorial-footer-link">
+            Back to writing →
           </Link>
         </footer>
       </article>

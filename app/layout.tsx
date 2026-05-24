@@ -4,8 +4,8 @@ import { Instrument_Serif, DM_Mono } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
+import { CustomCursor } from "@/components/custom-cursor"
 import { PageTransition } from "@/components/page-transition"
-import { EasterEgg } from "@/components/easter-egg"
 import { MaintenanceScreen } from "@/components/maintenance-screen"
 import './globals.css'
 
@@ -29,13 +29,13 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'PETER SENESH FERNANDO | IT Student & Developer',
-  description: 'Portfolio of PETER SENESH FERNANDO - Information Technology Student at Curtin University Colombo. Skilled in Python, data visualization, and analytical problem-solving.',
-  keywords: ['PETER SENESH FERNANDO', 'IT Student', 'Developer', 'Python', 'Curtin University Colombo', 'Portfolio'],
-  authors: [{ name: 'PETER SENESH FERNANDO' }],
+  title: 'Senesh — Developer',
+  description: 'Portfolio of Senesh — undergraduate developer from Sri Lanka building full-stack web apps and AI integrations.',
+  keywords: ['Senesh', 'Developer', 'Full-Stack', 'AI', 'Sri Lanka', 'Portfolio'],
+  authors: [{ name: 'Senesh' }],
   openGraph: {
-    title: 'PETER SENESH FERNANDO | IT Student & Developer',
-    description: 'Portfolio of PETER SENESH FERNANDO - Information Technology Student at Curtin University Colombo.',
+    title: 'Senesh — Developer',
+    description: 'Undergrad developer building full-stack web apps and AI integrations.',
     type: 'website',
   },
 }
@@ -63,10 +63,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="bg-background">
-      <body className={`${fontClasses} text-foreground`}>
-        <EasterEgg />
+      <body className={`${fontClasses} text-foreground ${isAdmin ? "" : "site-cursor"}`}>
+        {!isAdmin && <CustomCursor />}
         {!isAdmin && <Navbar />}
-        <main className={`relative z-10 ${isAdmin ? "" : "pt-16"}`}>
+        <main className="relative z-10">
           <PageTransition>
             {children}
           </PageTransition>
