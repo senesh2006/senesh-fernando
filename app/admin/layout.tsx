@@ -46,7 +46,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#050302] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 text-primary animate-spin" />
       </div>
     )
@@ -61,7 +61,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#050302] text-foreground font-sans flex">
+    <div className="min-h-screen bg-background text-foreground font-sans flex">
       {!isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
@@ -71,7 +71,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-[#0a0705] border-r border-white/5 transition-transform duration-300 transform lg:relative lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-border transition-transform duration-300 transform lg:relative lg:translate-x-0",
           !isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -132,7 +132,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="lg:hidden h-16 border-b border-white/5 bg-[#0a0705] flex items-center justify-between px-6 shrink-0">
+        <header className="lg:hidden h-16 border-b border-border bg-background flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xs">
               PS

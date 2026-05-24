@@ -5,6 +5,7 @@ import { ExternalLink, X, Code, Lightbulb, TrendingUp, Loader2, AlertCircle, Cpu
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Reveal } from "@/components/reveal"
+import { SectionHeader } from "@/components/editorial/section-header"
 
 interface Project {
   id: string
@@ -50,13 +51,9 @@ export function ProjectsSection() {
   }, [])
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
-      <div className="max-w-[1100px] mx-auto">
-        <Reveal>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-16 text-foreground">
-            Projects
-          </h1>
-        </Reveal>
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
+      <div className="max-w-[860px] mx-auto">
+        <SectionHeader kicker="Work" title="Projects" />
 
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
@@ -93,7 +90,7 @@ export function ProjectsSection() {
                         className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110 opacity-60"
                         onError={(e) => (e.currentTarget.style.display = 'none')}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#050302] via-transparent to-transparent opacity-80" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
                       <div className="absolute inset-0 bg-primary/10 group-hover/img:bg-transparent transition-colors" />
                     </div>
 

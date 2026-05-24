@@ -1,8 +1,8 @@
 import { Metadata, ResolvingMetadata } from "next"
-import { BlogsSection } from "@/components/sections/blogs"
 import { notFound } from "next/navigation"
 import { getDocument } from "@/lib/firestore"
 import { getAuthBaseUrl } from "@/lib/auth-url"
+import { BlogArticle, type BlogArticleData } from "@/components/editorial/blog-article"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -20,9 +20,7 @@ export async function generateMetadata(
   const blog = await getBlog(id)
 
   if (!blog) {
-    return {
-      title: "Blog Not Found",
-    }
+    return { title: "Blog Not Found" }
   }
 
   const previousImages = (await parent).openGraph?.images || []
@@ -41,12 +39,6 @@ export async function generateMetadata(
       type: "article",
       publishedTime: String(blog.created_at ?? ""),
     },
-    twitter: {
-      card: "summary_large_image",
-      title: String(blog.title),
-      description: String(blog.content).substring(0, 160),
-      images: blog.image_url ? [String(blog.image_url)] : [],
-    },
   }
 }
 
@@ -58,5 +50,19 @@ export default async function BlogPostPage({ params }: Props) {
     notFound()
   }
 
-  return <BlogsSection autoOpenId={id} />
+  const article: BlogArticleData = {
+    id: String(blog.id),
+    title: String(blog.title),
+    content: String(blog.content),
+    category: String(blog.category),
+    tags: Array.isArray(blog.tags) ? blog.tags.map(String) : [],
+    image_url: blog.image_url ? String(blog.image_url) : null,
+    github_url: blog.github_url ? String(blog.github_url) : null,
+    linkedin_url: blog.linkedin_url ? String(blog.linkedin_url) : null,
+    other_url: blog.other_url ? String(blog.other_url) : null,
+    created_at: String(blog.created_at ?? ""),
+    views: Number(blog.views ?? 0),
+  }
+
+  return <BlogArticle blog={article} />
 }

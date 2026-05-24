@@ -42,8 +42,8 @@ export function BlogLikeButton({
         "gap-1.5 rounded-full border transition-all",
         size === "md" ? "h-10 px-4 text-sm" : "h-8 px-3 text-xs",
         isLiked
-          ? "border-primary/40 bg-primary/15 text-primary hover:bg-primary/15 hover:text-primary"
-          : "border-white/10 bg-white/5 text-foreground-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary",
+          ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
+          : "border-border bg-background text-foreground-muted hover:border-primary/30 hover:bg-paper-2 hover:text-primary",
         className
       )}
       aria-label={isLiked ? "Already liked" : "Like this blog"}

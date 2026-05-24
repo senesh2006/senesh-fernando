@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { TestimonialCarousel } from "@/components/testimonial-carousel"
+import { SectionHeader } from "@/components/editorial/section-header"
 
 interface Recommendation {
   id: string
@@ -84,20 +85,19 @@ export function RecommendationsSection() {
   }
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-[#0a0705]">
-      <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-[#f5ede6] animate-fade-in-up">
-          Recommendations
-        </h1>
-        <p className="text-center text-[rgba(245,237,230,0.6)] mb-12 max-w-2xl mx-auto animate-fade-in-up">
-          What colleagues and mentors say about working with me
-        </p>
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
+      <div className="max-w-[860px] mx-auto">
+        <SectionHeader
+          kicker="Testimonials"
+          title="Recommendations"
+          description="What colleagues and mentors say about working with me."
+        />
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-4 mb-12 animate-fade-in-up">
           <Button
             onClick={() => setShowForm(!showForm)}
-            className="gap-2 bg-[#ff6a00] text-white hover:bg-[#e55f00] transition-all rounded-xl px-6 py-5"
+            className="gap-2 rounded-sm px-6"
             data-magnetic
           >
             <Star className="h-4 w-4" />
@@ -109,7 +109,7 @@ export function RecommendationsSection() {
               <Button
                 variant="ghost"
                 onClick={() => setViewMode("carousel")}
-                className={`gap-2 rounded-lg px-4 ${viewMode === "carousel" ? "bg-[rgba(255,106,0,0.2)] text-[#ff6a00]" : "text-[#f5ede6]"}`}
+                className={`gap-2 rounded-lg px-4 ${viewMode === "carousel" ? "bg-primary/10 text-primary" : "text-foreground"}`}
               >
                 <Play className="h-4 w-4" />
                 Carousel
@@ -117,7 +117,7 @@ export function RecommendationsSection() {
               <Button
                 variant="ghost"
                 onClick={() => setViewMode("grid")}
-                className={`gap-2 rounded-lg px-4 ${viewMode === "grid" ? "bg-[rgba(255,106,0,0.2)] text-[#ff6a00]" : "text-[#f5ede6]"}`}
+                className={`gap-2 rounded-lg px-4 ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-foreground"}`}
               >
                 <LayoutGrid className="h-4 w-4" />
                 Grid
@@ -143,14 +143,14 @@ export function RecommendationsSection() {
         {/* Recommendation Form */}
         {showForm && (
           <div className="mb-12 glass-card p-8 animate-scale-in">
-            <h2 className="text-xl font-semibold text-[#f5ede6] mb-6 flex items-center gap-2">
-              <Quote className="h-5 w-5 text-[#ff6a00]" />
+            <h2 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+              <Quote className="h-5 w-5 text-primary" />
               Write a Recommendation
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-sm text-[rgba(245,237,230,0.6)] flex items-center gap-2">
+                  <label className="text-sm text-foreground-muted flex items-center gap-2">
                     <User className="h-4 w-4" /> Your Name *
                   </label>
                   <Input
@@ -158,48 +158,48 @@ export function RecommendationsSection() {
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     required
-                    className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl"
+                    className="bg-background border-border text-foreground placeholder:text-foreground-muted/50 focus:border-primary rounded-sm"
                     placeholder="John Doe"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-[rgba(245,237,230,0.6)] flex items-center gap-2">
+                  <label className="text-sm text-foreground-muted flex items-center gap-2">
                     <Briefcase className="h-4 w-4" /> Your Role
                   </label>
                   <Input
                     type="text"
                     value={formData.role}
                     onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                    className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl"
+                    className="bg-background border-border text-foreground placeholder:text-foreground-muted/50 focus:border-primary rounded-sm"
                     placeholder="Software Engineer"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-[rgba(245,237,230,0.6)]">Company / Organization</label>
+                <label className="text-sm text-foreground-muted">Company / Organization</label>
                 <Input
                   type="text"
                   value={formData.company}
                   onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                  className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl"
+                  className="bg-background border-border text-foreground placeholder:text-foreground-muted/50 focus:border-primary rounded-sm"
                   placeholder="Tech Company Inc."
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-[rgba(245,237,230,0.6)]">Your Recommendation *</label>
+                <label className="text-sm text-foreground-muted">Your Recommendation *</label>
                 <Textarea
                   value={formData.message}
                   onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                   required
                   rows={4}
-                  className="bg-[rgba(255,255,255,0.04)] border-[rgba(255,120,20,0.2)] text-[#f5ede6] placeholder:text-[rgba(245,237,230,0.3)] focus:border-[#ff6a00] rounded-xl resize-none"
+                  className="bg-background border-border text-foreground placeholder:text-foreground-muted/50 focus:border-primary rounded-sm resize-none"
                   placeholder="Write your recommendation here..."
                 />
               </div>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="gap-2 bg-[#ff6a00] text-white hover:bg-[#e55f00] transition-all rounded-xl px-6 py-5 disabled:opacity-50"
+                className="gap-2 rounded-sm px-6 disabled:opacity-50"
                 data-magnetic
               >
                 {isSubmitting ? (
@@ -216,7 +216,7 @@ export function RecommendationsSection() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-8 w-8 text-[#ff6a00] animate-spin" />
+            <Loader2 className="h-8 w-8 text-primary animate-spin" />
           </div>
         )}
 
@@ -224,7 +224,7 @@ export function RecommendationsSection() {
         {!isLoading && recommendations.length === 0 && (
           <div className="text-center py-16 animate-fade-in-up">
             <Quote className="h-16 w-16 text-[rgba(255,106,0,0.3)] mx-auto mb-4" />
-            <p className="text-[rgba(245,237,230,0.6)]">No recommendations yet. Be the first to leave one!</p>
+            <p className="text-foreground-muted">No recommendations yet. Be the first to leave one!</p>
           </div>
         )}
 
@@ -241,25 +241,25 @@ export function RecommendationsSection() {
                     className="glass-card p-6 animate-fade-in-up"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <Quote className="h-8 w-8 text-[#ff6a00] mb-4 opacity-50" />
-                    <p className="text-[rgba(245,237,230,0.8)] leading-relaxed mb-6 italic">
+                    <Quote className="h-8 w-8 text-primary mb-4 opacity-50" />
+                    <p className="text-foreground-muted/70 leading-relaxed mb-6 italic">
                       &quot;{rec.message}&quot;
                     </p>
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-[rgba(255,106,0,0.2)] flex items-center justify-center flex-shrink-0">
-                        <span className="text-[#ff6a00] font-semibold text-lg">
+                        <span className="text-primary font-semibold text-lg">
                           {rec.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-[#f5ede6] truncate">{rec.name}</h3>
+                        <h3 className="font-semibold text-foreground truncate">{rec.name}</h3>
                         {(rec.role || rec.company) && (
-                          <p className="text-sm text-[rgba(245,237,230,0.5)] truncate">
+                          <p className="text-sm text-foreground-muted truncate">
                             {rec.role}{rec.role && rec.company && ' at '}{rec.company}
                           </p>
                         )}
                       </div>
-                      <span className="text-xs text-[rgba(245,237,230,0.4)] flex-shrink-0">
+                      <span className="text-xs text-foreground-muted/50 flex-shrink-0">
                         {formatDate(rec.created_at)}
                       </span>
                     </div>

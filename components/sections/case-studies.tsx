@@ -5,6 +5,7 @@ import { ArrowRight, Target, Lightbulb, Rocket, ChevronDown, ExternalLink } from
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Reveal } from "@/components/reveal"
+import { SectionHeader } from "@/components/editorial/section-header"
 
 interface CaseStudy {
   id: string
@@ -91,18 +92,13 @@ export function CaseStudiesSection() {
   const [expandedId, setExpandedId] = useState<string | null>(caseStudies[0]?.id || null)
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
-      <div className="max-w-[1100px] mx-auto">
-        <Reveal>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-6 text-foreground">
-            Case Studies
-          </h1>
-        </Reveal>
-        <Reveal delay={100}>
-          <p className="text-center text-foreground-muted mb-16 max-w-2xl mx-auto">
-            Deep dives into my most impactful projects, exploring the problems, solutions, and lessons learned
-          </p>
-        </Reveal>
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
+      <div className="max-w-[860px] mx-auto">
+        <SectionHeader
+          kicker="Deep dives"
+          title="Case studies"
+          description="Problems, solutions, and lessons learned from my most impactful projects."
+        />
 
         <div className="space-y-6">
           {caseStudies.map((study, index) => (

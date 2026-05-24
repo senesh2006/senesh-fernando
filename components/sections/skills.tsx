@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import { Reveal } from "@/components/reveal"
+import { SectionHeader } from "@/components/editorial/section-header"
 import { Code, Server, Database, Layout, Loader2, AlertCircle } from "lucide-react"
 import {
   Accordion,
@@ -47,18 +48,13 @@ export function SkillsSection() {
   }, [])
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
-      <div className="max-w-[900px] mx-auto">
-        <Reveal>
-          <div className="text-center mb-16">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium mb-4 text-foreground">
-              Skills
-            </h1>
-            <p className="text-foreground-muted max-w-xl mx-auto">
-              Expand each category to explore my technical toolkit.
-            </p>
-          </div>
-        </Reveal>
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
+      <div className="max-w-[860px] mx-auto">
+        <SectionHeader
+          kicker="Toolkit"
+          title="Skills"
+          description="Expand each category to explore my technical toolkit."
+        />
 
         {isLoading ? (
           <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>

@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { motion } from "motion/react"
+import { Loader2, BookOpen, AlertCircle, ArrowRight } from "lucide-react"
 import { Reveal } from "@/components/reveal"
-import { Terminal, Code2, Cpu, Globe, Loader2, BookOpen, Github, Linkedin, ExternalLink, X, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { SectionHeader } from "@/components/editorial/section-header"
 import { AvatarGroup } from "@/registry/magicui/avatar-group"
 import { getBlogLikers } from "@/lib/blog-likers"
 import {
@@ -27,29 +28,20 @@ interface BlogEntry {
   views: number
 }
 
-const iconMap: Record<string, any> = {
-  Frontend: Globe,
-  UX: Terminal,
-  "System Programming": Cpu,
-  "Next.js": Code2,
-}
-
-export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
+export function BlogsSection() {
   const [blogs, setBlogs] = useState<BlogEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null)
   const [isMounted, setIsMounted] = useState(false)
-  const [linkCopied, setLinkCopied] = useState(false)
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
   const [likingId, setLikingId] = useState<string | null>(null)
 
   useEffect(() => {
     setLikedIds(getLikedBlogIds())
+    setIsMounted(true)
   }, [])
 
   useEffect(() => {
-    setIsMounted(true)
     async function fetchBlogs() {
       try {
         const response = await fetch("/api/blogs")
@@ -58,59 +50,31 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
           throw new Error(data.error || "Failed to fetch from API")
         }
         const data = await response.json()
-        const blogList = Array.isArray(data)
-          ? data.map((b: BlogEntry) => ({ ...b, views: b.views ?? 0 }))
-          : []
-        setBlogs(blogList)
-
-        if (autoOpenId) {
-          const blogToOpen = blogList.find((b: BlogEntry) => b.id === autoOpenId)
-          if (blogToOpen) {
-            setSelectedBlog(blogToOpen)
-          }
-        }
-      } catch (e: any) {
-        console.error("Fetch error:", e)
-        setError(e.message || "Failed to load blogs")
+        setBlogs(
+          Array.isArray(data)
+            ? data.map((b: BlogEntry) => ({ ...b, views: b.views ?? 0 }))
+            : []
+        )
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to load blogs")
       } finally {
         setIsLoading(false)
       }
     }
     fetchBlogs()
-  }, [autoOpenId])
+  }, [])
 
   const formatDate = (dateString: string) => {
     if (!isMounted) return ""
     try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-    } catch (e) {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    } catch {
       return ""
     }
-  }
-
-  const handleBlogClick = (blog: BlogEntry) => {
-    setSelectedBlog(blog)
-    window.history.pushState(null, "", `/blogs/${blog.id}`)
-  }
-
-  const closePortal = () => {
-    setSelectedBlog(null)
-    // Restore the base /blogs URL
-    window.history.pushState(null, '', '/blogs')
-  }
-
-  const handleShareLinkedIn = (blog: BlogEntry) => {
-    const url = `${window.location.origin}/blogs/${blog.id}`
-    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
-    window.open(shareUrl, '_blank', 'width=600,height=600')
-  }
-
-  const handleCopyLink = (blog: BlogEntry) => {
-    const url = `${window.location.origin}/blogs/${blog.id}`
-    navigator.clipboard.writeText(url)
-    setLinkCopied(true)
-    setTimeout(() => setLinkCopied(false), 2000)
   }
 
   const handleLike = async (blogId: string) => {
@@ -120,108 +84,75 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
     try {
       const response = await fetch(`/api/blogs/${blogId}/views`, { method: "POST" })
       if (!response.ok) return
-
       const data = await response.json()
-      const likes = data.views ?? 0
       markBlogLiked(blogId)
       setLikedIds((prev) => new Set(prev).add(blogId))
       setBlogs((prev) =>
-        prev.map((b) => (b.id === blogId ? { ...b, views: likes } : b))
+        prev.map((b) => (b.id === blogId ? { ...b, views: data.views ?? 0 } : b))
       )
-      setSelectedBlog((prev) =>
-        prev?.id === blogId ? { ...prev, views: likes } : prev
-      )
-    } catch {
-      // keep UI unchanged on failure
     } finally {
       setLikingId(null)
     }
   }
 
   return (
-    <section className="min-h-screen px-4 sm:px-6 py-20 bg-background">
-      <div className="max-w-[1100px] mx-auto">
-        <Reveal>
-          <div className="flex flex-col items-center mb-16">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-4 text-foreground">
-              Technical Blogs
-            </h1>
-            <p className="text-foreground-muted text-center max-w-2xl">
-              In-depth looks at technical hurdles, daily discoveries, and my journey as a developer.
-            </p>
-          </div>
-        </Reveal>
+    <section className="min-h-screen px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
+      <div className="max-w-[860px] mx-auto">
+        <SectionHeader
+          kicker="Writing"
+          title="Technical blogs"
+          description="In-depth notes on technical hurdles, daily discoveries, and the journey of building as a developer."
+        />
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex justify-center py-20">
             <Loader2 className="h-8 w-8 text-primary animate-spin" />
           </div>
         ) : error ? (
-          <div className="max-w-md mx-auto p-6 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex flex-col items-center text-center gap-4">
-            <AlertCircle className="h-10 w-10" />
-            <div>
-              <h3 className="font-bold mb-1">Database Connection Error</h3>
-              <p className="text-sm opacity-80">{error}</p>
-              <p className="text-[10px] mt-4 uppercase tracking-widest opacity-50">Check Vercel Environment Variables</p>
-            </div>
+          <div className="editorial-callout border-l-red-500">
+            <div className="editorial-callout-title text-red-700">Connection error</div>
+            <p>{error}</p>
           </div>
         ) : blogs.length === 0 ? (
           <div className="text-center py-20 text-foreground-muted">
-             <BookOpen className="h-16 w-16 opacity-20 mx-auto mb-4" />
-             No blog posts yet.
+            <BookOpen className="h-12 w-12 opacity-30 mx-auto mb-4" />
+            No blog posts yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {blogs.map((entry, index) => {
-              const Icon = iconMap[entry.category] || BookOpen
-              return (
-                <Reveal key={entry.id} delay={index * 100}>
-                  <motion.div
-                    className="glass-card h-full flex flex-col glass-card-hover group overflow-hidden cursor-pointer"
-                    onClick={() => handleBlogClick(entry)}
-                    whileHover={{ y: -4 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 22 }}
+          <div className="space-y-0 border-t border-paper-3">
+            {blogs.map((entry, index) => (
+              <Reveal key={entry.id} delay={index * 80}>
+                <Link href={`/blogs/${entry.id}`} className="block group">
+                  <motion.article
+                    className="py-8 border-b border-paper-3 transition-colors hover:bg-paper-2/40 -mx-4 px-4 sm:-mx-6 sm:px-6"
+                    whileHover={{ x: 4 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
-                    {/* Blog Image */}
-                    {entry.image_url && (
-                      <div className="relative h-48 w-full overflow-hidden">
-                        <img 
-                          src={entry.image_url} 
-                          alt={entry.title}
-                          className="w-full h-full object-cover opacity-60 transition-transform duration-500 group-hover:scale-110"
-                          onError={(e) => (e.currentTarget.style.display = 'none')}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#050302] via-transparent to-transparent opacity-80" />
-                      </div>
-                    )}
-
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-medium block mb-1">
-                              {entry.category}
-                            </span>
-                            <h2 className="text-xl font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">
-                              {entry.title}
-                            </h2>
-                          </div>
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+                      {entry.image_url && (
+                        <div className="sm:w-40 sm:shrink-0 h-28 sm:h-24 overflow-hidden rounded-sm border border-paper-3">
+                          <img
+                            src={entry.image_url}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                      </div>
-
-                      <p className="text-sm text-foreground-muted leading-relaxed mb-6 line-clamp-3">
-                        {entry.content}
-                      </p>
-
-                      <div className="mt-auto pt-4 border-t border-white/5">
-                        <div className="flex items-center justify-between gap-4 mb-4">
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary mb-2">
+                          {entry.category}
+                        </p>
+                        <h2 className="font-serif text-2xl sm:text-3xl font-normal text-foreground group-hover:text-primary transition-colors leading-tight mb-3">
+                          {entry.title}
+                        </h2>
+                        <p className="text-sm text-foreground-muted line-clamp-2 leading-relaxed mb-4">
+                          {entry.content}
+                        </p>
+                        <div className="flex flex-wrap items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
                             <AvatarGroup
                               avatars={getBlogLikers(entry.id)}
-                              max={4}
+                              max={3}
                               totalCount={entry.views}
                               size="sm"
                             />
@@ -233,185 +164,34 @@ export function BlogsSection({ autoOpenId }: { autoOpenId?: string }) {
                               onLike={handleLike}
                             />
                           </div>
-                          <span className="text-[10px] text-foreground-muted font-mono shrink-0">
-                            {formatDate(entry.created_at)}
-                          </span>
+                          <div className="flex items-center gap-3 font-mono text-[11px] text-foreground-muted">
+                            <span>{formatDate(entry.created_at)}</span>
+                            <span className="text-primary inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                              Read <ArrowRight className="h-3 w-3" />
+                            </span>
+                          </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          className="p-0 h-auto text-primary hover:text-primary/80 hover:bg-transparent font-medium flex items-center gap-2 group/btn"
-                        >
-                          View Blog <ExternalLink className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
-                        </Button>
                       </div>
                     </div>
-                  </motion.div>
-                </Reveal>
-              )
-            })}
+                  </motion.article>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         )}
 
-        {/* Blog Detail Modal */}
-        {selectedBlog && (
-          <div 
-            className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6"
-            onClick={closePortal}
-          >
-            <div className="absolute inset-0 bg-black/90 backdrop-blur-md animate-fade-in" />
-            
-            <div 
-              className="relative w-full max-w-3xl glass-card max-h-full overflow-y-auto animate-scale-in p-6 sm:p-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={closePortal}
-                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-primary/20 transition-colors z-10"
-                data-magnetic
-              >
-                <X className="h-5 w-5 text-foreground" />
-              </button>
-
-              {selectedBlog.image_url && (
-                <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden mb-8 border border-white/10">
-                  <img 
-                    src={selectedBlog.image_url} 
-                    alt={selectedBlog.title}
-                    className="w-full h-full object-cover opacity-80"
-                  />
-                </div>
-              )}
-
-              <div className="mb-8">
-                <span className="text-xs text-primary uppercase tracking-[0.3em] font-bold block mb-3">
-                  {selectedBlog.category}
-                </span>
-                <h2 className="text-2xl sm:text-4xl font-bold text-foreground leading-tight">
-                  {selectedBlog.title}
-                </h2>
-                <p className="text-xs text-foreground-muted font-mono mt-4">
-                  Published on {formatDate(selectedBlog.created_at)}
-                </p>
-              </div>
-
-              <div className="prose prose-invert max-w-none mb-10">
-                <p className="text-foreground/90 text-lg leading-relaxed whitespace-pre-wrap font-sans">
-                  {selectedBlog.content}
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-white/10">
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <AvatarGroup
-                      avatars={getBlogLikers(selectedBlog.id, 5)}
-                      max={5}
-                      totalCount={selectedBlog.views}
-                      size="md"
-                    />
-                    <BlogLikeButton
-                      blogId={selectedBlog.id}
-                      likes={selectedBlog.views}
-                      isLiked={likedIds.has(selectedBlog.id)}
-                      isLoading={likingId === selectedBlog.id}
-                      size="md"
-                      onLike={handleLike}
-                    />
-                    <span className="text-sm text-foreground-muted">
-                      {likedIds.has(selectedBlog.id) ? "Thanks for the like!" : "Enjoyed this? Leave a like"}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-4">
-                   {/* Share Section */}
-                   <div className="flex items-center gap-2 pr-4 border-r border-white/10">
-                    <span className="text-[10px] text-foreground-muted uppercase tracking-widest font-bold">Share:</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleShareLinkedIn(selectedBlog)}
-                      className="h-8 w-8 p-0 text-foreground-muted hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-lg"
-                      title="Share on LinkedIn"
-                    >
-                      <Linkedin className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCopyLink(selectedBlog)}
-                      className="h-8 w-8 p-0 text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-lg"
-                      title="Copy Link"
-                    >
-                      {linkCopied ? <CheckCircle className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
-                    </Button>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    {selectedBlog.github_url && (
-                      <a 
-                        href={selectedBlog.github_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
-                        data-magnetic
-                      >
-                        <Github className="h-5 w-5" /> GitHub
-                      </a>
-                    )}
-                    {selectedBlog.linkedin_url && (
-                      <a 
-                        href={selectedBlog.linkedin_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
-                        data-magnetic
-                      >
-                        <Linkedin className="h-5 w-5" /> Original Post
-                      </a>
-                    )}
-                    {selectedBlog.other_url && (
-                      <a 
-                        href={selectedBlog.other_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="flex items-center gap-2 text-foreground-muted hover:text-primary transition-colors text-sm"
-                        data-magnetic
-                      >
-                        <ExternalLink className="h-5 w-5" /> Live Link
-                      </a>
-                    )}
-                  </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {selectedBlog.tags && selectedBlog.tags.map((tag, i) => (
-                    <span 
-                      key={i}
-                      className="px-3 py-1 rounded-full text-[10px] bg-primary/10 text-primary border border-primary/20 font-mono"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <Reveal delay={500}>
-          <div className="mt-20 p-8 glass-card border-dashed border-primary/30 flex flex-col items-center text-center">
-            <h3 className="text-xl font-medium text-foreground mb-4">Have a technical question?</h3>
-            <p className="text-foreground-muted text-sm mb-6 max-w-md">
-              I'm always happy to discuss these topics or collaborate on projects involving these technologies.
+        <Reveal delay={300}>
+          <div className="mt-16 editorial-callout">
+            <div className="editorial-callout-title">Collaborate</div>
+            <p className="mb-4">
+              Have a technical question or want to work on something together?
             </p>
-            <a 
-              href="/contact" 
-              className="px-6 py-2.5 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm font-medium hover:bg-primary/20 transition-all glow-orange"
-              data-magnetic
+            <Link
+              href="/contact"
+              className="editorial-footer-link inline-flex items-center gap-1"
             >
-              Get in touch
-            </a>
+              Get in touch →
+            </Link>
           </div>
         </Reveal>
       </div>

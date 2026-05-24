@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Reveal } from "@/components/reveal"
+import { SectionHeader } from "@/components/editorial/section-header"
 import { useSound } from "@/hooks/use-sound"
 import {
   Accordion,
@@ -95,19 +96,13 @@ export function ContactSection() {
   }
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 bg-background">
-      <div className="max-w-[1100px] mx-auto">
-        <Reveal>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-center mb-8 text-foreground">
-            Get In Touch
-          </h1>
-        </Reveal>
-
-        <Reveal delay={100}>
-          <p className="text-center text-foreground-muted mb-12">
-            Open to internships, freelance work, and collaborations.
-          </p>
-        </Reveal>
+    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
+      <div className="max-w-[860px] mx-auto">
+        <SectionHeader
+          kicker="Contact"
+          title="Get in touch"
+          description="Open to internships, freelance work, and collaborations."
+        />
 
         <div className="grid lg:grid-cols-2 gap-10">
           {/* Contact Form */}
