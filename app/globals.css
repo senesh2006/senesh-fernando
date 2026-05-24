@@ -914,6 +914,114 @@ footer {
   font-size: 0.95rem;
 }
 
+/* Flowing menu */
+.flowing-nav-section {
+  padding-bottom: 4rem;
+}
+
+.flowing-nav-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.flowing-nav-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 2rem;
+}
+
+.flowing-nav-wrap {
+  height: min(600px, 70vh);
+  position: relative;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.flowing-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+}
+
+.flowing-menu-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  z-index: 201;
+  background: none;
+  border: none;
+  color: var(--txt);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+/* Spotlight project grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.project-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+}
+
+body.site-cursor .project-card-link {
+  cursor: none;
+}
+
+.project-spotlight-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.project-card-link:hover .project-spotlight-card {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.project-spotlight-image {
+  width: 100%;
+  height: 160px;
+  border-radius: 0.5rem;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--line);
+}
+
+.project-card-footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.project-card-footer .project-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--txt3);
+  transition: color 0.2s;
+}
+
+.project-card-link:hover .project-arrow {
+  color: var(--accent);
+}
+
 .footer-copy,
 .footer-built {
   font-family: var(--font-mono);
@@ -966,28 +1074,10 @@ footer {
 
   .nav-links {
     display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    gap: 0;
-    background: rgba(10, 10, 9, 0.98);
-    border-bottom: 1px solid var(--line);
-    padding: 1rem 1.5rem 1.5rem;
   }
 
   .nav-links-open {
-    display: flex;
-  }
-
-  .nav-links li {
-    width: 100%;
-  }
-
-  .nav-links a {
-    display: block;
-    padding: 0.75rem 0;
+    display: none;
   }
 
   .nav-status {

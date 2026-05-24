@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Loader2, AlertCircle } from "lucide-react"
+import { Loader2, AlertCircle, ArrowUpRight } from "lucide-react"
 import { Reveal } from "@/components/reveal"
 import { SectionHeader } from "@/components/editorial/section-header"
+import SpotlightCard from "@/components/SpotlightCard"
 
 interface Project {
   id: string
@@ -12,6 +13,7 @@ interface Project {
   description: string
   source_url: string | null
   skills: string[]
+  image_url?: string | null
 }
 
 const fallbackProjects: Project[] = [
@@ -23,6 +25,7 @@ const fallbackProjects: Project[] = [
       "AI-powered content and event SaaS built in 24 hours at the Cursor Buildathon. Describe your campaign goal → Gemini generates a strategy → one click produces a flyer, audio promo, and a live event registration page. Placed 20th globally — undeployed.",
     source_url: "https://github.com/senesh2006/SoloScale",
     skills: ["Next.js 16", "Google Gemini", "Firebase", "TanStack Query", "Tailwind v4", "TypeScript"],
+    image_url: "https://picsum.photos/seed/soloscale/800/500",
   },
   {
     id: "more",
@@ -32,6 +35,7 @@ const fallbackProjects: Project[] = [
       "Currently working on new projects. Check back soon or visit my GitHub to see what's in progress.",
     source_url: "https://github.com/senesh2006",
     skills: ["github.com/senesh2006"],
+    image_url: "https://picsum.photos/seed/senesh-more/800/500",
   },
 ]
 
@@ -45,6 +49,10 @@ function getBadges(project: Project) {
     )
   }
   return <span className="project-badge badge-dim">Personal project</span>
+}
+
+function projectImage(project: Project) {
+  return project.image_url || `https://picsum.photos/seed/${encodeURIComponent(project.id)}/800/500`
 }
 
 export function ProjectsSection() {
@@ -88,16 +96,23 @@ export function ProjectsSection() {
                 {error}
               </p>
             )}
-            <div className="projects-list">
+            <div className="projects-grid">
               {items.map((project) => (
                 <a
                   key={project.id}
                   href={project.source_url || "https://github.com/senesh2006"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="project-card"
+                  className="project-card-link"
                 >
-                  <div>
+                  <SpotlightCard
+                    className="project-spotlight-card"
+                    spotlightColor="rgba(212, 168, 83, 0.22)"
+                  >
+                    <div
+                      className="project-spotlight-image"
+                      style={{ backgroundImage: `url(${projectImage(project)})` }}
+                    />
                     <div className="project-top">{getBadges(project)}</div>
                     <div className="project-name">{project.name}</div>
                     <div className="project-desc">{project.description}</div>
@@ -106,8 +121,12 @@ export function ProjectsSection() {
                         <span key={tech}>{tech}</span>
                       ))}
                     </div>
-                  </div>
-                  <div className="project-arrow">↗</div>
+                    <div className="project-card-footer">
+                      <span className="project-arrow">
+                        View project <ArrowUpRight className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </SpotlightCard>
                 </a>
               ))}
             </div>
