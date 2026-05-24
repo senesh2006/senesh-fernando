@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation"
+import { AchievementsSection } from "@/components/sections/achievements"
+import { PageShell } from "@/components/page-shell"
 
 export default function AchievementsPage() {
-  redirect("/#about")
+  return (
+    <PageShell>
+      <AchievementsSection />
+    </PageShell>
+  )
 }

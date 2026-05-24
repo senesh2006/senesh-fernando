@@ -1,51 +1,36 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
 const navItems = [
-  { label: "About", href: "/#about" },
-  { label: "Skills", href: "/#skills" },
-  { label: "Projects", href: "/#projects" },
-  { label: "Experience", href: "/#experience" },
-  { label: "Blog", href: "/#blog" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Skills", href: "/skills" },
+  { label: "Projects", href: "/projects" },
+  { label: "Experience", href: "/experience" },
+  { label: "Blog", href: "/blogs" },
+  { label: "Contact", href: "/contact" },
 ]
 
-const sectionIds = navItems.map((item) => item.href.replace("/#", ""))
-
 export function Navbar() {
+  const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState("hero")
-
-  useEffect(() => {
-    const onScroll = () => {
-      let current = "hero"
-      for (const id of sectionIds) {
-        const el = document.getElementById(id)
-        if (el && window.scrollY >= el.offsetTop - 120) {
-          current = id
-        }
-      }
-      setActiveSection(current)
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
 
   return (
     <nav>
-      <Link href="/#hero" className="nav-logo" onClick={() => setIsMobileMenuOpen(false)}>
+      <Link href="/" className="nav-logo" onClick={() => setIsMobileMenuOpen(false)}>
         Senesh
       </Link>
 
       <ul className={`nav-links ${isMobileMenuOpen ? "nav-links-open" : ""}`}>
         {navItems.map((item) => {
-          const id = item.href.replace("/#", "")
-          const isActive = activeSection === id
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
             <li key={item.href}>
               <Link

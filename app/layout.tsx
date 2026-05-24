@@ -5,6 +5,7 @@ import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from "@/components/navbar"
 import { CustomCursor } from "@/components/custom-cursor"
+import { PageBackground } from "@/components/page-background"
 import { PageTransition } from "@/components/page-transition"
 import { MaintenanceScreen } from "@/components/maintenance-screen"
 import './globals.css'
@@ -64,6 +65,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="bg-background">
       <body className={`${fontClasses} text-foreground ${isAdmin ? "" : "site-cursor"}`}>
+        {!isAdmin && <PageBackground />}
         {!isAdmin && <CustomCursor />}
         {!isAdmin && <Navbar />}
         <main className="relative z-10">

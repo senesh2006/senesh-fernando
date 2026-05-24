@@ -36,9 +36,9 @@ export function EducationSection() {
   }, [])
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
-      <div className="max-w-[860px] mx-auto">
-        <SectionHeader kicker="Background" title="Education" />
+    <section id="education">
+      <div className="container">
+        <SectionHeader num="07" title="Education" />
 
         {isLoading ? (
           <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>

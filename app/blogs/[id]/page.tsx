@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { getDocument } from "@/lib/firestore"
 import { getAuthBaseUrl } from "@/lib/auth-url"
 import { BlogArticle, type BlogArticleData } from "@/components/editorial/blog-article"
+import { SiteFooter } from "@/components/site-footer"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -64,5 +65,10 @@ export default async function BlogPostPage({ params }: Props) {
     views: Number(blog.views ?? 0),
   }
 
-  return <BlogArticle blog={article} />
+  return (
+    <>
+      <BlogArticle blog={article} />
+      <SiteFooter />
+    </>
+  )
 }

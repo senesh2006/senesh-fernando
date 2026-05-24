@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation"
+import { EducationSection } from "@/components/sections/education"
+import { PageShell } from "@/components/page-shell"
 
 export default function EducationPage() {
-  redirect("/#about")
+  return (
+    <PageShell>
+      <EducationSection />
+    </PageShell>
+  )
 }

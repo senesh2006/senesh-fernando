@@ -92,10 +92,10 @@ export function CaseStudiesSection() {
   const [expandedId, setExpandedId] = useState<string | null>(caseStudies[0]?.id || null)
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
-      <div className="max-w-[860px] mx-auto">
+    <section id="case-studies">
+      <div className="container">
         <SectionHeader
-          kicker="Deep dives"
+          num="10"
           title="Case studies"
           description="Problems, solutions, and lessons learned from my most impactful projects."
         />

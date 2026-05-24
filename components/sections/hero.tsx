@@ -5,7 +5,6 @@ import Link from "next/link"
 export function HeroSection() {
   return (
     <section id="hero">
-      <div className="hero-grid-bg" />
       <div className="hero-inner">
         <div className="hero-tag">Based in Sri Lanka · Undergrad Developer</div>
         <h1 className="hero-name">
@@ -18,10 +17,10 @@ export function HeroSection() {
           turning hackathon ideas into actual software.
         </p>
         <div className="hero-ctas">
-          <Link href="#projects" className="btn btn-primary">
+          <Link href="/projects" className="btn btn-primary">
             View my work
           </Link>
-          <Link href="#contact" className="btn btn-ghost">
+          <Link href="/contact" className="btn btn-ghost">
             Get in touch
           </Link>
           <a

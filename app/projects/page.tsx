@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation"
+import { ProjectsSection } from "@/components/sections/projects"
+import { PageShell } from "@/components/page-shell"
 
 export default function ProjectsPage() {
-  redirect("/#projects")
+  return (
+    <PageShell>
+      <ProjectsSection />
+    </PageShell>
+  )
 }

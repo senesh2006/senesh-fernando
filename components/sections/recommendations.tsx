@@ -85,10 +85,10 @@ export function RecommendationsSection() {
   }
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-16 bg-background border-b border-paper-3">
-      <div className="max-w-[860px] mx-auto">
+    <section id="recommendations">
+      <div className="container">
         <SectionHeader
-          kicker="Testimonials"
+          num="09"
           title="Recommendations"
           description="What colleagues and mentors say about working with me."
         />

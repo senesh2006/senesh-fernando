@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation"
+import { ExperienceSection } from "@/components/sections/experience"
+import { PageShell } from "@/components/page-shell"
 
 export default function ExperiencePage() {
-  redirect("/#experience")
+  return (
+    <PageShell>
+      <ExperienceSection />
+    </PageShell>
+  )
 }

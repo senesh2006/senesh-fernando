@@ -1,13 +1,10 @@
 import { BlogsSection } from "@/components/sections/blogs"
-import { SiteFooter } from "@/components/site-footer"
+import { PageShell } from "@/components/page-shell"
 
 export default function BlogsPage() {
   return (
-    <>
-      <div className="pt-20">
-        <BlogsSection />
-      </div>
-      <SiteFooter />
-    </>
+    <PageShell>
+      <BlogsSection />
+    </PageShell>
   )
 }

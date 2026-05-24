@@ -211,7 +211,7 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
           <span className="font-mono text-[10px] tracking-[0.1em] text-foreground-muted">
             Senesh
           </span>
-          <Link href="/#blog" className="editorial-footer-link">
+          <Link href="/blogs" className="editorial-footer-link">
             Back to writing →
           </Link>
         </footer>

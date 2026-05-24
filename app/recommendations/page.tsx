@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation"
+import { RecommendationsSection } from "@/components/sections/recommendations"
+import { PageShell } from "@/components/page-shell"
 
 export default function RecommendationsPage() {
-  redirect("/#about")
+  return (
+    <PageShell>
+      <RecommendationsSection />
+    </PageShell>
+  )
 }

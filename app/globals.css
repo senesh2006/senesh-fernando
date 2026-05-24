@@ -297,6 +297,8 @@ nav {
 
 section {
   padding: 7rem 3rem;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -870,6 +872,46 @@ footer {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fixed animated backgrounds */
+.page-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.page-background__color-bends {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  opacity: 0.5;
+}
+
+.page-background__dot-field {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+}
+
+.page-background__fade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to bottom, var(--bg) 0%, transparent 75%);
+  pointer-events: none;
+}
+
+.section-description {
+  color: var(--txt2);
+  max-width: 520px;
+  margin: -2.5rem 0 4rem;
+  line-height: 1.75;
+  font-size: 0.95rem;
 }
 
 .footer-copy,
