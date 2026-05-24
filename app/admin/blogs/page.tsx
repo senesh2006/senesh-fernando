@@ -280,14 +280,19 @@ export default function BlogAdminPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-foreground-muted">Content (Markdown supported)</label>
+              <label className="text-sm text-foreground-muted">Content</label>
+              <p className="text-xs text-foreground-muted leading-relaxed">
+                Supports plain text, Markdown, or HTML (paste article body with editorial
+                classes like pull-quote, scoreboard, timeline). Separate plain paragraphs
+                with a blank line.
+              </p>
               <Textarea
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 required
-                rows={10}
-                className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl resize-none"
-                placeholder="Write your blog content here..."
+                rows={16}
+                className="bg-background border-border text-foreground focus:border-primary rounded-sm resize-y font-mono text-sm"
+                placeholder="Write Markdown, HTML, or plain text..."
               />
             </div>
 

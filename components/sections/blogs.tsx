@@ -13,6 +13,7 @@ import {
   getLikedBlogIds,
   markBlogLiked,
 } from "@/components/blog-like-button"
+import { stripBlogExcerpt } from "@/lib/blog-content"
 
 interface BlogEntry {
   id: string
@@ -146,7 +147,7 @@ export function BlogsSection() {
                           {entry.title}
                         </h2>
                         <p className="text-sm text-foreground-muted line-clamp-2 leading-relaxed mb-4">
-                          {entry.content}
+                          {stripBlogExcerpt(entry.content)}
                         </p>
                         <div className="flex flex-wrap items-center justify-between gap-4">
                           <div className="flex items-center gap-3">

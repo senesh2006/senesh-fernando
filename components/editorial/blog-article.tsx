@@ -18,6 +18,7 @@ import {
   getLikedBlogIds,
   markBlogLiked,
 } from "@/components/blog-like-button"
+import { BlogContent } from "@/components/editorial/blog-content"
 
 export interface BlogArticleData {
   id: string
@@ -76,8 +77,6 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
     setTimeout(() => setLinkCopied(false), 2000)
   }
 
-  const paragraphs = blog.content.split(/\n\n+/).filter(Boolean)
-
   return (
     <div className="bg-background min-h-screen">
       <header className="editorial-hero border-b border-paper-3">
@@ -135,11 +134,7 @@ export function BlogArticle({ blog }: { blog: BlogArticleData }) {
       )}
 
       <article className="editorial-article max-w-[720px] mx-auto px-4 sm:px-8 py-12 sm:py-16">
-        {paragraphs.map((paragraph, index) => (
-          <p key={index} className={index === 0 ? "editorial-lead" : undefined}>
-            {paragraph}
-          </p>
-        ))}
+        <BlogContent content={blog.content} />
 
         <div className="editorial-divider">· · ·</div>
 

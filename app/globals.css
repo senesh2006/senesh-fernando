@@ -441,3 +441,294 @@ section {
   background: rgba(201, 79, 26, 0.2);
   color: var(--ink);
 }
+
+/* Markdown prose */
+.editorial-prose > p:first-of-type {
+  font-size: 1.15rem;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.editorial-prose > p {
+  margin-bottom: 1.4rem;
+  color: var(--ink-2);
+  font-weight: 300;
+}
+
+/* Rich HTML blog blocks (paste from editorial templates) */
+.pull-quote {
+  border-left: 3px solid var(--primary);
+  margin: 3rem 0;
+  padding: 0 0 0 2rem;
+}
+
+.pull-quote blockquote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.pull-quote cite {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-style: normal;
+}
+
+.scoreboard {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 4px;
+  padding: 2.5rem;
+  margin: 3rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.scoreboard-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 1.5rem;
+}
+
+.score-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.score-row:last-child {
+  border-bottom: none;
+}
+
+.score-label {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.score-val {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-style: italic;
+  line-height: 1;
+}
+
+.score-val.accent { color: #ef7a3d; }
+.score-val.blue { color: #5b9cf6; }
+.score-val.dim { color: #888; font-size: 1.8rem; }
+
+.score-suffix {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #666;
+  margin-left: 8px;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--paper-3);
+  border: 1px solid var(--paper-3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 2.5rem 0;
+}
+
+.tech-cell {
+  background: var(--paper);
+  padding: 1.2rem 1.4rem;
+}
+
+.tech-cell-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.tech-cell-val {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.tech-cell-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+.code-block {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-3);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.code-block pre {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+.timeline {
+  margin: 3rem 0;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--paper-3);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  transform: translateX(-3px);
+}
+
+.timeline-item.highlight::before {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--primary);
+}
+
+.timeline-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.timeline-title {
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.timeline-desc {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin: 0;
+}
+
+.team-row {
+  display: flex;
+  gap: 1px;
+  background: var(--paper-3);
+  border: 1px solid var(--paper-3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+
+.team-member {
+  flex: 1;
+  background: var(--paper);
+  padding: 1.5rem;
+}
+
+.team-role {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.team-area {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.team-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-blue);
+}
+
+.callout {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-3);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 0 4px 4px 0;
+  padding: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.callout-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+}
+
+.callout p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 4rem 0;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--paper-3);
+}
+
+@media (max-width: 600px) {
+  .team-row { flex-direction: column; }
+  .scoreboard { padding: 1.5rem; }
+  .score-val { font-size: 2rem; }
+}
