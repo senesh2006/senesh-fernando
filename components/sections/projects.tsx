@@ -5,6 +5,7 @@ import { Loader2, AlertCircle, ArrowUpRight } from "lucide-react"
 import { Reveal } from "@/components/reveal"
 import { SectionHeader } from "@/components/editorial/section-header"
 import SpotlightCard from "@/components/SpotlightCard"
+import { projectFallbackImages } from "@/lib/site-menu-items"
 
 interface Project {
   id: string
@@ -25,7 +26,7 @@ const fallbackProjects: Project[] = [
       "AI-powered content and event SaaS built in 24 hours at the Cursor Buildathon. Describe your campaign goal → Gemini generates a strategy → one click produces a flyer, audio promo, and a live event registration page. Placed 20th globally — undeployed.",
     source_url: "https://github.com/senesh2006/SoloScale",
     skills: ["Next.js 16", "Google Gemini", "Firebase", "TanStack Query", "Tailwind v4", "TypeScript"],
-    image_url: "https://picsum.photos/seed/soloscale/800/500",
+    image_url: projectFallbackImages.soloscale,
   },
   {
     id: "more",
@@ -35,7 +36,7 @@ const fallbackProjects: Project[] = [
       "Currently working on new projects. Check back soon or visit my GitHub to see what's in progress.",
     source_url: "https://github.com/senesh2006",
     skills: ["github.com/senesh2006"],
-    image_url: "https://picsum.photos/seed/senesh-more/800/500",
+    image_url: projectFallbackImages.more,
   },
 ]
 
@@ -52,7 +53,11 @@ function getBadges(project: Project) {
 }
 
 function projectImage(project: Project) {
-  return project.image_url || `https://picsum.photos/seed/${encodeURIComponent(project.id)}/800/500`
+  return (
+    project.image_url ||
+    projectFallbackImages[project.id] ||
+    `https://images.unsplash.com/photo-1555066931-436f8abb32?auto=format&fit=crop&w=800&q=80`
+  )
 }
 
 export function ProjectsSection() {

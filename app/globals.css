@@ -465,6 +465,19 @@ body.site-cursor .btn {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hero-tag,
+  .hero-name,
+  .hero-title,
+  .hero-bio,
+  .hero-ctas,
+  .hero-scroll {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
 .section-header {
   display: flex;
   align-items: baseline;
@@ -888,7 +901,7 @@ footer {
 .page-background__color-bends {
   position: absolute;
   inset: 0;
-  pointer-events: auto;
+  pointer-events: none;
   opacity: 0.5;
 }
 
@@ -932,12 +945,40 @@ footer {
   font-family: var(--font-serif);
   font-size: 2rem;
   font-weight: 400;
+  margin-bottom: 0.75rem;
+}
+
+.flowing-nav-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--txt3);
   margin-bottom: 2rem;
+}
+
+.flowing-nav-skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--bg2) 0%,
+    var(--bg3) 50%,
+    var(--bg2) 100%
+  );
+  animation: flowing-nav-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes flowing-nav-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
 }
 
 .flowing-nav-wrap {
   height: min(600px, 70vh);
+  min-height: 420px;
   position: relative;
+  z-index: 2;
+  isolation: isolate;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
