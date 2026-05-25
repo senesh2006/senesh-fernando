@@ -6,6 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { nitro } from "nitro/vite";
+import path from "node:path";
 
 // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
 // Nitro preset "vercel" outputs .vercel/output for Vercel Functions SSR deployment.
@@ -19,6 +20,11 @@ export default defineConfig({
         preset: process.env.VERCEL ? "vercel" : "node-server",
       }),
     ],
+    resolve: {
+      alias: {
+        framer: path.resolve(__dirname, "src/lib/framer-stub.ts"),
+      },
+    },
     server: {
       proxy: {
         "/api": {
@@ -26,6 +32,9 @@ export default defineConfig({
           changeOrigin: true,
         },
       },
+    },
+    ssr: {
+      noExternal: ["framer-motion"],
     },
   },
 });

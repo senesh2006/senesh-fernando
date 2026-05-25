@@ -4,7 +4,7 @@ import { fetchProject, fetchProjects } from "@/lib/api";
 import type { Project } from "@/data/projects";
 import { FilesTree } from "@/components/files-tree";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { CursorSpotlight } from "@/components/cursor-spotlight";
+import { ProjectDetailShell } from "@/components/project-detail-shell";
 import { useReveal } from "@/hooks/use-reveal";
 
 export const Route = createFileRoute("/projects/$slug")({
@@ -60,11 +60,10 @@ function ProjectPage() {
   return (
     <>
       <ScrollProgress />
+      <ProjectDetailShell>
       <article className="relative">
-        <CursorSpotlight />
-
         {/* HERO */}
-        <header className="mx-auto max-w-6xl px-5 sm:px-8 pt-12 sm:pt-16">
+        <header className="mx-auto max-w-6xl px-5 sm:px-8 pt-8 sm:pt-12">
           <Link to="/projects" className="font-mono text-xs text-muted-foreground link-hover px-1.5 py-0.5 rounded-sm">← projects</Link>
 
           <div className="mt-8 grid md:grid-cols-12 gap-8 items-end">
@@ -179,6 +178,7 @@ function ProjectPage() {
           <p className="mt-2 text-muted-foreground max-w-2xl">{next.body}</p>
         </nav>
       </article>
+      </ProjectDetailShell>
     </>
   );
 }

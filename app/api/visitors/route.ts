@@ -1,24 +1,26 @@
 import { NextResponse } from "next/server"
-import { FieldValue } from "firebase-admin/firestore"
-import { getFirestoreDb } from "@/lib/firebase-admin"
+import { ensureSchema, getSql } from "@/lib/neon"
 
 const VISITOR_DOC_ID = "global"
 
 export async function GET() {
   try {
-    const doc = await getFirestoreDb()
-      .collection("visitor_stats")
-      .doc(VISITOR_DOC_ID)
-      .get()
+    await ensureSchema()
+    const rows = await getSql()`
+      SELECT total_views, unique_visitors
+      FROM visitor_stats
+      WHERE id = ${VISITOR_DOC_ID}
+      LIMIT 1
+    `
 
-    if (!doc.exists) {
+    if (!rows[0]) {
       return NextResponse.json({ totalViews: 0, uniqueVisitors: 0 })
     }
 
-    const data = doc.data()!
+    const row = rows[0] as { total_views: number; unique_visitors: number }
     return NextResponse.json({
-      totalViews: Number(data.total_views ?? 0),
-      uniqueVisitors: Number(data.unique_visitors ?? 0),
+      totalViews: Number(row.total_views ?? 0),
+      uniqueVisitors: Number(row.unique_visitors ?? 0),
     })
   } catch (error) {
     console.error("Failed to fetch visitor stats:", error)
@@ -28,30 +30,21 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const ref = getFirestoreDb().collection("visitor_stats").doc(VISITOR_DOC_ID)
-    const existing = await ref.get()
+    await ensureSchema()
 
-    if (!existing.exists) {
-      await ref.set({
-        total_views: 1,
-        unique_visitors: 1,
-        last_updated: FieldValue.serverTimestamp(),
-      })
+    const rows = await getSql()`
+      INSERT INTO visitor_stats (id, total_views, unique_visitors, last_updated)
+      VALUES (${VISITOR_DOC_ID}, 1, 1, NOW())
+      ON CONFLICT (id) DO UPDATE
+      SET total_views = visitor_stats.total_views + 1,
+          last_updated = NOW()
+      RETURNING total_views, unique_visitors
+    `
 
-      return NextResponse.json({ totalViews: 1, uniqueVisitors: 1 })
-    }
-
-    await ref.update({
-      total_views: FieldValue.increment(1),
-      last_updated: FieldValue.serverTimestamp(),
-    })
-
-    const updated = await ref.get()
-    const data = updated.data()!
-
+    const row = rows[0] as { total_views: number; unique_visitors: number }
     return NextResponse.json({
-      totalViews: Number(data.total_views ?? 0),
-      uniqueVisitors: Number(data.unique_visitors ?? 0),
+      totalViews: Number(row.total_views ?? 0),
+      uniqueVisitors: Number(row.unique_visitors ?? 0),
     })
   } catch (error) {
     console.error("Failed to update visitor stats:", error)

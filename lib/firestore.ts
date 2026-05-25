@@ -1,46 +1,70 @@
-import {
-  FieldValue,
-  type DocumentData,
-  type QueryDocumentSnapshot,
-  type Timestamp,
-} from "firebase-admin/firestore"
-import { getFirestoreDb } from "@/lib/firebase-admin"
+import { ensureSchema, getSql } from "@/lib/neon"
 
-export type FirestoreRecord = DocumentData & { id: string }
+export type FirestoreRecord = Record<string, unknown> & { id: string }
 
-function serializeValue(value: unknown): unknown {
-  if (value === null || value === undefined) return value
-  if (value instanceof Date) return value.toISOString()
-  if (typeof value === "object" && value !== null && "toDate" in value) {
-    return (value as Timestamp).toDate().toISOString()
+const COLLECTIONS = new Set([
+  "projects",
+  "blogs",
+  "experience",
+  "education",
+  "skills",
+  "achievements",
+  "recommendations",
+])
+
+let schemaReady: Promise<void> | null = null
+
+async function ready() {
+  if (!schemaReady) {
+    schemaReady = ensureSchema()
   }
-  if (Array.isArray(value)) {
-    return value.map(serializeValue)
-  }
-  if (typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([k, v]) => [
-        k,
-        serializeValue(v),
-      ])
-    )
-  }
-  return value
+  await schemaReady
 }
 
-export function docToRecord(
-  doc: QueryDocumentSnapshot<DocumentData>
-): FirestoreRecord {
-  const data = doc.data()
-  return serializeValue({ id: doc.id, ...data }) as FirestoreRecord
+function rowToRecord(row: {
+  id: string
+  body: unknown
+  created_at: string | Date
+  updated_at?: string | Date | null
+}): FirestoreRecord {
+  const body =
+    typeof row.body === "object" && row.body !== null && !Array.isArray(row.body)
+      ? (row.body as Record<string, unknown>)
+      : {}
+
+  return {
+    id: row.id,
+    ...body,
+    created_at: new Date(row.created_at).toISOString(),
+    ...(row.updated_at
+      ? { updated_at: new Date(row.updated_at).toISOString() }
+      : {}),
+  }
+}
+
+function assertCollection(collectionName: string) {
+  if (!COLLECTIONS.has(collectionName)) {
+    throw new Error(`Unsupported collection: ${collectionName}`)
+  }
 }
 
 export async function listCollection(
   collectionName: string,
   sort?: (a: FirestoreRecord, b: FirestoreRecord) => number
 ): Promise<FirestoreRecord[]> {
-  const snapshot = await getFirestoreDb().collection(collectionName).get()
-  const records = snapshot.docs.map(docToRecord)
+  await ready()
+  assertCollection(collectionName)
+
+  const rows = await getSql()`
+    SELECT id, body, created_at, updated_at
+    FROM portfolio_documents
+    WHERE collection_name = ${collectionName}
+  `
+
+  const records = rows.map((row) =>
+    rowToRecord(row as { id: string; body: unknown; created_at: string | Date; updated_at?: string | Date })
+  )
+
   return sort ? records.sort(sort) : records
 }
 
@@ -48,51 +72,74 @@ export async function getDocument(
   collectionName: string,
   id: string
 ): Promise<FirestoreRecord | null> {
-  const doc = await getFirestoreDb().collection(collectionName).doc(id).get()
-  if (!doc.exists) return null
-  return docToRecord(doc as QueryDocumentSnapshot<DocumentData>)
+  await ready()
+  assertCollection(collectionName)
+
+  const rows = await getSql()`
+    SELECT id, body, created_at, updated_at
+    FROM portfolio_documents
+    WHERE collection_name = ${collectionName} AND id = ${id}
+    LIMIT 1
+  `
+
+  const row = rows[0]
+  if (!row) return null
+
+  return rowToRecord(row as { id: string; body: unknown; created_at: string | Date; updated_at?: string | Date })
 }
 
 export async function createDocument(
   collectionName: string,
-  data: DocumentData
+  data: Record<string, unknown>
 ): Promise<FirestoreRecord> {
-  const payload = {
-    ...data,
-    created_at: FieldValue.serverTimestamp(),
-  }
-  const ref = await getFirestoreDb().collection(collectionName).add(payload)
-  const created = await ref.get()
-  return docToRecord(created as QueryDocumentSnapshot<DocumentData>)
+  await ready()
+  assertCollection(collectionName)
+
+  const rows = await getSql()`
+    INSERT INTO portfolio_documents (collection_name, body)
+    VALUES (${collectionName}, ${JSON.stringify(data)}::jsonb)
+    RETURNING id, body, created_at, updated_at
+  `
+
+  return rowToRecord(rows[0] as { id: string; body: unknown; created_at: string | Date; updated_at?: string | Date })
 }
 
 export async function updateDocument(
   collectionName: string,
   id: string,
-  data: DocumentData
+  data: Record<string, unknown>
 ): Promise<FirestoreRecord | null> {
-  const ref = getFirestoreDb().collection(collectionName).doc(id)
-  const existing = await ref.get()
-  if (!existing.exists) return null
+  await ready()
+  assertCollection(collectionName)
 
-  await ref.update({
-    ...data,
-    updated_at: FieldValue.serverTimestamp(),
-  })
+  const rows = await getSql()`
+    UPDATE portfolio_documents
+    SET body = ${JSON.stringify(data)}::jsonb,
+        updated_at = NOW()
+    WHERE collection_name = ${collectionName} AND id = ${id}
+    RETURNING id, body, created_at, updated_at
+  `
 
-  const updated = await ref.get()
-  return docToRecord(updated as QueryDocumentSnapshot<DocumentData>)
+  const row = rows[0]
+  if (!row) return null
+
+  return rowToRecord(row as { id: string; body: unknown; created_at: string | Date; updated_at?: string | Date })
 }
 
 export async function deleteDocument(
   collectionName: string,
   id: string
 ): Promise<boolean> {
-  const ref = getFirestoreDb().collection(collectionName).doc(id)
-  const existing = await ref.get()
-  if (!existing.exists) return false
-  await ref.delete()
-  return true
+  await ready()
+  assertCollection(collectionName)
+
+  const rows = await getSql()`
+    DELETE FROM portfolio_documents
+    WHERE collection_name = ${collectionName} AND id = ${id}
+    RETURNING id
+  `
+
+  return rows.length > 0
 }
 
 export async function incrementField(
@@ -101,24 +148,26 @@ export async function incrementField(
   field: string,
   amount = 1
 ): Promise<number | null> {
-  const ref = getFirestoreDb().collection(collectionName).doc(id)
-  const existing = await ref.get()
+  await ready()
+  assertCollection(collectionName)
 
-  if (!existing.exists) {
-    await ref.set({
-      [field]: amount,
-      created_at: FieldValue.serverTimestamp(),
-    })
-    return amount
+  const existing = await getDocument(collectionName, id)
+
+  if (!existing) {
+    const created = await createDocument(collectionName, { [field]: amount })
+    return Number(created[field] ?? amount)
   }
 
-  await ref.update({
-    [field]: FieldValue.increment(amount),
-    updated_at: FieldValue.serverTimestamp(),
-  })
+  const body = { ...existing }
+  delete body.id
+  delete body.created_at
+  delete body.updated_at
 
-  const updated = await ref.get()
-  return (updated.data()?.[field] as number) ?? null
+  const nextValue = Number(body[field] ?? 0) + amount
+  body[field] = nextValue
+
+  const updated = await updateDocument(collectionName, id, body)
+  return updated ? Number(updated[field] ?? nextValue) : null
 }
 
 export function sortByOrderThenDate(
