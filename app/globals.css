@@ -958,7 +958,7 @@ footer {
 
 .flowing-nav-skeleton {
   width: 100%;
-  height: 100%;
+  min-height: calc(6 * 3.25rem);
   background: linear-gradient(
     180deg,
     var(--bg2) 0%,
@@ -974,8 +974,9 @@ footer {
 }
 
 .flowing-nav-wrap {
-  height: min(600px, 70vh);
-  min-height: 420px;
+  width: 100%;
+  height: auto;
+  min-height: unset;
   position: relative;
   z-index: 2;
   isolation: isolate;
@@ -983,11 +984,56 @@ footer {
   border-bottom: 1px solid var(--line);
 }
 
+.flowing-nav-wrap .menu-wrap,
+.flowing-nav-wrap .menu {
+  height: auto;
+}
+
+.flowing-nav-wrap .menu__item {
+  flex: 0 0 auto;
+  height: 3.25rem;
+  min-height: 3.25rem;
+}
+
+.flowing-nav-wrap .menu__item-link,
+.flowing-nav-wrap .marquee span {
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  letter-spacing: 0.12em;
+}
+
+.flowing-nav-wrap .marquee__img-wrap {
+  margin: 0 1rem;
+  padding: 0.35rem 0;
+}
+
+.flowing-nav-wrap .marquee__img {
+  width: clamp(64px, 10vw, 100px);
+  height: 1.75rem;
+  border-radius: 999px;
+}
+
 .flowing-menu-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
   background: var(--bg);
+}
+
+.flowing-menu-overlay .menu-wrap,
+.flowing-menu-overlay .menu {
+  height: 100%;
+}
+
+.flowing-menu-overlay .menu__item {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (min-width: 768px) {
+  .flowing-nav-wrap .menu__item {
+    height: 3.5rem;
+    min-height: 3.5rem;
+  }
 }
 
 .flowing-menu-close {
