@@ -33,3 +33,4 @@ next-env.d.ts
 /frontend/dist
 /frontend/.wrangler
 /frontend/.tanstack
+/frontend/.vercel
