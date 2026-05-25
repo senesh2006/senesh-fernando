@@ -14,6 +14,18 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      { source: "/blogs", destination: "/writing", permanent: true },
+      { source: "/blogs/:slug", destination: "/writing/:slug", permanent: true },
+      { source: "/skills", destination: "/about", permanent: true },
+      { source: "/experience", destination: "/about", permanent: true },
+      { source: "/education", destination: "/about", permanent: true },
+      { source: "/achievements", destination: "/about", permanent: true },
+      { source: "/case-studies", destination: "/projects", permanent: true },
+      { source: "/recommendations", destination: "/about", permanent: true },
+    ]
+  },
 }
 
 export default nextConfig

@@ -28,3 +28,9 @@ export function extractBlogHtml(content: string) {
 
   return html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
 }
+
+export function estimateReadMinutes(content: string) {
+  const text = stripBlogExcerpt(content, 100_000)
+  const words = text.split(/\s+/).filter(Boolean).length
+  return `${Math.max(1, Math.round(words / 200))} min`
+}

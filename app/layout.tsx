@@ -3,10 +3,6 @@ import { headers } from 'next/headers'
 import { Instrument_Serif, DM_Mono } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
-import { Navbar } from "@/components/navbar"
-import { CustomCursor } from "@/components/custom-cursor"
-import { PageBackground } from "@/components/page-background"
-import { PageTransition } from "@/components/page-transition"
 import { MaintenanceScreen } from "@/components/maintenance-screen"
 import './globals.css'
 
@@ -30,16 +26,19 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Senesh — Developer',
-  description: 'Portfolio of Senesh — undergraduate developer from Sri Lanka building full-stack web apps and AI integrations.',
-  keywords: ['Senesh', 'Developer', 'Full-Stack', 'AI', 'Sri Lanka', 'Portfolio'],
-  authors: [{ name: 'Senesh' }],
+  title: 'Senesh Fernando — Engineer / Designer',
+  description:
+    'Portfolio of Senesh Fernando — software engineer, designer, and builder of minimal, fast interfaces.',
+  keywords: ['Senesh', 'Developer', 'Full-Stack', 'Designer', 'Sri Lanka', 'Portfolio'],
+  authors: [{ name: 'Senesh Fernando' }],
   openGraph: {
-    title: 'Senesh — Developer',
-    description: 'Undergrad developer building full-stack web apps and AI integrations.',
+    title: 'Senesh Fernando — Engineer / Designer',
+    description: 'Software engineer and designer building fast, opinionated, well-mannered software.',
     type: 'website',
   },
 }
+
+const themeScript = `(function(){try{var s=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||(!s&&m)){document.documentElement.classList.add('dark');}}catch(e){}})();`
 
 export default async function RootLayout({
   children,
@@ -52,7 +51,7 @@ export default async function RootLayout({
 
   if (maintenance) {
     return (
-      <html lang="en" className="bg-background">
+      <html lang="en" className="bg-background" suppressHydrationWarning>
         <body className={fontClasses}>
           <MaintenanceScreen />
         </body>
@@ -60,19 +59,13 @@ export default async function RootLayout({
     )
   }
 
-  const isAdmin = pathname.startsWith("/admin")
-
   return (
-    <html lang="en" className="bg-background">
-      <body className={`${fontClasses} text-foreground ${isAdmin ? "" : "site-cursor"}`}>
-        {!isAdmin && <PageBackground />}
-        {!isAdmin && <CustomCursor />}
-        {!isAdmin && <Navbar />}
-        <main className="relative z-10">
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </main>
+    <html lang="en" className="bg-background" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className={`${fontClasses} text-foreground`}>
+        {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
