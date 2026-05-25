@@ -6,6 +6,7 @@ import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { IMAGES } from "@/lib/images";
+import { PROFILE } from "@/lib/profile";
 import type { Post } from "@/data/posts";
 
 export function HomePage({ featuredPost }: { featuredPost: Post }) {
@@ -20,16 +21,14 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-24 sm:py-36 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
             <div>// welcome.start</div>
-            <div>[MODE: VISITOR] · est. 1991 · based in Colombo / Berlin</div>
+            <div>[MODE: VISITOR] · {PROFILE.title} · {PROFILE.location}</div>
           </div>
           <h1 className="text-5xl sm:text-7xl md:text-[8.5rem] font-semibold tracking-tight leading-[0.9]">
             <span className="caret">Senesh</span>
             <span className="block text-muted-foreground font-normal">Fernando.</span>
           </h1>
           <p className="mt-10 max-w-2xl text-lg sm:text-xl text-muted-foreground leading-relaxed animate-fade-in-up">
-            Software engineer & designer building fast, opinionated, well-mannered
-            interfaces. I work across product, infrastructure, and design systems
-            for small teams with a strong point of view.
+            {PROFILE.tagline}
           </p>
           <div className="mt-10 flex flex-wrap gap-2 font-mono text-xs">
             <Link href="/projects" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ projects</Link>
@@ -41,9 +40,9 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
         </div>
 
         <MarqueeStrip items={[
-          "available q3 2026", "♪ deficit — mindvacy", "press ? for shortcuts",
+          "open to collaborations", "Curtin University Colombo", "press ? for shortcuts",
           "g then h · home", "g then p · projects", "[MODE: VISITOR]",
-          "no analytics. no cookies.", "built minimal — zero dependencies",
+          "data · AI · analytics", "Negombo, Sri Lanka",
         ]} />
       </section>
 
@@ -61,17 +60,17 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
         <div className="md:col-span-3 space-y-6">
           <div className="font-mono text-xs text-muted-foreground">// manifesto</div>
           <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight leading-[1.05]">
-            Less software, set with more care.
+            Data, decisions, and real-world impact.
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            I treat a product the way a typographer treats a page. Deliberate
-            spacing. No decorative weight. Every element earning its position.
-            The result is interfaces that load fast, behave predictably, and
-            hold up under taste-driven critique.
+            I believe curiosity, consistency, and compassion can create real impact.
+            My work sits at the intersection of data science, software engineering,
+            and building tools that help people make better decisions.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            That philosophy runs from the design system tokens down through
-            the database query plan. It's the same conversation.
+            From AI-driven business analysis tools to dashboards and digital
+            experiences for students and startups — I enjoy projects where
+            technology meets creativity.
           </p>
         </div>
       </section>
@@ -84,10 +83,10 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
         </div>
         <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8 stagger">
           {[
-            { n: "01", title: "Product engineering.", body: "Full-stack delivery on TypeScript / React / Postgres. From spec to ship, with an eye on performance budgets." },
-            { n: "02", title: "Design systems.", body: "Token-first, framework-agnostic. Opinionated defaults that scale across product, marketing, and docs." },
-            { n: "03", title: "Performance audits.", body: "Lighthouse, INP, CLS, server response times. I find the bottleneck and remove it." },
-            { n: "04", title: "Technical advisory.", body: "Architecture reviews, hiring panels, code reviews. Senior input without a full-time hire." },
+            { n: "01", title: "Data & analytics.", body: "Building data pipelines, dashboards, and analytics tools that turn raw information into actionable insights." },
+            { n: "02", title: "AI-powered solutions.", body: "Developing AI-driven business analysis tools and exploring practical applications of machine learning." },
+            { n: "03", title: "Full-stack development.", body: "Designing and shipping websites and web apps with React, TypeScript, and modern backends." },
+            { n: "04", title: "Teaching & mentoring.", body: "Tutoring programming fundamentals, C, and data structures at Curtin University Colombo." },
           ].map((s) => (
             <div key={s.n} className="border-t border-border pt-5 row-hover rounded-sm">
               <div className="flex items-baseline gap-3">
@@ -135,19 +134,18 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
           <div>
             <div className="text-foreground mb-3">+ what i build for</div>
             <ul className="space-y-1.5 text-muted-foreground">
-              <li>+ tiny, sharp tools that do one thing well</li>
-              <li>+ interfaces that feel instant under thumb</li>
-              <li>+ teams that ship weekly, not quarterly</li>
-              <li>+ products with a strong point of view</li>
+              {PROFILE.interests.map((item) => (
+                <li key={item}>+ {item}</li>
+              ))}
             </ul>
           </div>
           <div>
-            <div className="text-foreground mb-3">- what i don't do</div>
+            <div className="text-foreground mb-3">- currently exploring</div>
             <ul className="space-y-1.5 text-muted-foreground">
-              <li>- engagement-maximised dark patterns</li>
-              <li>- 600kb of JS to render a marketing page</li>
-              <li>- design-by-committee with no taste owner</li>
-              <li>- crypto / surveillance ad-tech</li>
+              <li>- deeper AI & ML applications</li>
+              <li>- scalable data pipeline architecture</li>
+              <li>- sustainability tech (CarbonWise)</li>
+              <li>- hackathons & tech competitions</li>
             </ul>
           </div>
         </div>
@@ -158,10 +156,10 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
         <div className="border-t border-b border-border py-16 text-center">
           <div className="font-mono text-xs text-muted-foreground mb-4">// end.of.welcome</div>
           <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight">
-            Have something worth building?
+            Working on something in tech, education, or AI?
           </h2>
           <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
-            One or two new engagements per quarter. Email is the fastest way in.
+            I'm open to collaborations, projects, and conversations. Email or LinkedIn is the fastest way to reach me.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
             <Link href="/contact" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ get in touch</Link>

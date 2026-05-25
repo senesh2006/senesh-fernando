@@ -3,15 +3,14 @@ import { HomePage } from "@/components/pages/home-page"
 import { getPosts } from "@/lib/content"
 import { FALLBACK_POSTS } from "@/data/posts"
 import { IMAGES } from "@/lib/images"
+import { PROFILE } from "@/lib/profile"
 
 export const metadata: Metadata = {
-  title: "Senesh Fernando — Engineer / Designer",
-  description:
-    "Senesh Fernando — software engineer and designer building fast, opinionated, well-mannered software.",
+  title: "Senesh Fernando — IT Undergraduate & Data Enthusiast",
+  description: PROFILE.tagline,
   openGraph: {
-    title: "Senesh Fernando — Engineer / Designer",
-    description:
-      "Software engineer and designer building fast, opinionated, well-mannered software.",
+    title: "Senesh Fernando — IT Undergraduate & Data Enthusiast",
+    description: PROFILE.tagline,
     images: [IMAGES.indexHero],
   },
 }

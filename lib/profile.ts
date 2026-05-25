@@ -1,0 +1,67 @@
+export const PROFILE = {
+  name: "Senesh Fernando",
+  fullName: "Mihindhukulasuriya Peter Senesh Fernando",
+  title: "Undergraduate @ Curtin University Colombo",
+  tagline:
+    "Passionate tech enthusiast and aspiring data scientist building AI-driven tools, data pipelines, and user-focused digital experiences.",
+  location: "Negombo, Western Province, Sri Lanka",
+  address: "46 Pitipana Veediya, Negombo",
+  phone: "0774054596",
+  phoneDisplay: "+94 77 405 4596",
+  email: "seneshfernando55@gmail.com",
+  linkedin: "https://www.linkedin.com/in/peter-senesh",
+  linkedinHandle: "linkedin.com/in/peter-senesh",
+  github: "https://github.com/senesh2006",
+  githubHandle: "github.com/senesh2006",
+  website: "https://v0-senesh-fernando.vercel.app",
+  summary: `Hi, I'm Senesh Fernando — a passionate tech enthusiast and future data scientist. Currently pursuing my Bachelor's in Information Technology at Curtin University Colombo, I'm driven by a mission to bridge the gap between data and decision-making. My core interests lie in artificial intelligence, analytics, and creating tech-powered solutions that solve real-world problems.
+
+Over the years, I've worked on diverse projects — from building AI-driven business analysis tools to designing websites that help students and startups thrive. Whether it's developing smart dashboards, crafting digital campaigns, or leading initiatives, I thrive where technology meets creativity.`,
+  skills: [
+    "Data Pipelines",
+    "Data Science & Analytics",
+    "Python",
+    "SQL",
+    "PostgreSQL",
+    "React",
+    "TypeScript",
+    "Red Hat Enterprise Linux (RHEL)",
+    "C",
+    "Artificial Intelligence",
+    "Agile Project Management",
+  ],
+  certifications: [
+    "Certificate of Completion — Agile Project Management",
+    "Certificate of Completion — Data Science & Analytics",
+    "Red Hat System Administration I (RH124 — RHA) Ver. 9.3",
+    "BCI Codemize — 1st Runners Up",
+  ],
+  timeline: [
+    [
+      "Aug 2025 —",
+      "Curtin University Colombo · Freelance tutor. Mentored engineering and CS students in programming fundamentals, C, and data structures & algorithms.",
+    ],
+    [
+      "Jun — Nov 2025",
+      "CarbonWise · Co-Founder. Led sustainability solutions, managed data reporting systems, and drove projects improving environmental insights.",
+    ],
+    [
+      "Jul 2025",
+      "Tetr College of Business · Tetr Verse Pro Hackathon participant.",
+    ],
+    [
+      "Feb 2025 —",
+      "Curtin University · Bachelor of Information Technology (ongoing).",
+    ],
+    [
+      "Jun 2024",
+      "St. Nicholas International College, Negombo · Cambridge A-Levels (Business / Computer Science).",
+    ],
+  ] as [string, string][],
+  interests: [
+    "Building data-driven tools that empower businesses and individuals",
+    "Applying AI in everyday life",
+    "Creating meaningful, user-focused digital experiences",
+    "Tech events, competitions, and hackathons",
+  ],
+} as const

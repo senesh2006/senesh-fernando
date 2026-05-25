@@ -7,7 +7,7 @@ import type { Post } from "@/data/posts";
 import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 
-const TAGS = ["all", "frontend", "design systems", "performance", "interaction"];
+const TAGS = ["all", "data science", "startups", "education", "hackathons", "linux"];
 
 export function WritingPage({ posts }: { posts: Post[] }) {
   useReveal();

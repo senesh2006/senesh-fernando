@@ -8,33 +8,40 @@ import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { FlipCard } from "@/components/site/flip-card";
 import type { FlipCardData } from "@/components/site/flip-card";
 import { submitContact } from "@/lib/client-api";
+import { PROFILE } from "@/lib/profile";
 import { useState } from "react";
 
 const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL || "seneshfernando55@gmail.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL || PROFILE.email;
 
 const GITHUB_USER =
   process.env.NEXT_PUBLIC_GITHUB_USERNAME || "senesh2006";
 
 const CHANNELS = [
-  ["01", "Email.",      CONTACT_EMAIL,  `mailto:${CONTACT_EMAIL}`, "→", "fastest"],
-  ["02", "GitHub.",     `github.com/${GITHUB_USER}`,        `https://github.com/${GITHUB_USER}`,              "↗", "code"],
-  ["03", "LinkedIn.",   "linkedin.com/in/seneshf",   "https://linkedin.com",            "↗", "work"],
-  ["04", "Twitter / X.", "@seneshf",                 "https://x.com",                   "↗", "rare"],
-  ["05", "RSS.",        "/rss.xml",                  "/rss.xml",                        "→", "writing"],
+  ["01", "Email.", CONTACT_EMAIL, `mailto:${CONTACT_EMAIL}`, "→", "fastest"],
+  ["02", "Phone.", PROFILE.phoneDisplay, `tel:${PROFILE.phone}`, "→", "mobile"],
+  ["03", "LinkedIn.", PROFILE.linkedinHandle, PROFILE.linkedin, "↗", "work"],
+  ["04", "GitHub.", `github.com/${GITHUB_USER}`, PROFILE.github, "↗", "code"],
+  ["05", "Portfolio.", "v0-senesh-fernando.vercel.app", PROFILE.website, "↗", "personal"],
+  ["06", "Location.", PROFILE.address, `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, "↗", "map"],
 ] as const;
 
-const SOCIAL_CARD_DATA: FlipCardData = {
-  name: 'Senesh Fernando',
-  username: 'seneshf',
-  image: 'https://avatars.githubusercontent.com/u/1?v=4',
-  bio: 'Engineering lead building taste-led products, design systems and performance-critical frontend infrastructure.',
-  stats: { following: 200, followers: 2900, posts: 120 },
-  socialLinks: {
-    linkedin: 'https://linkedin.com/in/seneshf',
-    github: 'https://github.com/seneshf',
-    twitter: 'https://x.com/seneshf',
-  },
+const GITHUB_CARD: FlipCardData = {
+  name: PROFILE.name,
+  username: GITHUB_USER,
+  image: "https://avatars.githubusercontent.com/u/1?v=4",
+  bio: "IT undergraduate building data-driven tools, AI solutions, and open-source projects.",
+  stats: { following: 50, followers: 100, posts: 12 },
+  socialLinks: { github: PROFILE.github },
+};
+
+const LINKEDIN_CARD: FlipCardData = {
+  name: PROFILE.name,
+  username: "peter-senesh",
+  image: "https://avatars.githubusercontent.com/u/1?v=4",
+  bio: "Undergraduate @ Curtin University Colombo. Co-founder of CarbonWise. Data science, AI, and full-stack development.",
+  stats: { following: 200, followers: 300, posts: 20 },
+  socialLinks: { linkedin: PROFILE.linkedin },
 };
 
 export function ContactPage() {
@@ -75,35 +82,34 @@ export function ContactPage() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-32 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
             <div>// contact.landing</div>
-            <div>[MODE: OPEN] · accepting q3 2026 work · response &lt; 48h</div>
+            <div>[MODE: OPEN] · {PROFILE.location} · response &lt; 48h</div>
           </div>
           <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95] max-w-5xl">
             <span className="caret">Get in touch.</span>{" "}
-            <span className="text-muted-foreground block">Email beats every other channel.</span>
+            <span className="text-muted-foreground block">Email or call — either works.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed animate-fade-in-up">
-            I'm taking on one or two engagements per quarter — engineering
-            leadership, design system work, and the occasional weird research
-            project. Send a paragraph about what you're building.
+            If you're working on something exciting in tech, education, or AI — or
+            just want to connect and chat ideas — I'd love to hear from you.
           </p>
           <div className="mt-10 flex flex-wrap gap-2 font-mono text-xs">
             <a href={`mailto:${CONTACT_EMAIL}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {CONTACT_EMAIL}</a>
+            <a href={`tel:${PROFILE.phone}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {PROFILE.phoneDisplay}</a>
             <Link href="/projects" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ see the work first</Link>
           </div>
         </div>
         <MarqueeStrip items={[
-          "currently — accepting q3 2026", "response within 48h", "[MODE: OPEN]",
-          "based colombo / berlin", "remote-friendly", "♪ deficit — mindvacy",
+          "open to collaborations", "response within 48h", "[MODE: OPEN]",
+          PROFILE.location, "Curtin University Colombo", PROFILE.phoneDisplay,
         ]} />
       </section>
 
       {/* SOCIAL FLIP CARDS */}
       <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// social.cards</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
-          <FlipCard data={SOCIAL_CARD_DATA} platform="github" />
-          <FlipCard data={SOCIAL_CARD_DATA} platform="linkedin" />
-          <FlipCard data={SOCIAL_CARD_DATA} platform="twitter" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 stagger max-w-2xl">
+          <FlipCard data={GITHUB_CARD} platform="github" />
+          <FlipCard data={LINKEDIN_CARD} platform="linkedin" />
         </div>
       </section>
 
@@ -169,19 +175,19 @@ export function ContactPage() {
           <div>
             <div className="text-foreground mb-3">+ great fit</div>
             <ul className="space-y-1.5 text-muted-foreground">
-              <li>+ small, sharp teams</li>
-              <li>+ taste-led products</li>
-              <li>+ performance-critical work</li>
-              <li>+ design systems at scale</li>
+              <li>+ data & analytics projects</li>
+              <li>+ AI / ML collaborations</li>
+              <li>+ student & education initiatives</li>
+              <li>+ hackathons & tech events</li>
             </ul>
           </div>
           <div>
-            <div className="text-foreground mb-3">- not a fit</div>
+            <div className="text-foreground mb-3">- also happy to discuss</div>
             <ul className="space-y-1.5 text-muted-foreground">
-              <li>- ad-tech / surveillance</li>
-              <li>- crypto speculation</li>
-              <li>- 'rewrite the monolith in 6 weeks'</li>
-              <li>- unpaid 'equity-only' work</li>
+              <li>- freelance web development</li>
+              <li>- sustainability tech (CarbonWise)</li>
+              <li>- tutoring & mentoring</li>
+              <li>- startup digital campaigns</li>
             </ul>
           </div>
         </div>
@@ -192,10 +198,10 @@ export function ContactPage() {
         <div className="font-mono text-xs text-muted-foreground mb-6">// frequently.asked</div>
         <div className="divide-y divide-border border-y border-border">
           {[
-            ["What time zone do you work?", "CET, with comfortable overlap into UK and US-East mornings."],
-            ["Do you take fixed-bid work?", "Rarely. I prefer time-and-materials with weekly check-ins — it keeps incentives honest."],
-            ["Will you sign an NDA?", "Yes, the standard one-page mutual NDA. I won't sign bespoke 30-page contracts before a first call."],
-            ["Do you do interviews / panels?", "Yes — happy to join hiring panels for senior engineering or design roles."],
+            ["Where are you based?", `${PROFILE.address}, ${PROFILE.location}.`],
+            ["What's the fastest way to reach you?", `Email (${CONTACT_EMAIL}) or mobile (${PROFILE.phoneDisplay}). I usually respond within 48 hours.`],
+            ["Are you open to freelance work?", "Yes — especially data, AI, web development, and tutoring projects alongside my studies."],
+            ["What are you studying?", "Bachelor of Information Technology at Curtin University Colombo (since February 2025)."],
           ].map(([q, a]) => (
             <details key={q} className="py-5 group">
               <summary className="cursor-pointer flex items-baseline gap-3 list-none">
@@ -214,9 +220,10 @@ export function ContactPage() {
         <div className="border-t border-b border-border py-16 text-center">
           <div className="font-mono text-xs text-muted-foreground mb-4">// end.of.contact</div>
           <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight">Still here? Just send the email.</h2>
-          <p className="mt-4 text-muted-foreground max-w-lg mx-auto">A paragraph beats a form, every time.</p>
+          <p className="mt-4 text-muted-foreground max-w-lg mx-auto">Or call {PROFILE.phoneDisplay} — happy to chat.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
             <a href={`mailto:${CONTACT_EMAIL}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {CONTACT_EMAIL}</a>
+            <a href={`tel:${PROFILE.phone}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {PROFILE.phoneDisplay}</a>
           </div>
         </div>
       </section>

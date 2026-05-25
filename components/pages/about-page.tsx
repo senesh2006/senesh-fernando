@@ -7,23 +7,22 @@ import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { RadialIntro, type OrbitItem } from "@/components/site/radial-intro";
 import { IMAGES } from "@/lib/images";
+import { PROFILE } from "@/lib/profile";
 
 // simpleicons.org serves a black SVG per slug; `dark:invert` flips it for dark mode.
 const ICON = (slug: string) => `https://cdn.simpleicons.org/${slug}/000000`;
 
 const TECH_ORBIT: OrbitItem[] = [
-  { id: "ts",       name: "TypeScript",  src: ICON("typescript") },
+  { id: "python",   name: "Python",      src: ICON("python") },
   { id: "react",    name: "React",       src: ICON("react") },
-  { id: "tanstack", name: "TanStack",    src: ICON("reactquery") },
-  { id: "node",     name: "Node",        src: ICON("nodedotjs") },
+  { id: "ts",       name: "TypeScript",  src: ICON("typescript") },
   { id: "pg",       name: "Postgres",    src: ICON("postgresql") },
-  { id: "redis",    name: "Redis",       src: ICON("redis") },
-  { id: "cf",       name: "Cloudflare",  src: ICON("cloudflare") },
+  { id: "rhel",     name: "RHEL",        src: ICON("redhat") },
+  { id: "node",     name: "Node",        src: ICON("nodedotjs") },
   { id: "tw",       name: "Tailwind",    src: ICON("tailwindcss") },
-  { id: "vite",     name: "Vite",        src: ICON("vite") },
-  { id: "bun",       name: "Bun",         src: ICON("bun") },
-  { id: "rust",     name: "Rust",        src: ICON("rust") },
-  { id: "css",      name: "CSS",         src: ICON("css3") },
+  { id: "next",     name: "Next.js",     src: ICON("nextdotjs") },
+  { id: "git",      name: "Git",         src: ICON("git") },
+  { id: "docker",   name: "Docker",      src: ICON("docker") },
 ];
 
 export function AboutPage({ timeline, stack }: { timeline: [string, string][]; stack: string[] }) {
@@ -39,16 +38,16 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
           <div className="md:col-span-3 space-y-6">
             <div className="font-mono text-xs text-muted-foreground stagger">
               <div>// about.landing</div>
-              <div>[MODE: EXPLORING] · 10+ yrs shipping · still curious</div>
+              <div>[MODE: EXPLORING] · {PROFILE.title} · still learning</div>
             </div>
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95]">
               <span className="caret">About.</span>
               <span className="block text-muted-foreground font-normal">A short field guide.</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-xl animate-fade-in-up">
-              I'm Senesh — a software engineer and designer working between
-              Colombo and Berlin. Mostly between IDE and Figma, occasionally
-              between problems and people.
+              I'm Senesh — an IT undergraduate at Curtin University Colombo, based in
+              Negombo. I work across data science, AI, and full-stack development,
+              with a focus on tools that bridge data and decision-making.
             </p>
           </div>
           <div className="md:col-span-2 aspect-[3/4] overflow-hidden rounded-md bg-secondary group">
@@ -62,8 +61,8 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
           </div>
         </div>
         <MarqueeStrip items={[
-          "colombo / berlin", "available q3 2026", "[MODE: EXPLORING]",
-          "currently reading — christopher alexander", "♪ deficit — mindvacy",
+          PROFILE.location, "Curtin University Colombo", "[MODE: EXPLORING]",
+          "data pipelines · AI · analytics", "CarbonWise co-founder",
           "press ? for shortcuts",
         ]} />
       </section>
@@ -72,19 +71,13 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
       <section className="mx-auto max-w-3xl px-5 sm:px-8 mt-24 sm:mt-32 space-y-6 reveal">
         <div className="font-mono text-xs text-muted-foreground">// approach</div>
         <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight leading-tight">
-          Most software is too large for what it does.
+          Bridging data and decision-making.
         </h2>
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          I work the other way: start from the smallest version that earns its
-          place on the page, then add only when the cost is honest. The result
-          is interfaces that load fast, behave predictably, and hold up under
-          taste-driven critique.
-        </p>
-        <p className="text-muted-foreground leading-relaxed">
-          I lean on vanilla web standards wherever I can — CSS variables for
-          theming, semantic HTML for accessibility, native ESM for delivery.
-          Frameworks are tools, not religions.
-        </p>
+        {PROFILE.summary.split("\n\n").map((paragraph) => (
+          <p key={paragraph.slice(0, 40)} className="text-muted-foreground leading-relaxed">
+            {paragraph}
+          </p>
+        ))}
       </section>
 
       {/* TIMELINE */}
@@ -106,11 +99,11 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
           <div className="md:col-span-5 space-y-4">
             <div className="font-mono text-xs text-muted-foreground">// stack</div>
             <h2 className="text-2xl sm:text-4xl font-semibold tracking-tight leading-tight">
-              Tools i reach for, in roughly that order.
+              Skills and tools I work with.
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-              Boring on purpose. Each one earns its keep — fast feedback loops,
-              honest defaults, a community that ships.
+              From data pipelines and analytics to full-stack web development
+              and Linux system administration — always learning, always building.
             </p>
             <div className="flex flex-wrap gap-1.5 pt-2 font-mono text-[11px]">
               {stack.map((s) => (
@@ -124,6 +117,18 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
         </div>
       </section>
 
+      {/* CERTIFICATIONS */}
+      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
+        <div className="font-mono text-xs text-muted-foreground mb-6">// certifications</div>
+        <ul className="space-y-2 font-mono text-sm border-y border-border divide-y divide-border stagger">
+          {PROFILE.certifications.map((cert) => (
+            <li key={cert} className="py-4 row-hover rounded-sm text-muted-foreground">
+              + {cert}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* VALUES */}
       <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// values</div>
@@ -131,19 +136,19 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
           <div>
             <div className="text-foreground mb-2">+ i care about</div>
             <ul className="space-y-1 text-muted-foreground">
-              <li>+ honest materials</li>
-              <li>+ legibility, then everything else</li>
-              <li>+ teams that disagree well</li>
-              <li>+ shipping over rehearsing</li>
+              <li>+ data-driven decision making</li>
+              <li>+ AI applied to real problems</li>
+              <li>+ teaching and mentoring students</li>
+              <li>+ curiosity, consistency, compassion</li>
             </ul>
           </div>
           <div>
-            <div className="text-foreground mb-2">- i avoid</div>
+            <div className="text-foreground mb-2">- what drives me</div>
             <ul className="space-y-1 text-muted-foreground">
-              <li>- meetings that should've been a doc</li>
-              <li>- design without an owner</li>
-              <li>- frameworks treated as identity</li>
-              <li>- 'just one more abstraction'</li>
+              <li>- sustainability & environmental tech</li>
+              <li>- student & startup empowerment</li>
+              <li>- hackathons & competitions</li>
+              <li>- building things that create impact</li>
             </ul>
           </div>
         </div>

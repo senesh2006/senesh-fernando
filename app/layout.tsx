@@ -4,6 +4,7 @@ import { Instrument_Serif, DM_Mono } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { MaintenanceScreen } from "@/components/maintenance-screen"
+import { PROFILE } from "@/lib/profile"
 import './globals.css'
 
 function isMaintenanceMode(pathname: string) {
@@ -26,14 +27,13 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Senesh Fernando — Engineer / Designer',
-  description:
-    'Portfolio of Senesh Fernando — software engineer, designer, and builder of minimal, fast interfaces.',
-  keywords: ['Senesh', 'Developer', 'Full-Stack', 'Designer', 'Sri Lanka', 'Portfolio'],
-  authors: [{ name: 'Senesh Fernando' }],
+  title: 'Senesh Fernando — IT Undergraduate & Data Enthusiast',
+  description: PROFILE.tagline,
+  keywords: ['Senesh Fernando', 'Data Science', 'AI', 'Curtin University', 'Negombo', 'Sri Lanka', 'Portfolio'],
+  authors: [{ name: PROFILE.name }],
   openGraph: {
-    title: 'Senesh Fernando — Engineer / Designer',
-    description: 'Software engineer and designer building fast, opinionated, well-mannered software.',
+    title: 'Senesh Fernando — IT Undergraduate & Data Enthusiast',
+    description: PROFILE.tagline,
     type: 'website',
   },
 }
