@@ -129,7 +129,11 @@ export default function BlogAdminPage() {
         body: JSON.stringify(payload),
       })
 
-      if (!response.ok) throw new Error(`Failed to ${editingBlog ? 'update' : 'create'} blog post`)
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || data.details || `Failed to ${editingBlog ? 'update' : 'create'} blog post`)
+      }
 
       setSubmitted(true)
       cancelEdit()
