@@ -27,3 +27,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tanstack frontend
+/frontend/node_modules
+/frontend/dist
+/frontend/.wrangler
+/frontend/.tanstack

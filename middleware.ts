@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import {
+  applyCors,
+  handleCorsPreflight,
+  isPublicApiRoute,
+} from "@/lib/api-cors"
 import { getAuthBaseUrl, getCanonicalHost } from "@/lib/auth-url"
 
 function shouldUseCanonicalAuthHost(pathname: string) {
@@ -8,6 +13,10 @@ function shouldUseCanonicalAuthHost(pathname: string) {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  const preflight = handleCorsPreflight(request)
+  if (preflight) return preflight
+
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set("x-pathname", pathname)
 
@@ -22,11 +31,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  return NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: requestHeaders,
     },
   })
+
+  if (isPublicApiRoute(pathname)) {
+    return applyCors(request, response)
+  }
+
+  return response
 }
 
 export const config = {
