@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
 import FlowingMenu from "@/components/FlowingMenu"
+import { AnimatedMenuButton } from "@/components/animated-menu-button"
 import { siteMenuItems } from "@/lib/site-menu-items"
 
 const navItems = [
@@ -19,20 +19,27 @@ const navItems = [
 
 export function Navbar() {
   const pathname = usePathname()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
-    setIsMobileMenuOpen(false)
+    setIsMenuOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? "hidden" : ""
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isMenuOpen])
 
   return (
     <>
       <nav>
-        <Link href="/" className="nav-logo" onClick={() => setIsMobileMenuOpen(false)}>
+        <Link href="/" className="nav-logo" onClick={() => setIsMenuOpen(false)}>
           Senesh
         </Link>
 
-        <ul className={`nav-links ${isMobileMenuOpen ? "nav-links-open" : ""}`}>
+        <ul className="nav-links">
           {navItems.map((item) => {
             const isActive =
               item.href === "/"
@@ -42,7 +49,7 @@ export function Navbar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => setIsMenuOpen(false)}
                   style={isActive ? { color: "var(--accent)" } : undefined}
                 >
                   {item.label}
@@ -57,27 +64,35 @@ export function Navbar() {
             <span className="status-dot" />
             Open to opportunities
           </div>
-          <button
-            type="button"
-            className="nav-menu-btn"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <AnimatedMenuButton
+            isOpen={isMenuOpen}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            label={isMenuOpen ? "Close menu" : "Open menu"}
+          />
         </div>
       </nav>
 
-      {isMobileMenuOpen && (
-        <div className="flowing-menu-overlay">
-          <button
-            type="button"
-            className="flowing-menu-close"
-            onClick={() => setIsMobileMenuOpen(false)}
-            aria-label="Close menu"
-          >
-            <X className="h-6 w-6" />
-          </button>
+      <button
+        type="button"
+        className={`nav-menu-backdrop ${isMenuOpen ? "nav-menu-backdrop--open" : ""}`}
+        aria-label="Close menu"
+        onClick={() => setIsMenuOpen(false)}
+        tabIndex={isMenuOpen ? 0 : -1}
+      />
+
+      <aside
+        className={`nav-menu-drawer ${isMenuOpen ? "nav-menu-drawer--open" : ""}`}
+        aria-hidden={!isMenuOpen}
+      >
+        <div className="nav-menu-drawer-header">
+          <p className="nav-menu-drawer-label">Navigate</p>
+          <AnimatedMenuButton
+            isOpen={isMenuOpen}
+            onClick={() => setIsMenuOpen(false)}
+            label="Close menu"
+          />
+        </div>
+        <div className="nav-menu-drawer-body">
           <FlowingMenu
             items={siteMenuItems}
             speed={12}
@@ -88,7 +103,7 @@ export function Navbar() {
             borderColor="rgba(255, 255, 255, 0.13)"
           />
         </div>
-      )}
+      </aside>
     </>
   )
 }
