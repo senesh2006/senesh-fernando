@@ -115,8 +115,8 @@ function Orbit({
                   src={item.src}
                   alt={item.name}
                   loading="lazy"
-                  className="h-6 w-6 rounded-full object-contain"
-                  style={{ filter: "invert(1)", minWidth: "24px", minHeight: "24px", display: "block" }}
+                  className="h-6 w-6 rounded-full object-contain dark:invert"
+                  style={{ minWidth: "24px", minHeight: "24px", display: "block" }}
                 />
                 <span className="pointer-events-none absolute left-1/2 -bottom-8 -translate-x-1/2 whitespace-nowrap rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 z-10">
                   {item.name}
