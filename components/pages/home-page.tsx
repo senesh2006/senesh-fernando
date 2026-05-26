@@ -20,14 +20,14 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
       <section className="relative border-b border-border overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Beams
-            beamWidth={4.3}
+            beamWidth={3}
             beamHeight={30}
-            beamNumber={50}
-            lightColor="#8B0000"
+            beamNumber={20}
+            lightColor="#ffffff"
             speed={2}
-            noiseIntensity={0}
+            noiseIntensity={1.75}
             scale={0.2}
-            rotation={28}
+            rotation={30}
           />
         </div>
         <CursorSpotlight />
