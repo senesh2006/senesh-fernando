@@ -43,11 +43,16 @@ export async function POST(request: Request) {
       )
     }
 
+    // Parse tags if it's a comma-separated string
+    const parsedTags = typeof tags === 'string' 
+      ? tags.split(",").map(t => t.trim()).filter(t => t !== "")
+      : (Array.isArray(tags) ? tags : [])
+
     const blog = await createDocument("blogs", {
       title,
       content,
       category,
-      tags: tags || [],
+      tags: parsedTags,
       image_url: image_url || null,
       github_url: github_url || null,
       linkedin_url: linkedin_url || null,
@@ -58,7 +63,7 @@ export async function POST(request: Request) {
     return NextResponse.json(blog, { status: 201 })
   } catch (error) {
     console.error("Failed to create blog:", error)
-    return NextResponse.json({ error: "Failed to create blog" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to create blog", details: String(error) }, { status: 500 })
   }
 }
 

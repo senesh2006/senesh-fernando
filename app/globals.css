@@ -1,11 +1,10 @@
 @import "tailwindcss" source(none);
-@source "../components";
-@source "../app";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@source "../components";
+@source "../app";
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@custom-variant dark (&:is(.dark *));
 
 /*
  * Design system definition.
@@ -374,5 +373,86 @@
   @keyframes panel-rise {
     from { opacity: 0; transform: translateY(18px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Editorial prose styles for blog content */
+  .editorial-prose {
+    @apply max-w-none;
+  }
+
+  .editorial-prose :where(h1, h2, h3, h4, h5, h6) {
+    @apply font-serif font-normal text-foreground;
+  }
+
+  .editorial-prose :where(h2) {
+    @apply text-3xl mt-16 mb-5;
+  }
+
+  .editorial-prose :where(h3) {
+    @apply text-xl mt-10 mb-3;
+  }
+
+  .editorial-prose :where(p) {
+    @apply text-muted-foreground leading-relaxed my-6;
+  }
+
+  .editorial-prose :where(a) {
+    @apply text-accent underline underline-offset-2 hover:text-foreground transition-colors;
+  }
+
+  .editorial-prose :where(blockquote) {
+    @apply border-l-4 border-primary/30 pl-6 my-8 py-2 italic text-muted-foreground;
+  }
+
+  .editorial-prose :where(code) {
+    @apply font-mono text-sm bg-background/50 border border-border/50 px-2 py-1 rounded text-foreground;
+  }
+
+  .editorial-prose :where(pre) {
+    @apply bg-background/50 border border-border/50 rounded-lg p-4 overflow-x-auto my-6;
+  }
+
+  .editorial-prose :where(pre code) {
+    @apply bg-transparent border-0 p-0;
+  }
+
+  .editorial-prose :where(ul, ol) {
+    @apply my-6 pl-6 space-y-2;
+  }
+
+  .editorial-prose :where(ul) {
+    @apply list-disc;
+  }
+
+  .editorial-prose :where(ol) {
+    @apply list-decimal;
+  }
+
+  .editorial-prose :where(li) {
+    @apply text-muted-foreground;
+  }
+
+  .editorial-prose :where(img) {
+    @apply rounded-lg my-8 w-full;
+  }
+
+  .pull-quote {
+    @apply border-l-4 border-primary pl-6 my-10 py-3 italic;
+  }
+
+  .pull-quote blockquote {
+    @apply text-lg text-muted-foreground border-0 pl-0;
+  }
+
+  .code-block {
+    @apply bg-background/50 border border-border/50 rounded-lg p-4 my-6 overflow-x-auto;
+  }
+
+  .editorial-divider {
+    @apply text-center text-muted-foreground/40 my-10 font-serif;
+  }
+
+  .editorial-html :where(p, ul, ol, blockquote) {
+    @apply text-muted-foreground;
   }
 }
