@@ -137,6 +137,10 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+  }
+
   * {
     border-color: var(--color-border);
   }
@@ -147,6 +151,7 @@
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv01";
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   ::selection {
