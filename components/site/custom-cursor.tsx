@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { motion, useSpring, useMotionValue, AnimatePresence } from "framer-motion"
 
 export function CustomCursor() {
@@ -9,12 +9,18 @@ export function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false)
   const [isClicking, setIsClicking] = useState(false)
 
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
+  const mouseX = useMotionValue(-100)
+  const mouseY = useMotionValue(-100)
 
-  const springConfig = { damping: 20, stiffness: 250, mass: 0.5 }
-  const cursorX = useSpring(mouseX, springConfig)
-  const cursorY = useSpring(mouseY, springConfig)
+  // Outer ring spring: slightly slower/trailing
+  const ringSpringConfig = { damping: 25, stiffness: 200, mass: 0.6 }
+  const cursorX = useSpring(mouseX, ringSpringConfig)
+  const cursorY = useSpring(mouseY, ringSpringConfig)
+
+  // Inner dot spring: very fast/reactive
+  const dotSpringConfig = { damping: 40, stiffness: 800, mass: 0.1 }
+  const dotX = useSpring(mouseX, dotSpringConfig)
+  const dotY = useSpring(mouseY, dotSpringConfig)
 
   useEffect(() => {
     setMounted(true)
@@ -36,7 +42,8 @@ export function CustomCursor() {
         target.closest('a') || 
         target.closest('button') ||
         target.classList.contains('link-hover') ||
-        target.classList.contains('cursor-pointer')
+        target.classList.contains('cursor-pointer') ||
+        target.role === 'button'
       
       setIsHovering(!!isInteractive)
     }
@@ -68,9 +75,9 @@ export function CustomCursor() {
       <AnimatePresence>
         {isVisible && (
           <>
-            {/* Outer ring */}
+            {/* Outer ring - Trailing glass effect */}
             <motion.div
-              className="fixed top-0 left-0 w-8 h-8 border border-primary rounded-full mix-blend-difference"
+              className="fixed top-0 left-0 w-10 h-10 border border-foreground/30 rounded-full mix-blend-difference"
               style={{
                 x: cursorX,
                 y: cursorY,
@@ -78,25 +85,46 @@ export function CustomCursor() {
                 translateY: "-50%",
               }}
               animate={{
-                scale: isHovering ? 1.5 : isClicking ? 0.8 : 1,
-                opacity: 0.5,
+                scale: isHovering ? 1.8 : isClicking ? 0.9 : 1,
+                opacity: isHovering ? 0.2 : 0.4,
+                borderWidth: isHovering ? '1px' : '1.5px',
               }}
+              transition={{ duration: 0.2 }}
               exit={{ opacity: 0, scale: 0 }}
             />
-            {/* Inner dot */}
+            
+            {/* Inner dot - High precision */}
             <motion.div
-              className="fixed top-0 left-0 w-1.5 h-1.5 bg-primary rounded-full mix-blend-difference"
+              className="fixed top-0 left-0 w-1.5 h-1.5 bg-foreground rounded-full mix-blend-difference"
               style={{
-                x: mouseX,
-                y: mouseY,
+                x: dotX,
+                y: dotY,
                 translateX: "-50%",
                 translateY: "-50%",
               }}
               animate={{
-                scale: isHovering ? 0 : isClicking ? 2 : 1,
+                scale: isHovering ? 4 : isClicking ? 0.8 : 1,
+                opacity: isHovering ? 0.15 : 1,
               }}
+              transition={{ duration: 0.15 }}
               exit={{ opacity: 0, scale: 0 }}
             />
+
+            {/* Hover flare */}
+            {isHovering && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="fixed top-0 left-0 w-12 h-12 bg-primary rounded-full blur-xl mix-blend-screen"
+                style={{
+                  x: dotX,
+                  y: dotY,
+                  translateX: "-50%",
+                  translateY: "-50%",
+                }}
+              />
+            )}
           </>
         )}
       </AnimatePresence>
