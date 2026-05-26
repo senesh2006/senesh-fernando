@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { BackgroundFX } from "@/components/site/background-fx"
+import { StaggeredMenu } from "@/components/staggered-menu"
 import { recordVisitor } from "@/lib/client-api"
 
 const NAV = [
@@ -134,6 +135,26 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <BackgroundFX />
+      <StaggeredMenu
+        position="right"
+        items={NAV.map((n) => ({
+          label: n.label,
+          ariaLabel: `Navigate to ${n.label}`,
+          link: n.href,
+        }))}
+        socialItems={[
+          { label: 'GitHub', link: 'https://github.com/senesh2006' },
+          { label: 'LinkedIn', link: 'https://www.linkedin.com/in/peter-senesh-fernando/' },
+        ]}
+        displaySocials={true}
+        displayItemNumbering={true}
+        menuButtonColor="#ffffff"
+        openMenuButtonColor="#ffffff"
+        accentColor="#d4a853"
+        changeMenuColorOnOpen={true}
+        closeOnClickAway={true}
+        isFixed={true}
+      />
       <TopBar theme={theme} toggle={toggle} pathname={pathname} />
       <main key={pathname} className="flex-1 w-full animate-fade-in">
         {children}
