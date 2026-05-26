@@ -10,6 +10,7 @@ import type { ChromaGridItem } from "@/components/site/ChromaGrid";
 import { submitContact } from "@/lib/client-api";
 import { PROFILE } from "@/lib/profile";
 import { useState } from "react";
+import { Github, Linkedin, Twitter, GraduationCap } from "lucide-react";
 
 const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL || PROFILE.email;
@@ -28,7 +29,7 @@ const CHANNELS = [
 
 const SOCIAL_ITEMS: ChromaGridItem[] = [
   {
-    image: "https://simpleicons.com/icons/github.svg?color=white",
+    icon: Github,
     title: "GitHub",
     subtitle: "Code & Projects",
     handle: " @senesh2006",
@@ -37,7 +38,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: PROFILE.github,
   },
   {
-    image: "https://simpleicons.com/icons/linkedin.svg?color=white",
+    icon: Linkedin,
     title: "LinkedIn",
     subtitle: "Professional",
     handle: " @peter-senesh",
@@ -46,7 +47,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: PROFILE.linkedin,
   },
   {
-    image: "https://simpleicons.com/icons/x.svg?color=white",
+    icon: Twitter,
     title: "X",
     subtitle: "Social Feed",
     handle: " @SeneshF",
@@ -55,7 +56,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: "https://x.com/SeneshF",
   },
   {
-    image: "https://simpleicons.com/icons/googlescholar.svg?color=white",
+    icon: GraduationCap,
     title: "Google Scholar",
     subtitle: "Research",
     handle: " @SeneshF",

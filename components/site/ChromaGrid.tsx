@@ -5,7 +5,8 @@ import { gsap } from 'gsap';
 import './ChromaGrid.css';
 
 export interface ChromaGridItem {
-  image: string;
+  icon?: React.ElementType;
+  image?: string;
   title: string;
   subtitle: string;
   handle: string;
@@ -166,7 +167,11 @@ export const ChromaGrid = ({
           } as React.CSSProperties}
         >
           <div className="chroma-img-wrapper">
-            <img src={c.image} alt={c.title} loading="lazy" />
+            {c.icon ? (
+              <c.icon className="w-16 h-16 text-white opacity-80" />
+            ) : c.image ? (
+              <img src={c.image} alt={c.title} loading="lazy" />
+            ) : null}
           </div>
           <footer className="chroma-info">
             <div className="flex flex-col">
