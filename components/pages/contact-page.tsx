@@ -28,7 +28,7 @@ const CHANNELS = [
 
 const SOCIAL_ITEMS: ChromaGridItem[] = [
   {
-    image: "https://cdn.simpleicons.org/github/ffffff",
+    image: "https://simpleicons.com/icons/github.svg?color=white",
     title: "GitHub",
     subtitle: "Code & Projects",
     handle: " @senesh2006",
@@ -37,7 +37,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: PROFILE.github,
   },
   {
-    image: "https://cdn.simpleicons.org/linkedin/ffffff",
+    image: "https://simpleicons.com/icons/linkedin.svg?color=white",
     title: "LinkedIn",
     subtitle: "Professional",
     handle: " @peter-senesh",
@@ -46,7 +46,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: PROFILE.linkedin,
   },
   {
-    image: "https://cdn.simpleicons.org/x/ffffff",
+    image: "https://simpleicons.com/icons/x.svg?color=white",
     title: "X",
     subtitle: "Social Feed",
     handle: " @SeneshF",
@@ -55,7 +55,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: "https://x.com/SeneshF",
   },
   {
-    image: "https://cdn.simpleicons.org/googlescholar/ffffff",
+    image: "https://simpleicons.com/icons/googlescholar.svg?color=white",
     title: "Google Scholar",
     subtitle: "Research",
     handle: " @SeneshF",
