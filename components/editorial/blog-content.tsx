@@ -3,7 +3,7 @@
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import DOMPurify from "isomorphic-dompurify"
-import { extractBlogHtml, looksLikeHtml } from "@/lib/blog-content"
+import { extractBlogHtml, looksLikeHtml, parseMarkdownWithBlocks } from "@/lib/blog-content"
 
 interface BlogContentProps {
   content: string
@@ -22,6 +22,9 @@ export function BlogContent({ content }: BlogContentProps) {
       />
     )
   }
+
+  // Parse markdown with custom blocks
+  const processedContent = parseMarkdownWithBlocks(content)
 
   return (
     <ReactMarkdown
@@ -70,7 +73,7 @@ export function BlogContent({ content }: BlogContentProps) {
         hr: () => <div className="editorial-divider">· · ·</div>,
       }}
     >
-      {content}
+      {processedContent}
     </ReactMarkdown>
   )
 }
