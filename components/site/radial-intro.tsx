@@ -91,13 +91,12 @@ function Orbit({
         return (
           <div
             key={item.id}
-            className="absolute left-1/2 top-1/2"
+            className="absolute inset-0 flex items-center justify-center"
             style={{
               transform: `rotate(${angle}deg) translateY(-${radiusPct}%) rotate(-${angle}deg)`,
             }}
           >
             <div
-              className="relative -translate-x-1/2 -translate-y-1/2"
               style={{
                 animation: `orbit-spin ${durationMs}ms linear infinite`,
                 animationDirection: reverse ? "normal" : "reverse",
