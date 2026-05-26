@@ -393,15 +393,15 @@
   }
 
   .editorial-prose :where(p) {
-    @apply text-foreground-muted leading-relaxed my-6;
+    @apply text-muted-foreground leading-relaxed my-6;
   }
 
   .editorial-prose :where(a) {
-    @apply text-accent-blue underline underline-offset-2 hover:text-primary transition-colors;
+    @apply text-accent underline underline-offset-2 hover:text-foreground transition-colors;
   }
 
   .editorial-prose :where(blockquote) {
-    @apply border-l-4 border-primary/30 pl-6 my-8 py-2 italic text-foreground-muted;
+    @apply border-l-4 border-primary/30 pl-6 my-8 py-2 italic text-muted-foreground;
   }
 
   .editorial-prose :where(code) {
@@ -429,7 +429,7 @@
   }
 
   .editorial-prose :where(li) {
-    @apply text-foreground-muted;
+    @apply text-muted-foreground;
   }
 
   .editorial-prose :where(img) {
@@ -441,7 +441,7 @@
   }
 
   .pull-quote blockquote {
-    @apply text-lg text-foreground-muted border-0 pl-0;
+    @apply text-lg text-muted-foreground border-0 pl-0;
   }
 
   .code-block {
@@ -449,10 +449,10 @@
   }
 
   .editorial-divider {
-    @apply text-center text-foreground-muted/40 my-10 font-serif;
+    @apply text-center text-muted-foreground/40 my-10 font-serif;
   }
 
   .editorial-html :where(p, ul, ol, blockquote) {
-    @apply text-foreground-muted;
+    @apply text-muted-foreground;
   }
 }
