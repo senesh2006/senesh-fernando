@@ -9,6 +9,8 @@ import Beams from "@/components/site/Beams";
 import { IMAGES } from "@/lib/images";
 import { PROFILE } from "@/lib/profile";
 import type { Post } from "@/data/posts";
+import { SEED_PROJECTS } from "@/data/seed-content";
+import CardSwap, { Card } from "@/components/site/CardSwap";
 
 export function HomePage({ featuredPost }: { featuredPost: Post }) {
   useReveal();
@@ -160,6 +162,51 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
               <li>- sustainability tech (CarbonWise)</li>
               <li>- hackathons & tech competitions</li>
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED PROJECTS WITH CARDSWAP */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 sm:mt-32 reveal relative">
+        <div className="flex items-baseline justify-between mb-8">
+          <div className="font-mono text-xs text-muted-foreground">// selected.projects</div>
+          <Link href="/projects" className="font-mono text-xs link-hover px-2 py-1 rounded-sm border border-border">view more →</Link>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-12 items-center min-h-[500px]">
+          <div>
+             <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight leading-[1.05] mb-6">
+               Shaping data into stories.
+             </h2>
+             <p className="text-muted-foreground leading-relaxed mb-8">
+               A collection of projects where I've applied data science, AI, and full-stack development to solve real problems.
+             </p>
+             <Link href="/projects" className="inline-flex items-center gap-2 font-mono text-xs link-hover px-3 py-2 rounded-sm border border-border">
+               Explore all projects →
+             </Link>
+          </div>
+          
+          <div className="relative h-[450px] w-full flex items-center justify-center">
+            <CardSwap
+              width="100%"
+              height={300}
+              cardDistance={30}
+              verticalDistance={40}
+              delay={4000}
+            >
+              {SEED_PROJECTS.map((project) => (
+                <Card key={project.id} className="p-6 border border-border bg-card flex flex-col justify-between shadow-xl">
+                  <div>
+                    <div className="font-mono text-[10px] text-muted-foreground mb-2 uppercase tracking-wider">{project.year} · {project.language}</div>
+                    <h3 className="text-xl font-semibold mb-3">{project.name}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{project.description}</p>
+                  </div>
+                  <Link href={`/projects/${project.id}`} className="mt-4 font-mono text-xs text-primary hover:underline">
+                    View project details →
+                  </Link>
+                </Card>
+              ))}
+            </CardSwap>
           </div>
         </div>
       </section>
