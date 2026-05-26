@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Senesh Fernando — IT Undergraduate & Data Enthusiast",
     description: PROFILE.tagline,
-    images: [IMAGES.indexHero],
+    images: [IMAGES.portrait],
   },
 }
 

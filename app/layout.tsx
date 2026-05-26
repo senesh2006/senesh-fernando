@@ -5,6 +5,7 @@ import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { MaintenanceScreen } from "@/components/maintenance-screen"
 import { PROFILE } from "@/lib/profile"
+import { IMAGES } from "@/lib/images"
 import './globals.css'
 
 function isMaintenanceMode(pathname: string) {
@@ -35,6 +36,13 @@ export const metadata: Metadata = {
     title: 'Senesh Fernando — IT Undergraduate & Data Enthusiast',
     description: PROFILE.tagline,
     type: 'website',
+    images: [IMAGES.portrait],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Senesh Fernando — IT Undergraduate & Data Enthusiast',
+    description: PROFILE.tagline,
+    images: [IMAGES.portrait],
   },
 }
 
