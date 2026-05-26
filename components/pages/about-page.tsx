@@ -68,15 +68,18 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
               </a>
             </div>
           </div>
-          <div className="md:col-span-2 aspect-[3/4] overflow-hidden rounded-md bg-secondary group">
-            <img
-              src={IMAGES.portrait}
-              alt="Senesh Fernando portrait"
-              width={900}
-              height={1200}
-              className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
-            />
+          <div className="md:col-span-2 flex justify-center items-start">
+            <div className="w-64 h-64 overflow-hidden rounded-full bg-secondary group border border-border">
+              <img
+                src={IMAGES.portrait}
+                alt="Senesh Fernando portrait"
+                width={400}
+                height={400}
+                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
+              />
+            </div>
           </div>
+
         </div>
         <MarqueeStrip items={[
           PROFILE.location, "Curtin University Colombo", "[MODE: EXPLORING]",
