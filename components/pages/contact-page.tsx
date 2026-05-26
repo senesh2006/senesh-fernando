@@ -37,7 +37,7 @@ const SOCIAL_ITEMS: ChromaGridItem[] = [
     url: PROFILE.github,
   },
   {
-    image: "https://cdn.simpleicons.org/linkedin/ffffff",
+    image: "https://cdn.simpleicons.org/linkedin/0A66C2",
     title: "LinkedIn",
     subtitle: "Professional",
     handle: " @peter-senesh",
