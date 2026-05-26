@@ -167,9 +167,9 @@ export function ContactPage() {
       </section>
 
       {/* SOCIAL CHROMA GRID */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-12 sm:mt-16 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// social.cards</div>
-        <div className="relative min-h-[600px]">
+        <div className="relative min-h-[350px]">
           <ChromaGrid
             items={SOCIAL_ITEMS}
             radius={300}
@@ -182,7 +182,7 @@ export function ContactPage() {
       </section>
 
       {/* CHANNELS */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
+      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-12 sm:mt-16 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// channels</div>
         <ul className="divide-y divide-border border-y border-border font-mono text-sm stagger">
           {CHANNELS.map(([n, label, val, href, arrow, hint]) => (
