@@ -16,6 +16,7 @@ interface Project {
   skills: string[]
   impact: string
   image_url: string
+  gallery: string[]
   order_index: number
   created_at: string
 }
@@ -33,6 +34,7 @@ export default function ProjectAdminPage() {
     skills: "",
     impact: "",
     image_url: "",
+    gallery: "",
     order_index: 0,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -68,6 +70,7 @@ export default function ProjectAdminPage() {
       skills: project.skills.join(", "),
       impact: project.impact,
       image_url: project.image_url,
+      gallery: Array.isArray(project.gallery) ? project.gallery.join(", ") : "",
       order_index: project.order_index,
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -96,6 +99,7 @@ export default function ProjectAdminPage() {
       skills: "",
       impact: "",
       image_url: "",
+      gallery: "",
       order_index: 0
     })
   }
@@ -109,6 +113,7 @@ export default function ProjectAdminPage() {
       ...formData,
       id: editingProject?.id,
       skills: formData.skills.split(",").map(s => s.trim()).filter(s => s !== ""),
+      gallery: formData.gallery.split(",").map(s => s.trim()).filter(s => s !== ""),
       order_index: Number(formData.order_index)
     }
 
@@ -242,6 +247,19 @@ export default function ProjectAdminPage() {
                   placeholder="https://github.com/..."
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-foreground-muted flex items-center gap-2">
+                <ImageIcon className="h-4 w-4" /> Screenshots (Gallery URLs, comma separated)
+              </label>
+              <Textarea
+                value={formData.gallery}
+                onChange={(e) => setFormData(prev => ({ ...prev, gallery: e.target.value }))}
+                rows={3}
+                className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl resize-none"
+                placeholder="https://image1.com, https://image2.com..."
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

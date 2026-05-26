@@ -29,6 +29,7 @@ export async function POST(request: Request) {
       skills,
       impact,
       image_url,
+      gallery,
       order_index,
     } = body
 
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
       skills: skills || [],
       impact,
       image_url,
+      gallery: gallery || [],
       order_index: order_index || 0,
     })
 
@@ -64,6 +66,7 @@ export async function PUT(request: Request) {
       skills,
       impact,
       image_url,
+      gallery,
       order_index,
     } = body
 
@@ -76,6 +79,7 @@ export async function PUT(request: Request) {
       skills: skills || [],
       impact,
       image_url,
+      gallery: gallery || [],
       order_index: order_index || 0,
     })
 

@@ -8,6 +8,7 @@ export interface BackendProject {
   skills?: string[]
   impact?: string
   image_url?: string | null
+  gallery?: string[]
   order_index?: number
   created_at?: string
 }

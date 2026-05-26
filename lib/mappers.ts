@@ -74,7 +74,7 @@ export function mapBackendProject(record: BackendProject, index: number): Projec
     pros: skills.slice(0, 3).map((skill) => skill),
     cons: record.impact ? [record.impact] : [],
     cover,
-    gallery: [cover],
+    gallery: Array.isArray(record.gallery) && record.gallery.length > 0 ? record.gallery : [cover],
     repo,
     demo: repo,
     stack: skills.length > 0 ? skills : [record.language || "TypeScript"],
