@@ -125,21 +125,6 @@ export function ContactPage() {
         ]} />
       </section>
 
-      {/* SOCIAL CHROMA GRID */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// social.cards</div>
-        <div className="relative min-h-[600px]">
-          <ChromaGrid
-            items={SOCIAL_ITEMS}
-            radius={300}
-            damping={0.45}
-            fadeOut={0.6}
-            ease="power3.out"
-            columns={2}
-          />
-        </div>
-      </section>
-
       {/* CONTACT FORM */}
       <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// send.message</div>
@@ -178,6 +163,21 @@ export function ContactPage() {
             )}
           </div>
         </form>
+      </section>
+
+      {/* SOCIAL CHROMA GRID */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
+        <div className="font-mono text-xs text-muted-foreground mb-6">// social.cards</div>
+        <div className="relative min-h-[600px]">
+          <ChromaGrid
+            items={SOCIAL_ITEMS}
+            radius={300}
+            damping={0.45}
+            fadeOut={0.6}
+            ease="power3.out"
+            columns={2}
+          />
+        </div>
       </section>
 
       {/* CHANNELS */}
