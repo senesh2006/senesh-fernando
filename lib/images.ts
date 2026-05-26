@@ -2,7 +2,7 @@ export const IMAGES = {
   indexHero:
     "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1600&q=80",
   portrait:
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=80",
+    "https://media.licdn.com/dms/image/v2/D5603AQFVENT05T1dDA/profile-displayphoto-scale_400_400/B56Z3jX3V9GgAg-/0/1777636181256?e=1781136000&v=beta&t=rsWvrjJGKbpDlGlPEjqhT8TNe9LhNWJJMbqREBHwHVg",
   projectsHero:
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
   coverVanilla:
