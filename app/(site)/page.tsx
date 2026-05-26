@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import { HomePage } from "@/components/pages/home-page"
-import { getPosts } from "@/lib/content"
+import { getPosts, getProjects } from "@/lib/content"
 import { FALLBACK_POSTS } from "@/data/posts"
+import { FALLBACK_PROJECTS } from "@/data/projects"
 import { IMAGES } from "@/lib/images"
 import { PROFILE } from "@/lib/profile"
 
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const posts = await getPosts()
+  const [posts, projects] = await Promise.all([getPosts(), getProjects()])
   const featuredPost = posts[0] ?? FALLBACK_POSTS[0]
-  return <HomePage featuredPost={featuredPost} />
+  const displayProjects = projects.length > 0 ? projects : FALLBACK_PROJECTS
+
+  return <HomePage featuredPost={featuredPost} projects={displayProjects} />
 }

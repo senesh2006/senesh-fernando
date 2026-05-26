@@ -9,11 +9,15 @@ import Beams from "@/components/site/Beams";
 import { IMAGES } from "@/lib/images";
 import { PROFILE } from "@/lib/profile";
 import type { Post } from "@/data/posts";
-import { SEED_PROJECTS } from "@/data/seed-content";
+import type { Project } from "@/data/projects";
 import CardSwap, { Card } from "@/components/site/CardSwap";
 
-export function HomePage({ featuredPost }: { featuredPost: Post }) {
+export function HomePage({ featuredPost, projects }: { featuredPost: Post, projects: Project[] }) {
   useReveal();
+  
+  // Use top 3 projects for the swap
+  const swapProjects = projects.slice(0, 3);
+
   return (
     <>
       <ScrollProgress />
@@ -194,14 +198,14 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
               verticalDistance={40}
               delay={4000}
             >
-              {SEED_PROJECTS.map((project) => (
-                <Card key={project.id} className="p-6 border border-border bg-card flex flex-col justify-between shadow-xl">
+              {swapProjects.map((project) => (
+                <Card key={project.slug} className="p-6 border border-border bg-card flex flex-col justify-between shadow-xl">
                   <div>
-                    <div className="font-mono text-[10px] text-muted-foreground mb-2 uppercase tracking-wider">{project.year} · {project.language}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground mb-2 uppercase tracking-wider">{project.year} · {project.tag}</div>
                     <h3 className="text-xl font-semibold mb-3">{project.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-3">{project.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{project.body}</p>
                   </div>
-                  <Link href={`/projects/${project.id}`} className="mt-4 font-mono text-xs text-primary hover:underline">
+                  <Link href={`/projects/${project.slug}`} className="mt-4 font-mono text-xs text-primary hover:underline">
                     View project details →
                   </Link>
                 </Card>
