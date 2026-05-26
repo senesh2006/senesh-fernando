@@ -5,8 +5,8 @@ import { useReveal } from "@/hooks/use-reveal";
 import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
-import { FlipCard } from "@/components/site/flip-card";
-import type { FlipCardData } from "@/components/site/flip-card";
+import { ChromaGrid } from "@/components/site/ChromaGrid";
+import type { ChromaGridItem } from "@/components/site/ChromaGrid";
 import { submitContact } from "@/lib/client-api";
 import { PROFILE } from "@/lib/profile";
 import { useState } from "react";
@@ -26,23 +26,44 @@ const CHANNELS = [
   ["06", "Location.", PROFILE.address, `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, "↗", "map"],
 ] as const;
 
-const GITHUB_CARD: FlipCardData = {
-  name: PROFILE.name,
-  username: GITHUB_USER,
-  image: "https://avatars.githubusercontent.com/u/1?v=4",
-  bio: "IT undergraduate building data-driven tools, AI solutions, and open-source projects.",
-  stats: { following: 50, followers: 100, posts: 12 },
-  socialLinks: { github: PROFILE.github },
-};
-
-const LINKEDIN_CARD: FlipCardData = {
-  name: PROFILE.name,
-  username: "peter-senesh",
-  image: "https://avatars.githubusercontent.com/u/1?v=4",
-  bio: "Undergraduate @ Curtin University Colombo. Co-founder of CarbonWise. Data science, AI, and full-stack development.",
-  stats: { following: 200, followers: 300, posts: 20 },
-  socialLinks: { linkedin: PROFILE.linkedin },
-};
+const SOCIAL_ITEMS: ChromaGridItem[] = [
+  {
+    image: "https://cdn.simpleicons.org/github/ffffff",
+    title: "GitHub",
+    subtitle: "Code & Projects",
+    handle: " @senesh2006",
+    borderColor: "#4F46E5",
+    gradient: "linear-gradient(145deg, #4F46E5, #000)",
+    url: PROFILE.github,
+  },
+  {
+    image: "https://cdn.simpleicons.org/linkedin/ffffff",
+    title: "LinkedIn",
+    subtitle: "Professional",
+    handle: " @peter-senesh",
+    borderColor: "#0A66C2",
+    gradient: "linear-gradient(180deg, #0A66C2, #000)",
+    url: PROFILE.linkedin,
+  },
+  {
+    image: "https://cdn.simpleicons.org/x/ffffff",
+    title: "X",
+    subtitle: "Social Feed",
+    handle: " @SeneshF",
+    borderColor: "#ffffff",
+    gradient: "linear-gradient(165deg, #1da1f2, #000)",
+    url: "https://x.com/SeneshF",
+  },
+  {
+    image: "https://cdn.simpleicons.org/googlescholar/ffffff",
+    title: "Google Scholar",
+    subtitle: "Research",
+    handle: " @SeneshF",
+    borderColor: "#4285F4",
+    gradient: "linear-gradient(195deg, #4285F4, #000)",
+    url: "https://scholar.google.com/citations?user=BQ7naRAAAAAJ&hl=en",
+  },
+];
 
 export function ContactPage() {
   useReveal();
@@ -104,12 +125,18 @@ export function ContactPage() {
         ]} />
       </section>
 
-      {/* SOCIAL FLIP CARDS */}
+      {/* SOCIAL CHROMA GRID */}
       <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// social.cards</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 stagger max-w-2xl">
-          <FlipCard data={GITHUB_CARD} platform="github" />
-          <FlipCard data={LINKEDIN_CARD} platform="linkedin" />
+        <div className="relative min-h-[600px]">
+          <ChromaGrid
+            items={SOCIAL_ITEMS}
+            radius={300}
+            damping={0.45}
+            fadeOut={0.6}
+            ease="power3.out"
+            columns={2}
+          />
         </div>
       </section>
 
