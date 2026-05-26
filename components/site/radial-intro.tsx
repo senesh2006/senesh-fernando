@@ -81,6 +81,7 @@ function Orbit({
       style={{
         animation: `orbit-spin ${durationMs}ms linear infinite`,
         animationDirection: reverse ? "reverse" : "normal",
+        willChange: "transform",
       }}
     >
       {items.map((item, i) => {
@@ -98,6 +99,7 @@ function Orbit({
               style={{
                 animation: `orbit-spin ${durationMs}ms linear infinite`,
                 animationDirection: reverse ? "normal" : "reverse",
+                willChange: "transform",
               }}
             >
               <div

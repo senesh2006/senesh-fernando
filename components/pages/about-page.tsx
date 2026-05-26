@@ -49,6 +49,24 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
               Negombo. I work across data science, AI, and full-stack development,
               with a focus on tools that bridge data and decision-making.
             </p>
+            <div className="flex gap-3 pt-2">
+              <a
+                href="https://github.com/senesh2006"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 border border-border rounded-sm bg-background hover:bg-primary/10 hover:border-primary transition-all font-mono text-sm"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://www.linkedin.com/in/peter-senesh-fernando/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 border border-border rounded-sm bg-background hover:bg-primary/10 hover:border-primary transition-all font-mono text-sm"
+              >
+                LinkedIn
+              </a>
+            </div>
           </div>
           <div className="md:col-span-2 aspect-[3/4] overflow-hidden rounded-md bg-secondary group">
             <img
