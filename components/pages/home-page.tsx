@@ -69,8 +69,8 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post, proje
       <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 grid md:grid-cols-5 gap-10 items-end reveal">
         <div className="md:col-span-2 aspect-[4/5] overflow-hidden rounded-md bg-secondary group">
           <img
-            src={IMAGES.indexHero}
-            alt="Letterpress type on cream paper"
+            src="https://i0.wp.com/lumenore.com/wp-content/uploads/2024/06/42-B.png?fit=720%2C400&ssl=1"
+            alt="Data and analytics visualization"
             width={1600}
             height={1000}
             className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
