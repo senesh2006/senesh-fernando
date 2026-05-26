@@ -75,6 +75,8 @@ function Orbit({
   size: "md" | "lg";
 }) {
   const dim = size === "lg" ? "h-12 w-12" : "h-10 w-10";
+  const iconSize = size === "lg" ? "h-8 w-8" : "h-6 w-6";
+  
   return (
     <div
       className="absolute inset-0"
@@ -104,7 +106,7 @@ function Orbit({
             >
               <div
                 className={cn(
-                  "group rounded-full border border-border bg-background p-1.5 shadow-sm transition-transform hover:scale-110",
+                  "group relative rounded-full border border-border/80 bg-background/90 shadow-md transition-all hover:scale-110 hover:border-primary/50 hover:shadow-lg flex items-center justify-center flex-shrink-0",
                   dim,
                 )}
                 title={item.name}
@@ -113,9 +115,10 @@ function Orbit({
                   src={item.src}
                   alt={item.name}
                   loading="lazy"
-                  className="h-full w-full rounded-full object-contain dark:invert"
+                  className="h-6 w-6 rounded-full object-contain"
+                  style={{ filter: "invert(1)", minWidth: "24px", minHeight: "24px", display: "block" }}
                 />
-                <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="pointer-events-none absolute left-1/2 -bottom-8 -translate-x-1/2 whitespace-nowrap rounded-sm border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 z-10">
                   {item.name}
                 </span>
               </div>
