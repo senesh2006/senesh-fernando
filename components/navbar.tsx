@@ -35,10 +35,6 @@ export function Navbar() {
   return (
     <>
       <nav>
-        <Link href="/" className="nav-logo" onClick={() => setIsMenuOpen(false)}>
-          Senesh
-        </Link>
-
         <ul className="nav-links">
           {navItems.map((item) => {
             const isActive =
