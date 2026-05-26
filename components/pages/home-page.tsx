@@ -23,7 +23,7 @@ export function HomePage({ featuredPost }: { featuredPost: Post }) {
             beamWidth={4.3}
             beamHeight={30}
             beamNumber={50}
-            lightColor="#F97316"
+            lightColor="#8B0000"
             speed={2}
             noiseIntensity={0}
             scale={0.2}
