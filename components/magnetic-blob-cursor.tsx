@@ -87,39 +87,7 @@ export function MagneticBlobCursor() {
       
       if (closestElement || interactive) {
         setIsHovering(true)
-        
-        // Determine cursor text based on element type
-        const el = interactive || closestElement?.element
-        if (el) {
-          if (el.classList.contains('project-card')) {
-            setCursorText("View")
-          } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-            setCursorText("Type")
-          } else if (el.tagName === 'SELECT') {
-            setCursorText("Select")
-          } else if (el.tagName === 'A') {
-            const isExternal = el.getAttribute('target') === '_blank'
-            const isNav = el.closest('nav')
-            if (isExternal) {
-              setCursorText("Open")
-            } else if (isNav) {
-              setCursorText("Go")
-            } else {
-              setCursorText("View")
-            }
-          } else if (el.tagName === 'BUTTON' || el.getAttribute('role') === 'button') {
-            const buttonText = el.textContent?.toLowerCase() || ''
-            if (buttonText.includes('submit') || buttonText.includes('send')) {
-              setCursorText("Send")
-            } else if (buttonText.includes('close') || buttonText.includes('cancel')) {
-              setCursorText("Close")
-            } else {
-              setCursorText("Click")
-            }
-          } else {
-            setCursorText("View")
-          }
-        }
+        setCursorText("View")
         
         if (closestElement) {
           const pull = 1 - (closestDistance / magneticRadius)
