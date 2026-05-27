@@ -30,7 +30,7 @@ export function MagneticBlobCursor() {
   const magneticElements = useRef<MagneticElement[]>([])
   
   const updateMagneticElements = useCallback(() => {
-    const elements = document.querySelectorAll('a, button, [data-magnetic], .glass-card-hover, .project-card, input, textarea, select')
+    const elements = document.querySelectorAll('[data-magnetic], .glass-card-hover, .project-card')
     magneticElements.current = Array.from(elements).map(el => {
       const rect = el.getBoundingClientRect()
       return {
@@ -68,7 +68,7 @@ export function MagneticBlobCursor() {
       
       // Check what element we're hovering over for cursor text
       const target = e.target as HTMLElement
-      const interactive = target.closest('a, button, [role="button"], .project-card, input, textarea, select')
+      const interactive = target.closest('[data-magnetic], .glass-card-hover, .project-card')
       
       let closestElement: MagneticElement | null = null
       let closestDistance = Infinity
@@ -213,15 +213,16 @@ export function MagneticBlobCursor() {
           width: isHovering ? "48px" : "20px",
           height: isHovering ? "48px" : "20px",
           background: isHovering 
-            ? "#ff6a00"
+            ? "rgba(255, 106, 0, 0.15)"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
-          border: "none",
+          border: isHovering ? "1.5px solid #ff6a00" : "none",
           borderRadius: "50%",
           opacity: 0,
+          backdropFilter: isHovering ? "blur(4px)" : "none",
           boxShadow: isHovering 
-            ? "0 0 25px rgba(255,106,0,0.5), 0 0 50px rgba(255,106,0,0.2)"
+            ? "0 0 20px rgba(255,106,0,0.3)"
             : "0 0 15px rgba(255,106,0,0.5), 0 0 30px rgba(255,106,0,0.2)",
-          transition: "width 0.3s cubic-bezier(0.23, 1, 0.32, 1), height 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.3s ease, box-shadow 0.3s ease, opacity 0.1s ease",
+          transition: "width 0.3s cubic-bezier(0.23, 1, 0.32, 1), height 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.3s ease, box-shadow 0.3s ease, opacity 0.1s ease, border 0.3s ease, backdrop-filter 0.3s ease",
           willChange: "transform, width, height, opacity",
         }}
       >
@@ -229,18 +230,10 @@ export function MagneticBlobCursor() {
           ref={textRef}
           className="text-[8px] font-bold tracking-[0.05em] uppercase"
           style={{
-            color: "#000000",
+            color: "#ff6a00",
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.2s ease",
             fontFamily: "var(--font-dm-mono), monospace",
-          }}
-        >
-          {cursorText}
-        </span>
-      </div>
-    </>
-  )
-}
           }}
         >
           {cursorText}
