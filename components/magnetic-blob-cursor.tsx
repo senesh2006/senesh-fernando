@@ -248,30 +248,29 @@ export function MagneticBlobCursor() {
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
         style={{
-          width: isHovering ? "42px" : "20px",
-          height: isHovering ? "42px" : "20px",
+          width: isHovering ? "64px" : "20px",
+          height: isHovering ? "64px" : "20px",
           background: isHovering 
-            ? "transparent"
+            ? "#ff6a00"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
-          border: isHovering ? "2px solid #ff6a00" : "none",
+          border: "none",
           borderRadius: "50%",
           opacity: 0,
           boxShadow: isHovering 
-            ? "0 0 20px rgba(255,106,0,0.4), 0 0 40px rgba(255,106,0,0.2), inset 0 0 20px rgba(255,106,0,0.1)"
+            ? "0 0 25px rgba(255,106,0,0.5), 0 0 50px rgba(255,106,0,0.2)"
             : "0 0 15px rgba(255,106,0,0.5), 0 0 30px rgba(255,106,0,0.2)",
-          transition: "width 0.2s ease-out, height 0.2s ease-out, background 0.2s ease, box-shadow 0.2s ease, opacity 0.1s ease, border 0.2s ease",
+          transition: "width 0.3s cubic-bezier(0.23, 1, 0.32, 1), height 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.3s ease, box-shadow 0.3s ease, opacity 0.1s ease",
           willChange: "transform, width, height, opacity",
         }}
       >
         <span
           ref={textRef}
-          className="text-[7px] font-medium tracking-[0.12em] lowercase"
+          className="text-[8px] font-bold tracking-[0.05em] uppercase"
           style={{
-            color: "#ff6a00",
+            color: "#000000",
             opacity: isHovering && cursorText ? 1 : 0,
-            transition: "opacity 0.15s ease",
-            fontFamily: "var(--font-offbit), ui-sans-serif, system-ui",
-            letterSpacing: "0.08em",
+            transition: "opacity 0.2s ease",
+            fontFamily: "var(--font-dm-mono), monospace",
           }}
         >
           {cursorText}
