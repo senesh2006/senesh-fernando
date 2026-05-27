@@ -206,12 +206,6 @@ export function MagneticBlobCursor() {
   
   return (
     <>
-      <style jsx global>{`
-        * {
-          cursor: none !important;
-        }
-      `}</style>
-      
       <div
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
@@ -239,6 +233,14 @@ export function MagneticBlobCursor() {
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.2s ease",
             fontFamily: "var(--font-dm-mono), monospace",
+          }}
+        >
+          {cursorText}
+        </span>
+      </div>
+    </>
+  )
+}
           }}
         >
           {cursorText}
