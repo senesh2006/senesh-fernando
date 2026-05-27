@@ -248,8 +248,8 @@ export function MagneticBlobCursor() {
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
         style={{
-          width: isHovering ? "64px" : "20px",
-          height: isHovering ? "64px" : "20px",
+          width: isHovering ? "48px" : "20px",
+          height: isHovering ? "48px" : "20px",
           background: isHovering 
             ? "#ff6a00"
             : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.8) 70%, rgba(255,106,0,0.4) 100%)",
