@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "meta/llama-3.1-405b-instruct", // High quality model
+        model: "meta/llama-3.1-70b-instruct", // More available high-quality model
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages.map((m: any) => ({ role: m.role, content: m.content })),
@@ -78,16 +78,27 @@ export async function POST(req: Request) {
       })
     })
 
+    const contentType = response.headers.get("content-type")
+    const text = await response.text()
+
     if (!response.ok) {
-      const errorData = await response.json()
-      console.error("NVIDIA NIM Error:", errorData)
-      throw new Error(`NVIDIA API responded with ${response.status}`)
+      console.error("NVIDIA NIM Error Status:", response.status)
+      console.error("NVIDIA NIM Error Body:", text)
+      return NextResponse.json({ 
+        content: `NVIDIA API Error (${response.status}). Please check your API key and model availability.` 
+      })
     }
 
-    const data = await response.json()
-    const content = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response."
-
-    return NextResponse.json({ content })
+    try {
+      const data = JSON.parse(text)
+      const content = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response."
+      return NextResponse.json({ content })
+    } catch (parseError) {
+      console.error("Failed to parse NVIDIA response as JSON:", text)
+      return NextResponse.json({ 
+        content: "Received an invalid response from the AI provider. Please try again later." 
+      })
+    }
   } catch (error) {
     console.error("Chat API error:", error)
     return NextResponse.json({ error: "Failed to process chat" }, { status: 500 })
