@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import type { Post } from "@/data/posts";
 import { ScrollProgress } from "@/components/site/scroll-progress";
+import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
 import { useReveal } from "@/hooks/use-reveal";
 import { recordBlogView } from "@/lib/client-api";
 
@@ -23,7 +24,7 @@ export function WritingDetailPage({ post, posts }: { post: Post; posts: Post[] }
         <Link href="/writing" className="font-mono text-xs text-muted-foreground link-hover px-1.5 py-0.5 rounded-sm">← writing</Link>
 
         <header className="mt-8 space-y-5 stagger">
-          <div className="font-mono text-xs text-muted-foreground flex flex-wrap gap-3">
+          <div className="font-mono text-xs text-muted-foreground flex flex-wrap items-center gap-3">
             <span>{post.date}</span><span>·</span>
             <span># {post.tag}</span><span>·</span>
             <span>{post.read} read</span>
@@ -33,6 +34,8 @@ export function WritingDetailPage({ post, posts }: { post: Post; posts: Post[] }
                 <span>{post.views} views</span>
               </>
             )}
+            <span>·</span>
+            <LikeButton id={post.slug} type="blogs" size="sm" variant="ghost" />
           </div>
           <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">{post.title}</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">{post.dek}</p>

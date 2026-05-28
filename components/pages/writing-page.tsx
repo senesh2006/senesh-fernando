@@ -6,6 +6,7 @@ import { useReveal } from "@/hooks/use-reveal";
 import type { Post } from "@/data/posts";
 import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
+import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
 
 const TAGS = ["all", "data science", "startups", "education", "hackathons", "linux"];
 
@@ -98,7 +99,10 @@ export function WritingPage({ posts }: { posts: Post[] }) {
               <span className="story-link">{featured.title}</span>
             </h2>
             <p className="mt-4 text-muted-foreground leading-relaxed">{featured.dek}</p>
-            <div className="mt-6 font-mono text-xs text-muted-foreground">→ continue reading</div>
+            <div className="mt-6 flex items-center gap-3">
+              <div className="font-mono text-xs text-muted-foreground">→ continue reading</div>
+              <LikeButton id={featured.slug} type="blogs" size="sm" />
+            </div>
           </div>
         </Link>
       </section>
@@ -114,38 +118,41 @@ export function WritingPage({ posts }: { posts: Post[] }) {
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 stagger mt-8">
           {rest.map((p, i) => (
-            <Link
-              key={p.slug}
-              href={`/writing/${p.slug}`}
-              className="group block"
-            >
-              <div className="aspect-[4/3] overflow-hidden rounded-md bg-secondary mb-4 relative">
-                <img
-                  src={p.cover}
-                  alt={p.title}
-                  width={1600}
-                  height={1000}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                />
-                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-300" />
-                <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between font-mono text-[10px] uppercase tracking-widest text-background opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                  <span className="bg-foreground px-2 py-1 rounded-sm">0{i + 2}</span>
-                  <span className="bg-foreground px-2 py-1 rounded-sm">read ↗</span>
+            <div key={p.slug} className="group block">
+              <Link href={`/writing/${p.slug}`}>
+                <div className="aspect-[4/3] overflow-hidden rounded-md bg-secondary mb-4 relative">
+                  <img
+                    src={p.cover}
+                    alt={p.title}
+                    width={1600}
+                    height={1000}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                  />
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-300" />
+                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between font-mono text-[10px] uppercase tracking-widest text-background opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                    <span className="bg-foreground px-2 py-1 rounded-sm">0{i + 2}</span>
+                    <span className="bg-foreground px-2 py-1 rounded-sm">read ↗</span>
+                  </div>
                 </div>
+              </Link>
+              <div className="font-mono text-[11px] text-muted-foreground mb-2 flex justify-between items-center">
+                <div className="flex gap-2 items-center">
+                  <span>{p.date}</span>
+                  <span>·</span>
+                  <span># {p.tag}</span>
+                  <span>·</span>
+                  <span>{p.read}</span>
+                </div>
+                <LikeButton id={p.slug} type="blogs" size="sm" variant="ghost" />
               </div>
-              <div className="font-mono text-[11px] text-muted-foreground mb-2 flex gap-2 items-center">
-                <span>{p.date}</span>
-                <span>·</span>
-                <span># {p.tag}</span>
-                <span>·</span>
-                <span>{p.read}</span>
-              </div>
-              <h3 className="text-lg font-semibold leading-snug">
-                <span className="story-link">{p.title}</span>
-              </h3>
+              <Link href={`/writing/${p.slug}`}>
+                <h3 className="text-lg font-semibold leading-snug">
+                  <span className="story-link">{p.title}</span>
+                </h3>
+              </Link>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed line-clamp-2">{p.dek}</p>
-            </Link>
+            </div>
           ))}
         </div>
       </section>

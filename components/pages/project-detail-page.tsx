@@ -6,6 +6,7 @@ import type { Project } from "@/data/projects";
 import { FilesTree } from "@/components/site/files-tree";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { ProjectDetailShell } from "@/components/site/project-detail-shell";
+import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
 import { useReveal } from "@/hooks/use-reveal";
 
 const STATUS_COLOR: Record<Project["status"], string> = {
@@ -47,13 +48,14 @@ export function ProjectDetailPage({ project, projects }: { project: Project; pro
               </h1>
               <p className="mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">{p.body}</p>
             </div>
-            <div className="md:col-span-4 flex flex-wrap gap-2 font-mono text-xs">
+            <div className="md:col-span-4 flex flex-wrap gap-2 font-mono text-xs items-center">
               <a href={p.repo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm link-hover">
                 <Github className="h-3.5 w-3.5" /> repository
               </a>
               <a href={p.demo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm bg-foreground text-background hover:opacity-90 transition-opacity">
                 <ExternalLink className="h-3.5 w-3.5" /> live demo
               </a>
+              <LikeButton id={p.slug} type="projects" />
             </div>
           </div>
         </header>
