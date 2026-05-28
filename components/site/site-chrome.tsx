@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { BackgroundFX } from "@/components/site/background-fx"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
+import { ChatBot } from "@/components/site/chat-bot"
 import { recordVisitor } from "@/lib/client-api"
 
 const NAV = [
@@ -148,6 +149,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         now={now}
         visitorCount={visitorCount}
       />
+      <ChatBot />
       {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
     </div>
   )
