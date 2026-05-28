@@ -103,19 +103,17 @@ export function LikeButton({
         className
       )}
     >
-      <div className="relative">
+      <div className="relative h-3.5 w-3.5 flex items-center justify-center">
+        {isAnimating && (
+          <Heart
+            className="h-full w-full fill-current text-rose-500 animate-ping absolute inset-0 opacity-75"
+          />
+        )}
         <Heart
           className={cn(
-            "h-3.5 w-3.5 transition-all duration-300",
-            isLiked ? "fill-current" : "fill-none",
-            isAnimating && "animate-ping absolute inset-0 opacity-75"
-          )}
-        />
-        <Heart
-          className={cn(
-            "h-3.5 w-3.5 transition-all duration-300",
+            "h-full w-full transition-all duration-300 relative z-10",
             isLiked ? "fill-current scale-110" : "fill-none",
-            isAnimating && "scale-125"
+            isAnimating && "scale-125 text-rose-500"
           )}
         />
       </div>
