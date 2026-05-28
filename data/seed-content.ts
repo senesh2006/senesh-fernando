@@ -41,6 +41,7 @@ export type Project = {
   stack: string[]
   stats: { stars: string; forks: string; issues: string; license: string; lastCommit: string }
   tree: FileNode[]
+  isPrivate?: boolean
 }
 
 const baseTree: FileNode[] = [
@@ -90,6 +91,7 @@ export type SeedProject = {
   gallery: string[]
   stats: Project["stats"]
   tree?: FileNode[]
+  is_private?: boolean
 }
 
 export type SeedBlog = {
@@ -151,6 +153,7 @@ export const SEED_PROJECTS: SeedProject[] = [
     cons: ["early-stage product", "private codebase"],
     gallery: ["https://raw.githubusercontent.com/senesh2006/senesh-fernando/main/pictures/carbonwise-1.png", "https://raw.githubusercontent.com/senesh2006/senesh-fernando/main/pictures/carbonwise-2.png"],
     stats: { stars: "—", forks: "—", issues: "—", license: "Private", lastCommit: "2025" },
+    is_private: true,
   },
   {
     id: "curtin-tutor-resources",
@@ -400,6 +403,7 @@ export function seedProjectToFrontend(record: SeedProject, index: number): Proje
     stack: record.skills,
     stats: record.stats,
     tree: record.tree || baseTree,
+    isPrivate: record.is_private,
   }
 }
 

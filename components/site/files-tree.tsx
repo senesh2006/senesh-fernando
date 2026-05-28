@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronRight, Folder, FolderOpen, FileText, FileJson, FileCode } from "lucide-react";
+import { ChevronRight, Folder, FolderOpen, FileText, FileJson, FileCode, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type FileNode =
@@ -53,7 +53,7 @@ function Node({ node, depth = 0 }: { node: FileNode; depth?: number }) {
   );
 }
 
-export function FilesTree({ tree, className }: { tree: FileNode[]; className?: string }) {
+export function FilesTree({ tree, isPrivate, className }: { tree: FileNode[]; isPrivate?: boolean; className?: string }) {
   return (
     <div
       className={cn(
@@ -65,7 +65,10 @@ export function FilesTree({ tree, className }: { tree: FileNode[]; className?: s
         <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
         <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
         <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
-        <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground">repository</span>
+        <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+          {isPrivate && <Lock className="h-2.5 w-2.5 text-amber-500/80" />}
+          {isPrivate ? "private repository" : "repository"}
+        </span>
       </div>
       {tree.map((n, i) => (
         <Node key={`${n.type}-${n.name}-${i}`} node={n} />

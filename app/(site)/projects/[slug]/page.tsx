@@ -38,6 +38,9 @@ export default async function Page({ params }: Props) {
       if (gitData.tree && gitData.tree.length > 0) {
         project.tree = gitData.tree
       }
+      if (gitData.isPrivate !== undefined) {
+        project.isPrivate = gitData.isPrivate
+      }
       if (gitData.stats) {
         project.stats = {
           ...project.stats,

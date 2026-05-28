@@ -66,6 +66,7 @@ export async function fetchGitHubRepoData(repoUrl: string) {
         license: repoData.license?.spdx_id || "MIT",
         lastCommit,
       },
+      isPrivate: repoData.private,
       tree: await treePromise,
     }
   } catch (error) {

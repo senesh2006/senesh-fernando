@@ -46,6 +46,9 @@ export function MagneticBlobCursor() {
     const hasHover = window.matchMedia("(hover: hover)").matches
     if (!hasHover) return
     
+    // Hide default cursor
+    document.body.style.cursor = "none"
+    
     const blob = blobRef.current
     if (!blob) return
     
@@ -197,6 +200,7 @@ export function MagneticBlobCursor() {
       window.removeEventListener("resize", handleScrollOrResize)
       clearInterval(updateInterval)
       cancelAnimationFrame(animationId)
+      document.body.style.cursor = "auto"
     }
   }, [updateMagneticElements])
   

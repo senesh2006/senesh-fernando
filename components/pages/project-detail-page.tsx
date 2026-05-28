@@ -109,7 +109,7 @@ export function ProjectDetailPage({ project, projects }: { project: Project; pro
 
           <div className="md:col-span-5">
             <div className="font-mono text-xs text-muted-foreground mb-3">// repo.tree</div>
-            <FilesTree tree={p.tree} />
+            <FilesTree tree={p.tree} isPrivate={p.isPrivate} />
           </div>
         </section>
 
