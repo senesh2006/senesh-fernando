@@ -21,12 +21,13 @@ Rules:
 export async function POST(req: Request) {
   try {
     const { messages, context } = await req.json()
-    const lastMessage = messages[messages.length - 1].content.toLowerCase()
+    const lastMessage = messages[messages.length - 1].content
     
     let pageContent = ""
     
     // Check if summarization is requested
-    if (context?.pathname && (lastMessage.includes("summarize") || lastMessage.includes("summary"))) {
+    const lastMessageLower = lastMessage.toLowerCase()
+    if (context?.pathname && (lastMessageLower.includes("summarize") || lastMessageLower.includes("summary"))) {
       const parts = context.pathname.split("/").filter(Boolean)
       if (parts.length >= 2) {
         const type = parts[0] // "projects" or "writing"
@@ -46,32 +47,45 @@ export async function POST(req: Request) {
       }
     }
 
-    const apiKey = process.env.GEMINI_API_KEY
+    const apiKey = process.env.NVIDIA_NIM_API_KEY
     if (!apiKey) {
       return NextResponse.json({ 
-        content: "I'm currently in 'offline mode' because the Gemini API key is missing. Please add GEMINI_API_KEY to your .env file." 
+        content: "NVIDIA NIM API key is missing. Please add NVIDIA_NIM_API_KEY to your .env file." 
       })
     }
 
-    const prompt = pageContent 
+    const fullPrompt = pageContent 
       ? `${SYSTEM_PROMPT}\n\n${pageContent}\n\nUser: ${lastMessage}`
       : `${SYSTEM_PROMPT}\n\nUser: ${lastMessage}`
 
-    // Call Gemini API
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // Call NVIDIA NIM API (standard OpenAI-compatible format)
+    const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        }
+        model: "meta/llama-3.1-405b-instruct", // High quality model
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+          ...(pageContent ? [{ role: "user", content: `Context for current page: ${pageContent}` }] : [])
+        ],
+        temperature: 0.2,
+        top_p: 0.7,
+        max_tokens: 1024,
       })
     })
 
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error("NVIDIA NIM Error:", errorData)
+      throw new Error(`NVIDIA API responded with ${response.status}`)
+    }
+
     const data = await response.json()
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response."
+    const content = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response."
 
     return NextResponse.json({ content })
   } catch (error) {
