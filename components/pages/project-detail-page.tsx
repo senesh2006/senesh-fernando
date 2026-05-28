@@ -7,6 +7,7 @@ import { FilesTree } from "@/components/site/files-tree";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { ProjectDetailShell } from "@/components/site/project-detail-shell";
 import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
+import { ContentSummarizer } from "@/components/content-summarizer";
 import { useReveal } from "@/hooks/use-reveal";
 
 const STATUS_COLOR: Record<Project["status"], string> = {
@@ -94,7 +95,9 @@ export function ProjectDetailPage({ project, projects }: { project: Project; pro
             <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">What it is, and why it exists.</h2>
             <p className="text-[17px] leading-[1.8] text-muted-foreground">{p.longDescription}</p>
 
-            <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-mono text-sm pt-2">
+            <ContentSummarizer id={p.slug} type="projects" className="pt-2" />
+
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-mono text-sm pt-6">
               <ul className="space-y-1">{p.pros.map((x) => <li key={x}><span className="text-foreground">+</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
               <ul className="space-y-1">{p.cons.map((x) => <li key={x}><span className="text-foreground">-</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
             </div>

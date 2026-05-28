@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import type { Post } from "@/data/posts";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
+import { ContentSummarizer } from "@/components/content-summarizer";
 import { useReveal } from "@/hooks/use-reveal";
 import { recordBlogView } from "@/lib/client-api";
 
@@ -39,6 +40,7 @@ export function WritingDetailPage({ post, posts }: { post: Post; posts: Post[] }
           </div>
           <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">{post.title}</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">{post.dek}</p>
+          <ContentSummarizer id={post.slug} type="writing" className="pt-2" />
         </header>
 
         <figure className="mt-12 -mx-5 sm:mx-0 reveal">
