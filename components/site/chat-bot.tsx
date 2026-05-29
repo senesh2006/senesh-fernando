@@ -140,16 +140,52 @@ interface ContextShape {
   triggerClose: () => void
   messages: Message[]
   isLoading: boolean
-  handleSend: (content?: string) => Promise<void>
+  handleSend: (content: string) => Promise<void>
+  showWorkflows: boolean
+  setShowWorkflows: (show: boolean) => void
 }
 
 const ChatContext = createContext({} as ContextShape)
 const useChatContext = () => useContext(ChatContext)
 
+// --- WORKFLOWS DATA ---
+
+const WORKFLOWS = [
+  { 
+    id: "summarize", 
+    label: "Summarize Page", 
+    description: "Get a 3-bullet summary of the current view.",
+    prompt: "Please summarize this page in 3 clear bullet points.",
+    icon: Sparkles
+  },
+  { 
+    id: "experience", 
+    label: "Review Experience", 
+    description: "Ask about Senesh's career and background.",
+    prompt: "Can you give me an overview of Senesh's professional experience and key achievements?",
+    icon: Bot
+  },
+  { 
+    id: "skills", 
+    label: "Technical Audit", 
+    description: "Deep dive into Senesh's technical stack.",
+    prompt: "What are Senesh's strongest technical skills and how has he applied them in projects?",
+    icon: Sparkles
+  },
+  { 
+    id: "collaboration", 
+    label: "Collaboration Idea", 
+    description: "Explore ways to work with Senesh.",
+    prompt: "I'm interested in collaborating with Senesh. What kind of projects is he looking for and how should we start?",
+    icon: Send
+  },
+]
+
 // --- MAIN COMPONENT ---
 
 export function ChatBot() {
   const [showForm, setShowForm] = useState(false)
+  const [showWorkflows, setShowWorkflows] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hi! I'm Senesh's AI assistant. How can I help you today?" }
   ])
@@ -157,7 +193,10 @@ export function ChatBot() {
   const pathname = usePathname()
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  const triggerClose = useCallback(() => setShowForm(false), [])
+  const triggerClose = useCallback(() => {
+    setShowForm(false)
+    setShowWorkflows(false)
+  }, [])
   const triggerOpen = useCallback(() => setShowForm(true), [])
 
   const handleSend = async (content: string) => {
@@ -201,8 +240,8 @@ export function ChatBot() {
   }, [showForm, triggerClose])
 
   const ctx = useMemo(
-    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend }),
-    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend]
+    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, showWorkflows, setShowWorkflows }),
+    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, showWorkflows, setShowWorkflows]
   )
 
   return (
@@ -252,7 +291,7 @@ function DockBar() {
 }
 
 function ChatInterface() {
-  const { showForm, messages, isLoading, handleSend, triggerClose } = useChatContext()
+  const { showForm, messages, isLoading, handleSend, triggerClose, showWorkflows, setShowWorkflows } = useChatContext()
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
@@ -266,16 +305,29 @@ function ChatInterface() {
   if (!showForm) return null
 
   return (
-    <div className="flex h-full w-full flex-col p-0">
+    <div className="flex h-full w-full flex-col p-0 relative">
+      <AnimatePresence>
+        {showWorkflows && <WorkflowsOverlay />}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="p-3 border-b border-border bg-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ColorOrb dimension="24px" tones={{ base: "oklch(15% 0 0)" }} />
           <span className="font-mono text-xs font-bold uppercase tracking-tight">NVIDIA NIM Assistant</span>
         </div>
-        <button onClick={triggerClose} className="p-1 hover:bg-secondary rounded-md transition-colors">
-          <X className="h-4 w-4 text-muted-foreground" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={() => setShowWorkflows(true)}
+            className="p-1 hover:bg-secondary rounded-md transition-colors text-muted-foreground hover:text-foreground"
+            title="AI Workflows"
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
+          <button onClick={triggerClose} className="p-1 hover:bg-secondary rounded-md transition-colors">
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
@@ -306,7 +358,7 @@ function ChatInterface() {
       </div>
 
       {/* Quick Actions */}
-      {canSummarize && !isLoading && (
+      {!showWorkflows && canSummarize && !isLoading && (
         <div className="px-4 pb-2">
           <button
             onClick={() => handleSend(`Please summarize this ${pathname.includes("projects") ? "project" : "essay"}.`)}
@@ -340,5 +392,58 @@ function ChatInterface() {
         </button>
       </form>
     </div>
+  )
+}
+
+function WorkflowsOverlay() {
+  const { setShowWorkflows, handleSend } = useChatContext()
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      className="absolute inset-0 z-20 bg-background/98 p-4 flex flex-col"
+    >
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-amber-500" />
+          <span className="font-mono text-xs font-bold uppercase tracking-tight">AI Workflows</span>
+        </div>
+        <button 
+          onClick={() => setShowWorkflows(false)}
+          className="p-1 hover:bg-secondary rounded-md"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+        {WORKFLOWS.map((w) => (
+          <button
+            key={w.id}
+            onClick={() => {
+              handleSend(w.prompt)
+              setShowWorkflows(false)
+            }}
+            className="w-full text-left p-3 rounded-lg border border-border bg-secondary/20 hover:bg-secondary/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <w.icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-amber-500 transition-colors" />
+              <span className="text-xs font-semibold">{w.label}</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              {w.description}
+            </p>
+          </button>
+        ))}
+      </div>
+      
+      <div className="mt-4 pt-4 border-t border-border flex justify-center">
+        <p className="text-[9px] text-muted-foreground font-mono">
+          Powered by NVIDIA NIM & Llama 3.1
+        </p>
+      </div>
+    </motion.div>
   )
 }
