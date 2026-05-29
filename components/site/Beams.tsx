@@ -153,10 +153,6 @@ const Beams = ({
   scale = 0.2,
   rotation = 0
 }) => {
-  const { theme, resolvedTheme } = useTheme();
-  const currentTheme = resolvedTheme || theme;
-  const isDark = currentTheme === 'dark';
-
   const meshRef = useRef(null);
   const beamMaterial = useMemo(
     () =>
@@ -202,7 +198,7 @@ const Beams = ({
         },
         material: { fog: true },
         uniforms: {
-          diffuse: new THREE.Color(...hexToNormalizedRGB(isDark ? '#000000' : '#ffffff')),
+          diffuse: new THREE.Color(...hexToNormalizedRGB('#000000')),
           time: { shared: true, mixed: true, linked: true, value: 0 },
           roughness: 0.3,
           metalness: 0.3,
@@ -212,24 +208,17 @@ const Beams = ({
           uScale: scale
         }
       }),
-    [speed, noiseIntensity, scale, isDark]
+    [speed, noiseIntensity, scale]
   );
-
-  const effectiveLightColor = useMemo(() => {
-    if (lightColor !== '#ffffff') return lightColor;
-    return isDark ? '#ffffff' : '#000000';
-  }, [lightColor, isDark]);
-
-  const bgColor = isDark ? '#000000' : '#ffffff';
 
   return (
     <CanvasWrapper>
       <group rotation={[0, 0, THREE.MathUtils.degToRad(rotation)]}>
         <PlaneNoise ref={meshRef} material={beamMaterial} count={beamNumber} width={beamWidth} height={beamHeight} />
-        <DirLight color={effectiveLightColor} position={[0, 3, 10]} />
+        <DirLight color={lightColor} position={[0, 3, 10]} />
       </group>
-      <ambientLight intensity={isDark ? 0.2 : 0.8} />
-      <color attach="background" args={[bgColor]} />
+      <ambientLight intensity={0.2} />
+      <color attach="background" args={['#000000']} />
       <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={30} />
     </CanvasWrapper>
   );

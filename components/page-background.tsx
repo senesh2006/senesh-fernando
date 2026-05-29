@@ -5,15 +5,11 @@ import ColorBends from "@components/ColorBends"
 import { useTheme } from "next-themes"
 
 export function PageBackground() {
-  const { theme, resolvedTheme } = useTheme()
-  const currentTheme = resolvedTheme || theme
-  const isDark = currentTheme === "dark"
-
   return (
     <div className="page-background" aria-hidden>
       <ColorBends
         className="page-background__color-bends"
-        colors={isDark ? ["#A855F7"] : ["#6366f1"]}
+        colors={["#A855F7"]}
         speed={0.2}
         frequency={1.0}
         noise={0.15}
