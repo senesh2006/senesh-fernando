@@ -165,11 +165,6 @@
     font-feature-settings: "ss01", "cv01";
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    cursor: none;
-  }
-
-  a, button {
-    cursor: none;
   }
 
   ::selection {

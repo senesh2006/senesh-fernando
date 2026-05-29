@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { BackgroundFX } from "@/components/site/background-fx"
-import { CustomCursor } from "@/components/custom-cursor"
+import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { ChatBot } from "@/components/site/chat-bot"
 import { recordVisitor } from "@/lib/client-api"
 
@@ -135,7 +135,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <CustomCursor />
+      <MagneticBlobCursor />
       <BackgroundFX />
       <TopBar theme={theme} toggle={toggle} pathname={pathname} />
       <main key={pathname} className="flex-1 w-full animate-fade-in">
