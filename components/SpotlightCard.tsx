@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, type ReactNode, type MouseEvent } from "react"
+import { useTheme } from "next-themes"
 import "./SpotlightCard.css"
 
 interface SpotlightCardProps {
@@ -12,9 +13,19 @@ interface SpotlightCardProps {
 export default function SpotlightCard({
   children,
   className = "",
-  spotlightColor = "rgba(212, 168, 83, 0.2)",
+  spotlightColor: propSpotlightColor,
 }: SpotlightCardProps) {
+  const { theme, resolvedTheme } = useTheme()
+  const currentTheme = resolvedTheme || theme
+  const isDark = currentTheme === "dark"
+
+  const defaultSpotlightColor = isDark
+    ? "rgba(212, 168, 83, 0.2)"
+    : "rgba(59, 130, 246, 0.1)"
+  
+  const spotlightColor = propSpotlightColor || defaultSpotlightColor
   const divRef = useRef<HTMLDivElement>(null)
+// ...
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!divRef.current) return

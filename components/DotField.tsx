@@ -1,8 +1,10 @@
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo, useMemo } from 'react';
+import { useTheme } from 'next-themes';
 
 import './DotField.css';
 
 const TWO_PI = Math.PI * 2;
+// ... (rest of imports/types)
 
 interface Dot {
   ax: number;
@@ -41,12 +43,25 @@ const DotField = memo(({
   glowRadius = 160,
   sparkle = false,
   waveAmplitude = 0,
-  gradientFrom = 'rgba(168, 85, 247, 0.35)',
-  gradientTo = 'rgba(180, 151, 207, 0.25)',
-  glowColor = '#120F17',
+  gradientFrom: propGradientFrom,
+  gradientTo: propGradientTo,
+  glowColor: propGlowColor,
   ...rest
 }: DotFieldProps) => {
+  const { theme, resolvedTheme } = useTheme();
+  const currentTheme = resolvedTheme || theme;
+  const isDark = currentTheme === 'dark';
+
+  const defaultGradientFrom = isDark ? 'rgba(168, 85, 247, 0.35)' : 'rgba(79, 70, 229, 0.45)';
+  const defaultGradientTo = isDark ? 'rgba(180, 151, 207, 0.25)' : 'rgba(99, 102, 241, 0.3)';
+  const defaultGlowColor = isDark ? '#120F17' : '#f0f9ff';
+
+  const gradientFrom = propGradientFrom || defaultGradientFrom;
+  const gradientTo = propGradientTo || defaultGradientTo;
+  const glowColor = propGlowColor || defaultGlowColor;
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
+// ... (rest of the component)
   const svgRef = useRef<SVGSVGElement>(null);
   const glowRef = useRef<SVGCircleElement>(null);
   const dotsRef = useRef<Dot[]>([]);

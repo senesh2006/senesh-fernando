@@ -6,10 +6,12 @@ import * as THREE from 'three';
 
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
+import { useTheme } from 'next-themes';
 
 import './Beams.css';
 
 function extendMaterial(BaseMaterial, cfg) {
+// ... (rest of the function)
   const physical = THREE.ShaderLib.physical;
   const { vertexShader: baseVert, fragmentShader: baseFrag, uniforms: baseUniforms } = physical;
   const baseDefines = physical.defines ?? {};
@@ -151,6 +153,10 @@ const Beams = ({
   scale = 0.2,
   rotation = 0
 }) => {
+  const { theme, resolvedTheme } = useTheme();
+  const currentTheme = resolvedTheme || theme;
+  const isDark = currentTheme === 'dark';
+
   const meshRef = useRef(null);
   const beamMaterial = useMemo(
     () =>
@@ -196,7 +202,7 @@ const Beams = ({
         },
         material: { fog: true },
         uniforms: {
-          diffuse: new THREE.Color(...hexToNormalizedRGB('#000000')),
+          diffuse: new THREE.Color(...hexToNormalizedRGB(isDark ? '#000000' : '#ffffff')),
           time: { shared: true, mixed: true, linked: true, value: 0 },
           roughness: 0.3,
           metalness: 0.3,
@@ -206,17 +212,24 @@ const Beams = ({
           uScale: scale
         }
       }),
-    [speed, noiseIntensity, scale]
+    [speed, noiseIntensity, scale, isDark]
   );
+
+  const effectiveLightColor = useMemo(() => {
+    if (lightColor !== '#ffffff') return lightColor;
+    return isDark ? '#ffffff' : '#000000';
+  }, [lightColor, isDark]);
+
+  const bgColor = isDark ? '#000000' : '#ffffff';
 
   return (
     <CanvasWrapper>
       <group rotation={[0, 0, THREE.MathUtils.degToRad(rotation)]}>
         <PlaneNoise ref={meshRef} material={beamMaterial} count={beamNumber} width={beamWidth} height={beamHeight} />
-        <DirLight color={lightColor} position={[0, 3, 10]} />
+        <DirLight color={effectiveLightColor} position={[0, 3, 10]} />
       </group>
-      <ambientLight intensity={0.2} />
-      <color attach="background" args={['#000000']} />
+      <ambientLight intensity={isDark ? 0.2 : 0.8} />
+      <color attach="background" args={[bgColor]} />
       <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={30} />
     </CanvasWrapper>
   );

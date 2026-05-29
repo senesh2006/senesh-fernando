@@ -92,11 +92,6 @@ export function Navbar() {
           <FlowingMenu
             items={siteMenuItems}
             speed={12}
-            textColor="#e8e4dc"
-            bgColor="#0a0a09"
-            marqueeBgColor="#d4a853"
-            marqueeTextColor="#120F17"
-            borderColor="rgba(255, 255, 255, 0.13)"
           />
         </div>
       </aside>

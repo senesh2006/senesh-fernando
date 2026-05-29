@@ -1,8 +1,9 @@
 "use client"
 
-import { useRef, useEffect, useState, useCallback } from "react"
+import { useRef, useEffect, useState, useCallback, useMemo } from "react"
 import Link from "next/link"
 import { gsap } from "gsap"
+import { useTheme } from "next-themes"
 import "./FlowingMenu.css"
 
 export interface FlowingMenuItem {
@@ -211,12 +212,28 @@ function MenuItem({
 export default function FlowingMenu({
   items = [],
   speed = 15,
-  textColor = "#fff",
-  bgColor = "#120F17",
-  marqueeBgColor = "#fff",
-  marqueeTextColor = "#120F17",
-  borderColor = "#fff",
+  textColor: propTextColor,
+  bgColor: propBgColor,
+  marqueeBgColor: propMarqueeBgColor,
+  marqueeTextColor: propMarqueeTextColor,
+  borderColor: propBorderColor,
 }: FlowingMenuProps) {
+  const { theme, resolvedTheme } = useTheme()
+  const currentTheme = resolvedTheme || theme
+  const isDark = currentTheme === "dark"
+
+  const defaultTextColor = isDark ? "#fff" : "#000"
+  const defaultBgColor = isDark ? "#120F17" : "#fff"
+  const defaultMarqueeBgColor = isDark ? "#fff" : "#000"
+  const defaultMarqueeTextColor = isDark ? "#120F17" : "#fff"
+  const defaultBorderColor = isDark ? "rgba(255, 255, 255, 0.13)" : "rgba(0, 0, 0, 0.13)"
+
+  const textColor = propTextColor || defaultTextColor
+  const bgColor = propBgColor || defaultBgColor
+  const marqueeBgColor = propMarqueeBgColor || defaultMarqueeBgColor
+  const marqueeTextColor = propMarqueeTextColor || defaultMarqueeTextColor
+  const borderColor = propBorderColor || defaultBorderColor
+
   return (
     <div className="menu-wrap" style={{ backgroundColor: bgColor }}>
       <nav className="menu">
@@ -235,3 +252,4 @@ export default function FlowingMenu({
     </div>
   )
 }
+

@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
+import { useTheme } from 'next-themes';
 import './ColorBends.css';
+// ... (rest of imports/types)
 
 type ColorBendsProps = {
   className?: string;
@@ -131,7 +133,7 @@ export default function ColorBends({
   style,
   rotation = 90,
   speed = 0.2,
-  colors = [],
+  colors: propColors,
   transparent = true,
   autoRotate = 0,
   scale = 1,
@@ -144,6 +146,15 @@ export default function ColorBends({
   intensity = 1.5,
   bandWidth = 6
 }: ColorBendsProps) {
+  const { theme, resolvedTheme } = useTheme();
+  const currentTheme = resolvedTheme || theme;
+  const isDark = currentTheme === 'dark';
+
+  const defaultColors = isDark 
+    ? ['#000000', '#1a1a1a', '#333333'] 
+    : ['#ffffff', '#f0f0f0', '#e0e0e0'];
+  const colors = propColors || defaultColors;
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -200,7 +211,7 @@ export default function ColorBends({
     rendererRef.current = renderer;
     (renderer as any).outputColorSpace = (THREE as any).SRGBColorSpace;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x000000, transparent ? 0 : 1);
+    renderer.setClearColor(isDark ? 0x000000 : 0xffffff, transparent ? 0 : 1);
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.display = 'block';
@@ -258,7 +269,7 @@ export default function ColorBends({
         container.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [isDark]);
 
   useEffect(() => {
     const material = materialRef.current;
@@ -296,7 +307,7 @@ export default function ColorBends({
     material.uniforms.uColorCount.value = arr.length;
 
     material.uniforms.uTransparent.value = transparent ? 1 : 0;
-    if (renderer) renderer.setClearColor(0x000000, transparent ? 0 : 1);
+    if (renderer) renderer.setClearColor(isDark ? 0x000000 : 0xffffff, transparent ? 0 : 1);
   }, [
     rotation,
     autoRotate,
@@ -311,7 +322,8 @@ export default function ColorBends({
     intensity,
     bandWidth,
     colors,
-    transparent
+    transparent,
+    isDark
   ]);
 
   useEffect(() => {
