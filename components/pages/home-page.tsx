@@ -54,6 +54,7 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post, proje
             <Link href="/writing" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ writing</Link>
             <Link href="/about" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ about</Link>
             <Link href="/contact" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ get in touch</Link>
+            <a href="/Senesh_Fernando_CV.pdf" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ download cv</a>
             <span className="px-3 py-1.5 text-muted-foreground">press <span className="kbd">?</span> for shortcuts</span>
           </div>
         </div>
@@ -228,6 +229,7 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post, proje
           <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
             <Link href="/contact" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ get in touch</Link>
             <Link href="/projects" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ see the work</Link>
+            <a href="/Senesh_Fernando_CV.pdf" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ download cv</a>
           </div>
         </div>
       </section>

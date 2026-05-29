@@ -185,6 +185,14 @@ function TopBar({
               </Link>
             )
           })}
+          <a
+            href="/Senesh_Fernando_CV.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-2 py-0.5 rounded-sm link-hover text-muted-foreground"
+          >
+            CV
+          </a>
           <button
             onClick={toggle}
             aria-label="Toggle theme"

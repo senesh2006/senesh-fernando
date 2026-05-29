@@ -66,6 +66,14 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
               >
                 LinkedIn
               </a>
+              <a
+                href="/Senesh_Fernando_CV.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 border border-border rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-mono text-sm shadow-sm"
+              >
+                Download CV
+              </a>
             </div>
           </div>
           <div className="md:col-span-2 flex justify-center items-start">

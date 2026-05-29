@@ -24,7 +24,8 @@ const CHANNELS = [
   ["03", "LinkedIn.", PROFILE.linkedinHandle, PROFILE.linkedin, "↗", "work"],
   ["04", "GitHub.", `github.com/${GITHUB_USER}`, PROFILE.github, "↗", "code"],
   ["05", "Portfolio.", "v0-senesh-fernando.vercel.app", PROFILE.website, "↗", "personal"],
-  ["06", "Location.", PROFILE.address, `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, "↗", "map"],
+  ["06", "Resume/CV.", "Senesh_Fernando_CV.pdf", "/Senesh_Fernando_CV.pdf", "↓", "document"],
+  ["07", "Location.", PROFILE.address, `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, "↗", "map"],
 ] as const;
 
 const SOCIAL_ITEMS: ChromaGridItem[] = [
