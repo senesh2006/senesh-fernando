@@ -3,14 +3,15 @@
 import { useEffect, useRef, useState } from "react"
 
 /**
- * CustomCursor component that implements a smooth, theme-aware cursor
- * inspired by modern design portfolios.
+ * CustomCursor component that emulates the iconic iOS pointer behavior.
+ * It's a small dot that magnetically snaps and morphs into clickable elements.
  */
 export function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null)
-  const [isHovered, setIsHovered] = useState(false)
+  const [targetEl, setTargetEl] = useState<HTMLElement | null>(null)
   const mousePos = useRef({ x: 0, y: 0 })
   const cursorPos = useRef({ x: 0, y: 0 })
+  const cursorSize = useRef({ w: 8, h: 8, r: 50 }) // width, height, border-radius
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
@@ -28,11 +29,12 @@ export function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement
-      // Detect links, buttons, and elements with interactive roles/classes
-      if (target.closest('a, button, [role="button"], .link-hover, .project-card, .glass-card-hover')) {
-        setIsHovered(true)
+      // Broadly detect interactive elements
+      const clickable = target.closest('a, button, [role="button"], .link-hover, .project-card, .glass-card-hover, .row-hover, .sm-panel-item, .sm-toggle') as HTMLElement
+      if (clickable) {
+        setTargetEl(clickable)
       } else {
-        setIsHovered(false)
+        setTargetEl(null)
       }
     }
 
@@ -40,17 +42,63 @@ export function CustomCursor() {
     window.addEventListener("mouseover", handleMouseOver)
 
     const animate = () => {
-      // Linear Interpolation (Lerp) for smooth gliding effect
-      // 0.15 provides a nice balance between responsiveness and smoothness
-      const lerp = 0.15
-      cursorPos.current.x += (mousePos.current.x - cursorPos.current.x) * lerp
-      cursorPos.current.y += (mousePos.current.y - cursorPos.current.y) * lerp
+      // Use faster lerp for snapping, slower for idle
+      const lerp = targetEl ? 0.22 : 0.18
+      const sizeLerp = 0.15
+
+      let targetX = mousePos.current.x
+      let targetY = mousePos.current.y
+      let targetW = 8
+      let targetH = 8
+      let targetR = 50
+
+      if (targetEl) {
+        const rect = targetEl.getBoundingClientRect()
+        const centerX = rect.left + rect.width / 2
+        const centerY = rect.top + rect.height / 2
+        
+        // Snap to center but allow subtle mouse resistance for that "magnetic" feel
+        targetX = centerX + (mousePos.current.x - centerX) * 0.15
+        targetY = centerY + (mousePos.current.y - centerY) * 0.15
+        
+        // Add padding around the target element
+        targetW = rect.width + 12
+        targetH = rect.height + 8
+        
+        // Match border radius with slight offset
+        const style = window.getComputedStyle(targetEl)
+        const borderRadius = parseInt(style.borderRadius)
+        targetR = isNaN(borderRadius) ? 8 : borderRadius + 4
+      }
+
+      // Smoothly interpolate all properties
+      cursorPos.current.x += (targetX - cursorPos.current.x) * lerp
+      cursorPos.current.y += (targetY - cursorPos.current.y) * lerp
+      cursorSize.current.w += (targetW - cursorSize.current.w) * sizeLerp
+      cursorSize.current.h += (targetH - cursorSize.current.h) * sizeLerp
+      
+      if (!targetEl) {
+        cursorSize.current.r += (50 - cursorSize.current.r) * sizeLerp
+      } else {
+        cursorSize.current.r += (targetR - cursorSize.current.r) * sizeLerp
+      }
 
       if (cursorRef.current) {
-        // Apply transformation: position + scale on hover
-        cursorRef.current.style.transform = `translate3d(${cursorPos.current.x}px, ${cursorPos.current.y}px, 0) translate(-50%, -50%) scale(${isHovered ? 2.5 : 1})`
-        // Update opacity to ensure it's visible once it starts moving
+        const { x, y } = cursorPos.current
+        const { w, h, r } = cursorSize.current
+        
+        cursorRef.current.style.width = `${w}px`
+        cursorRef.current.style.height = `${h}px`
+        cursorRef.current.style.borderRadius = targetEl ? `${r}px` : `${r}%`
+        cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
         cursorRef.current.style.opacity = "1"
+        
+        // Visual styling for morphing mode
+        cursorRef.current.style.backgroundColor = targetEl 
+          ? 'rgba(255, 255, 255, 0.15)' 
+          : 'white'
+        cursorRef.current.style.mixBlendMode = targetEl ? 'normal' : 'difference'
+        cursorRef.current.style.backdropFilter = targetEl ? 'blur(4px)' : 'none'
       }
 
       requestAnimationFrame(animate)
@@ -63,7 +111,7 @@ export function CustomCursor() {
       window.removeEventListener("mouseover", handleMouseOver)
       cancelAnimationFrame(raf)
     }
-  }, [enabled, isHovered])
+  }, [enabled, targetEl])
 
   if (!enabled) return null
 
@@ -75,16 +123,16 @@ export function CustomCursor() {
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '24px',
-        height: '24px',
+        width: '8px',
+        height: '8px',
         backgroundColor: 'white',
         borderRadius: '50%',
         pointerEvents: 'none',
         zIndex: 9999,
         mixBlendMode: 'difference',
-        transition: 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease',
-        willChange: 'transform',
-        opacity: 0 // Start hidden until movement
+        transition: 'opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.4s ease',
+        willChange: 'transform, width, height, border-radius',
+        opacity: 0
       }}
     />
   )
