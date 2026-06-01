@@ -224,35 +224,34 @@ export function ChatBot() {
     () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, agentId }),
     [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, agentId]
   )
-
-  return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
-      <motion.div
-        ref={wrapperRef}
-        className={cn(
-          "bg-background/95 backdrop-blur-md relative flex flex-col items-center overflow-hidden border shadow-2xl",
-          !showForm && "hover:scale-105 transition-transform"
-        )}
-        initial={false}
-        animate={{
-          width: showForm ? FORM_WIDTH : 140,
-          height: showForm ? FORM_HEIGHT : 48,
-          borderRadius: showForm ? 16 : 24,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 550 / SPEED_FACTOR,
-          damping: 45,
-          mass: 0.7,
-        }}
-      >
-        <ChatContext.Provider value={ctx}>
-          <DockBar />
-          <ChatInterface />
-        </ChatContext.Provider>
-      </motion.div>
-    </div>
-  )
+return (
+  <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
+    <motion.div
+      ref={wrapperRef}
+      className={cn(
+        "bg-background/95 backdrop-blur-md relative flex flex-col items-center overflow-hidden border shadow-2xl",
+        !showForm && "hover:scale-105 transition-transform"
+      )}
+      initial={false}
+      animate={{
+        width: showForm ? FORM_WIDTH : 140,
+        height: showForm ? FORM_HEIGHT : 48,
+        borderRadius: showForm ? 16 : 24,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 550 / SPEED_FACTOR,
+        damping: 45,
+        mass: 0.7,
+      }}
+    >
+      <ChatContext.Provider value={ctx}>
+        <DockBar />
+        <ChatInterface />
+      </ChatContext.Provider>
+    </motion.div>
+  </div>
+)
 }
 
 function DockBar() {

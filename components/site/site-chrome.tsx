@@ -7,6 +7,7 @@ import { BackgroundFX } from "@/components/site/background-fx"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { ChatBot } from "@/components/site/chat-bot"
 import { recordVisitor } from "@/lib/client-api"
+import { ConversationProvider } from "@elevenlabs/react"
 
 const NAV = [
   { href: "/", label: "index", key: "h" },
@@ -133,25 +134,29 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     return () => clearInterval(id)
   }, [])
 
+  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
+
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <MagneticBlobCursor />
-      <BackgroundFX />
-      <TopBar theme={theme} toggle={toggle} pathname={pathname} />
-      <main key={pathname} className="flex-1 w-full animate-fade-in">
-        {children}
-      </main>
-      <MetaFooter
-        pathname={pathname}
-        theme={theme}
-        mode={mode}
-        nodeId={nodeId}
-        now={now}
-        visitorCount={visitorCount}
-      />
-      <ChatBot />
-      {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
-    </div>
+    <ConversationProvider agentId={agentId}>
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <MagneticBlobCursor />
+        <BackgroundFX />
+        <TopBar theme={theme} toggle={toggle} pathname={pathname} />
+        <main key={pathname} className="flex-1 w-full animate-fade-in">
+          {children}
+        </main>
+        <MetaFooter
+          pathname={pathname}
+          theme={theme}
+          mode={mode}
+          nodeId={nodeId}
+          now={now}
+          visitorCount={visitorCount}
+        />
+        <ChatBot />
+        {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
+      </div>
+    </ConversationProvider>
   )
 }
 
