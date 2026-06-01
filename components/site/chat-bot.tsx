@@ -172,7 +172,13 @@ export function ChatBot() {
         { role: msg.source === "user" ? "user" : "assistant", content: msg.message }
       ])
     },
-    onError: (err) => console.error("ElevenLabs Error:", err),
+    onError: (err) => {
+      console.error("ElevenLabs Error:", err)
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `Voice Error: ${err.message || "Failed to connect to voice agent."}` }
+      ])
+    },
   })
 
   const triggerClose = useCallback(() => {
@@ -182,6 +188,17 @@ export function ChatBot() {
 
   const handleSend = async (content: string) => {
     if (!content.trim() || isLoading) return
+
+    // If voice session is active, send via ElevenLabs
+    if (conversation.status === "connected") {
+      try {
+        await conversation.sendUserMessage(content)
+        // message will be added via onMessage callback from ElevenLabs
+        return
+      } catch (err) {
+        console.error("Failed to send message to voice agent:", err)
+      }
+    }
 
     const newMessages = [...messages, { role: "user" as const, content }]
     setMessages(newMessages)
@@ -272,7 +289,7 @@ function DockBar() {
 
 function ChatInterface() {
   const { showForm, messages, isLoading, handleSend, triggerClose, conversation, agentId } = useChatContext()
-  const { status, startSession, endSession } = conversation
+  const { status, startSession, endSession, isSpeaking } = conversation
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
@@ -290,8 +307,9 @@ function ChatInterface() {
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
         await startSession({ agentId })
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to start voice session:", err)
+        handleSend(`Error: ${err.message || "Microphone access denied."}`)
       }
     }
   }
@@ -303,19 +321,30 @@ function ChatInterface() {
       {/* Header */}
       <div className="p-3 border-b border-border bg-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ColorOrb dimension="24px" tones={{ base: "oklch(15% 0 0)" }} />
+          <ColorOrb dimension="24px" tones={{ base: "oklch(15% 0 0)" }} spinDuration={isSpeaking ? 2 : 20} />
           <span className="font-mono text-xs font-bold uppercase tracking-tight">Senesh AI</span>
         </div>
         <div className="flex items-center gap-1">
           <button 
             onClick={toggleVoice}
             className={cn(
-              "p-1 hover:bg-secondary rounded-md transition-colors",
-              status === "connected" ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"
+              "p-1 hover:bg-secondary rounded-md transition-colors flex items-center gap-1.5 px-2",
+              status === "connected" ? "text-red-500 bg-red-500/10" : "text-muted-foreground hover:text-foreground"
             )}
-            title={status === "connected" ? "End Voice (Talk to Senesh)" : "Start Voice (Talk to Senesh)"}
+            title={status === "connected" ? "End Voice Session" : "Start Voice Session"}
           >
-            {status === "connected" ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+            {status === "connected" ? (
+              <>
+                <div className="flex gap-0.5 items-center">
+                  <span className="w-0.5 h-2 bg-current animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-0.5 h-3 bg-current animate-bounce" style={{ animationDelay: "100ms" }} />
+                  <span className="w-0.5 h-2 bg-current animate-bounce" style={{ animationDelay: "200ms" }} />
+                </div>
+                <span className="text-[10px] font-bold">LIVE</span>
+              </>
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
           </button>
           <button onClick={triggerClose} className="p-1 hover:bg-secondary rounded-md transition-colors">
             <X className="h-4 w-4 text-muted-foreground" />
@@ -333,6 +362,18 @@ function ChatInterface() {
             <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-full text-[10px] font-mono animate-pulse">
               Voice Session Active: Start Talking!
             </div>
+          </div>
+        )}
+        {status === "disconnected" && messages.length > 1 && (
+          <div className="flex justify-center mb-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={toggleVoice} 
+              className="text-[10px] h-7 px-3 font-mono uppercase tracking-tighter"
+            >
+              <Mic className="h-3 w-3 mr-1.5" /> Join Voice Session
+            </Button>
           </div>
         )}
         {messages.map((m, i) => (
@@ -380,13 +421,13 @@ function ChatInterface() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={status === "connected" ? "Listening to your voice..." : "Type message..."}
-          disabled={status === "connected"}
+          placeholder={status === "connected" ? "Talk or type here..." : "Type message..."}
+          disabled={isLoading}
           className="flex-1 bg-secondary/30 border border-border rounded-md px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-border transition-all"
         />
         <button
           type="submit"
-          disabled={!input.trim() || isLoading || status === "connected"}
+          disabled={!input.trim() || isLoading}
           className="bg-foreground text-background p-2 rounded-md disabled:opacity-50 transition-all hover:opacity-90"
         >
           <Send className="h-3.5 w-3.5" />
