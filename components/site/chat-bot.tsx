@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { 
   useConversation 
 } from "@elevenlabs/react"
+import { useAssemblyAIVoice } from "@/hooks/use-assemblyai-voice"
 
 // --- ORB COMPONENT ---
 
@@ -144,7 +145,10 @@ interface ContextShape {
   messages: Message[]
   isLoading: boolean
   handleSend: (content: string) => Promise<void>
-  conversation: any // Using any for simplicity as it's from ElevenLabs
+  conversation: any // ElevenLabs
+  assemblyVoice: any // AssemblyAI
+  voiceProvider: "elevenlabs" | "assemblyai"
+  setVoiceProvider: (p: "elevenlabs" | "assemblyai") => void
   agentId: string
 }
 
@@ -159,6 +163,7 @@ export function ChatBot() {
     { role: "assistant", content: "Hi! I'm Senesh's AI assistant. How can I help you today?" }
   ])
   const [isLoading, setIsLoading] = useState(false)
+  const [voiceProvider, setVoiceProvider] = useState<"elevenlabs" | "assemblyai">("elevenlabs")
   const pathname = usePathname()
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -177,28 +182,48 @@ export function ChatBot() {
       const message = typeof err === 'string' ? err : err.message || "Failed to connect to voice agent."
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: `Voice Error: ${message}. (Check console for full details)` }
+        { role: "assistant", content: `ElevenLabs Error: ${message}. Switching to fallback...` }
       ])
+      setVoiceProvider("assemblyai")
     },
+  })
+
+  // Initialize AssemblyAI Voice Agent
+  const assemblyVoice = useAssemblyAIVoice({
+    onMessage: (msg) => {
+      setMessages((prev) => [...prev, msg])
+    },
+    onError: (err) => {
+      console.error("AssemblyAI Error:", err)
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `AssemblyAI Error: ${err}.` }
+      ])
+    }
   })
 
   const triggerClose = useCallback(() => {
     setShowForm(false)
-  }, [])
+    if (conversation.status === "connected") conversation.endSession()
+    if (assemblyVoice.status === "active") assemblyVoice.stopSession()
+  }, [conversation, assemblyVoice])
+
   const triggerOpen = useCallback(() => setShowForm(true), [])
 
   const handleSend = async (content: string) => {
     if (!content.trim() || isLoading) return
 
-    // If voice session is active, send via ElevenLabs
-    if (conversation.status === "connected") {
+    // If voice session is active, send via active provider
+    if (voiceProvider === "elevenlabs" && conversation.status === "connected") {
       try {
         await conversation.sendUserMessage(content)
-        // message will be added via onMessage callback from ElevenLabs
         return
       } catch (err) {
-        console.error("Failed to send message to voice agent:", err)
+        console.error("Failed to send message to ElevenLabs:", err)
       }
+    } else if (voiceProvider === "assemblyai" && assemblyVoice.status === "active") {
+      assemblyVoice.sendText(content)
+      return
     }
 
     const newMessages = [...messages, { role: "user" as const, content }]
@@ -239,8 +264,11 @@ export function ChatBot() {
   }, [showForm, triggerClose])
 
   const ctx = useMemo(
-    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, agentId }),
-    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, agentId]
+    () => ({ 
+      showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, 
+      conversation, assemblyVoice, voiceProvider, setVoiceProvider, agentId 
+    }),
+    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, assemblyVoice, voiceProvider, agentId]
   )
 return (
   <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
@@ -289,11 +317,27 @@ function DockBar() {
 }
 
 function ChatInterface() {
-  const { showForm, messages, isLoading, handleSend, triggerClose, conversation, agentId } = useChatContext()
-  const { status, startSession, endSession, isSpeaking } = conversation
+  const { 
+    showForm, messages, isLoading, handleSend, triggerClose, 
+    conversation, assemblyVoice, voiceProvider, setVoiceProvider, agentId 
+  } = useChatContext()
+  
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+
+  // Computed voice state based on provider
+  const isVoiceActive = voiceProvider === "elevenlabs" 
+    ? conversation.status === "connected" 
+    : assemblyVoice.status === "active"
+  
+  const isVoiceConnecting = voiceProvider === "elevenlabs"
+    ? conversation.status === "connecting"
+    : assemblyVoice.status === "connecting"
+
+  const isSpeaking = voiceProvider === "elevenlabs"
+    ? conversation.isSpeaking
+    : assemblyVoice.isSpeaking
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -302,21 +346,25 @@ function ChatInterface() {
   const canSummarize = (pathname.startsWith("/projects/") || pathname.startsWith("/writing/")) && messages.length < 3
 
   const toggleVoice = async () => {
-    if (status === "connected") {
-      await endSession()
+    if (isVoiceActive) {
+      if (voiceProvider === "elevenlabs") await conversation.endSession()
+      else assemblyVoice.stopSession()
     } else {
-      if (!agentId) {
-        const errorMsg = "Error: NEXT_PUBLIC_ELEVENLABS_AGENT_ID is not set in the environment."
-        console.error(errorMsg)
-        handleSend(errorMsg)
-        return
-      }
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true })
-        await startSession({ agentId })
-      } catch (err: any) {
-        console.error("Failed to start voice session:", err)
-        handleSend(`Error: ${err.message || "Microphone access denied."}`)
+      if (voiceProvider === "elevenlabs") {
+        if (!agentId) {
+          handleSend("ElevenLabs Agent ID missing. Swapping to AssemblyAI Voice Agent...")
+          setVoiceProvider("assemblyai")
+          return
+        }
+        try {
+          await navigator.mediaDevices.getUserMedia({ audio: true })
+          await conversation.startSession({ agentId })
+        } catch (err: any) {
+          console.error("ElevenLabs failed, falling back:", err)
+          setVoiceProvider("assemblyai")
+        }
+      } else {
+        await assemblyVoice.startSession()
       }
     }
   }
@@ -329,18 +377,30 @@ function ChatInterface() {
       <div className="p-3 border-b border-border bg-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ColorOrb dimension="24px" tones={{ base: "oklch(15% 0 0)" }} spinDuration={isSpeaking ? 2 : 20} />
-          <span className="font-mono text-xs font-bold uppercase tracking-tight">Senesh AI</span>
+          <span className="font-mono text-xs font-bold uppercase tracking-tight">
+            {voiceProvider === "assemblyai" ? "AssemblyAI Voice" : "Senesh AI"}
+          </span>
         </div>
         <div className="flex items-center gap-1">
+          {/* Provider Toggle */}
+          {!isVoiceActive && !isVoiceConnecting && (
+            <button 
+              onClick={() => setVoiceProvider(voiceProvider === "elevenlabs" ? "assemblyai" : "elevenlabs")}
+              className="text-[9px] font-mono px-1.5 py-0.5 border border-border rounded bg-background hover:bg-secondary transition-colors"
+            >
+              {voiceProvider === "elevenlabs" ? "SWAP TO AAI" : "SWAP TO 11LABS"}
+            </button>
+          )}
+          
           <button 
             onClick={toggleVoice}
             className={cn(
               "p-1 hover:bg-secondary rounded-md transition-colors flex items-center gap-1.5 px-2",
-              status === "connected" ? "text-red-500 bg-red-500/10" : "text-muted-foreground hover:text-foreground"
+              isVoiceActive ? "text-red-500 bg-red-500/10" : "text-muted-foreground hover:text-foreground"
             )}
-            title={status === "connected" ? "End Voice Session" : "Start Voice Session"}
+            title={isVoiceActive ? "End Voice Session" : "Start Voice Session"}
           >
-            {status === "connected" ? (
+            {isVoiceActive ? (
               <>
                 <div className="flex gap-0.5 items-center">
                   <span className="w-0.5 h-2 bg-current animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -349,6 +409,8 @@ function ChatInterface() {
                 </div>
                 <span className="text-[10px] font-bold">LIVE</span>
               </>
+            ) : isVoiceConnecting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Mic className="h-4 w-4" />
             )}
@@ -364,14 +426,14 @@ function ChatInterface() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs scrollbar-none"
       >
-        {status === "connected" && (
+        {isVoiceActive && (
           <div className="flex justify-center mb-4">
             <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-full text-[10px] font-mono animate-pulse">
               Voice Session Active: Start Talking!
             </div>
           </div>
         )}
-        {status === "disconnected" && messages.length > 1 && (
+        {!isVoiceActive && messages.length > 1 && (
           <div className="flex justify-center mb-4">
             <Button 
               variant="outline" 
@@ -379,7 +441,7 @@ function ChatInterface() {
               onClick={toggleVoice} 
               className="text-[10px] h-7 px-3 font-mono uppercase tracking-tighter"
             >
-              <Mic className="h-3 w-3 mr-1.5" /> Join Voice Session
+              <Mic className="h-3 w-3 mr-1.5" /> Join {voiceProvider === "assemblyai" ? "AssemblyAI" : "ElevenLabs"} Voice
             </Button>
           </div>
         )}
@@ -406,7 +468,7 @@ function ChatInterface() {
       </div>
 
       {/* Quick Actions */}
-      {canSummarize && !isLoading && status !== "connected" && (
+      {canSummarize && !isLoading && !isVoiceActive && (
         <div className="px-4 pb-2">
           <button
             onClick={() => handleSend(`Please summarize this ${pathname.includes("projects") ? "project" : "essay"}.`)}
@@ -428,7 +490,7 @@ function ChatInterface() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={status === "connected" ? "Talk or type here..." : "Type message..."}
+          placeholder={isVoiceActive ? "Talk or type here..." : "Type message..."}
           disabled={isLoading}
           className="flex-1 bg-secondary/30 border border-border rounded-md px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-border transition-all"
         />
