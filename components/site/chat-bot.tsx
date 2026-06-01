@@ -1,11 +1,16 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from "react"
-import { AnimatePresence, motion } from "motion/react"
-import { Bot, Sparkles, Loader2, Send, X } from "lucide-react"
+import { motion } from "motion/react"
+import { Bot, Sparkles, Loader2, Send, X, Mic, MicOff } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { 
+  ConversationProvider, 
+  useConversationControls, 
+  useConversationStatus 
+} from "@elevenlabs/react"
 
 // --- ORB COMPONENT ---
 
@@ -141,51 +146,15 @@ interface ContextShape {
   messages: Message[]
   isLoading: boolean
   handleSend: (content: string) => Promise<void>
-  showWorkflows: boolean
-  setShowWorkflows: (show: boolean) => void
 }
 
 const ChatContext = createContext({} as ContextShape)
 const useChatContext = () => useContext(ChatContext)
 
-// --- WORKFLOWS DATA ---
-
-const WORKFLOWS = [
-  { 
-    id: "summarize", 
-    label: "Summarize Page", 
-    description: "Get a 3-bullet summary of the current view.",
-    prompt: "Please summarize this page in 3 clear bullet points.",
-    icon: Sparkles
-  },
-  { 
-    id: "experience", 
-    label: "Review Experience", 
-    description: "Ask about Senesh's career and background.",
-    prompt: "Can you give me an overview of Senesh's professional experience and key achievements?",
-    icon: Bot
-  },
-  { 
-    id: "skills", 
-    label: "Technical Audit", 
-    description: "Deep dive into Senesh's technical stack.",
-    prompt: "What are Senesh's strongest technical skills and how has he applied them in projects?",
-    icon: Sparkles
-  },
-  { 
-    id: "collaboration", 
-    label: "Collaboration Idea", 
-    description: "Explore ways to work with Senesh.",
-    prompt: "I'm interested in collaborating with Senesh. What kind of projects is he looking for and how should we start?",
-    icon: Send
-  },
-]
-
 // --- MAIN COMPONENT ---
 
 export function ChatBot() {
   const [showForm, setShowForm] = useState(false)
-  const [showWorkflows, setShowWorkflows] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hi! I'm Senesh's AI assistant. How can I help you today?" }
   ])
@@ -195,7 +164,6 @@ export function ChatBot() {
 
   const triggerClose = useCallback(() => {
     setShowForm(false)
-    setShowWorkflows(false)
   }, [])
   const triggerOpen = useCallback(() => setShowForm(true), [])
 
@@ -220,7 +188,7 @@ export function ChatBot() {
         const data = await res.json()
         setMessages([...newMessages, { role: "assistant", content: data.content }])
       } else {
-        setMessages([...newMessages, { role: "assistant", content: "Error connecting to NVIDIA NIM." }])
+        setMessages([...newMessages, { role: "assistant", content: "Error connecting to AI." }])
       }
     } catch (err) {
       setMessages([...newMessages, { role: "assistant", content: "An unexpected error occurred." }])
@@ -240,9 +208,11 @@ export function ChatBot() {
   }, [showForm, triggerClose])
 
   const ctx = useMemo(
-    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, showWorkflows, setShowWorkflows }),
-    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, showWorkflows, setShowWorkflows]
+    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend }),
+    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend]
   )
+
+  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
@@ -265,10 +235,12 @@ export function ChatBot() {
           mass: 0.7,
         }}
       >
-        <ChatContext.Provider value={ctx}>
-          <DockBar />
-          <ChatInterface />
-        </ChatContext.Provider>
+        <ConversationProvider agentId={agentId}>
+          <ChatContext.Provider value={ctx}>
+            <DockBar />
+            <ChatInterface />
+          </ChatContext.Provider>
+        </ConversationProvider>
       </motion.div>
     </div>
   )
@@ -291,7 +263,9 @@ function DockBar() {
 }
 
 function ChatInterface() {
-  const { showForm, messages, isLoading, handleSend, triggerClose, showWorkflows, setShowWorkflows } = useChatContext()
+  const { showForm, messages, isLoading, handleSend, triggerClose } = useChatContext()
+  const { startSession, endSession } = useConversationControls()
+  const { status } = useConversationStatus()
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
@@ -302,27 +276,39 @@ function ChatInterface() {
 
   const canSummarize = (pathname.startsWith("/projects/") || pathname.startsWith("/writing/")) && messages.length < 3
 
+  const toggleVoice = async () => {
+    if (status === "connected") {
+      await endSession()
+    } else {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+        await startSession()
+      } catch (err) {
+        console.error("Failed to start voice session:", err)
+      }
+    }
+  }
+
   if (!showForm) return null
 
   return (
     <div className="flex h-full w-full flex-col p-0 relative">
-      <AnimatePresence>
-        {showWorkflows && <WorkflowsOverlay />}
-      </AnimatePresence>
-
       {/* Header */}
       <div className="p-3 border-b border-border bg-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ColorOrb dimension="24px" tones={{ base: "oklch(15% 0 0)" }} />
-          <span className="font-mono text-xs font-bold uppercase tracking-tight">NVIDIA NIM Assistant</span>
+          <span className="font-mono text-xs font-bold uppercase tracking-tight">Senesh AI</span>
         </div>
         <div className="flex items-center gap-1">
           <button 
-            onClick={() => setShowWorkflows(true)}
-            className="p-1 hover:bg-secondary rounded-md transition-colors text-muted-foreground hover:text-foreground"
-            title="AI Workflows"
+            onClick={toggleVoice}
+            className={cn(
+              "p-1 hover:bg-secondary rounded-md transition-colors",
+              status === "connected" ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"
+            )}
+            title={status === "connected" ? "End Voice" : "Start Voice"}
           >
-            <Sparkles className="h-4 w-4" />
+            {status === "connected" ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
           </button>
           <button onClick={triggerClose} className="p-1 hover:bg-secondary rounded-md transition-colors">
             <X className="h-4 w-4 text-muted-foreground" />
@@ -335,6 +321,13 @@ function ChatInterface() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs scrollbar-none"
       >
+        {status === "connected" && (
+          <div className="flex justify-center mb-4">
+            <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-full text-[10px] font-mono animate-pulse">
+              Voice Session Active
+            </div>
+          </div>
+        )}
         {messages.map((m, i) => (
           <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
             <div className={cn(
@@ -358,7 +351,7 @@ function ChatInterface() {
       </div>
 
       {/* Quick Actions */}
-      {!showWorkflows && canSummarize && !isLoading && (
+      {canSummarize && !isLoading && status !== "connected" && (
         <div className="px-4 pb-2">
           <button
             onClick={() => handleSend(`Please summarize this ${pathname.includes("projects") ? "project" : "essay"}.`)}
@@ -380,70 +373,18 @@ function ChatInterface() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type message..."
+          placeholder={status === "connected" ? "Listening..." : "Type message..."}
+          disabled={status === "connected"}
           className="flex-1 bg-secondary/30 border border-border rounded-md px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-border transition-all"
         />
         <button
           type="submit"
-          disabled={!input.trim() || isLoading}
+          disabled={!input.trim() || isLoading || status === "connected"}
           className="bg-foreground text-background p-2 rounded-md disabled:opacity-50 transition-all hover:opacity-90"
         >
           <Send className="h-3.5 w-3.5" />
         </button>
       </form>
     </div>
-  )
-}
-
-function WorkflowsOverlay() {
-  const { setShowWorkflows, handleSend } = useChatContext()
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      className="absolute inset-0 z-20 bg-background/98 p-4 flex flex-col"
-    >
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-amber-500" />
-          <span className="font-mono text-xs font-bold uppercase tracking-tight">AI Workflows</span>
-        </div>
-        <button 
-          onClick={() => setShowWorkflows(false)}
-          className="p-1 hover:bg-secondary rounded-md"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-
-      <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-        {WORKFLOWS.map((w) => (
-          <button
-            key={w.id}
-            onClick={() => {
-              handleSend(w.prompt)
-              setShowWorkflows(false)
-            }}
-            className="w-full text-left p-3 rounded-lg border border-border bg-secondary/20 hover:bg-secondary/40 transition-all group"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <w.icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-amber-500 transition-colors" />
-              <span className="text-xs font-semibold">{w.label}</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              {w.description}
-            </p>
-          </button>
-        ))}
-      </div>
-      
-      <div className="mt-4 pt-4 border-t border-border flex justify-center">
-        <p className="text-[9px] text-muted-foreground font-mono">
-          Powered by NVIDIA NIM & Llama 3.1
-        </p>
-      </div>
-    </motion.div>
   )
 }
