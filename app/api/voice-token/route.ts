@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-
 async function handleRequest() {
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
   if (!apiKey) {
+    console.error("DEBUG: ASSEMBLYAI_API_KEY is missing from process.env");
     return NextResponse.json(
-      { error: "ASSEMBLYAI_API_KEY is not configured" },
+      { error: "ASSEMBLYAI_API_KEY is not configured on the server." },
       { status: 500 }
     );
   }
 
-  try {
-    // Voice Agent API requires "Bearer " prefix for authorization
-    const response = await fetch("https://agents.assemblyai.com/v1/token", {
+  console.log("DEBUG: Attempting to fetch AssemblyAI token...");
+...
+
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,

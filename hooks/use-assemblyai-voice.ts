@@ -85,7 +85,10 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
 
       // 1. Get temporary token
       const tokenRes = await fetch("/api/voice-token", { method: "POST" })
-      if (!tokenRes.ok) throw new Error("Failed to get voice token")
+      if (!tokenRes.ok) {
+        const errorData = await tokenRes.json().catch(() => ({}))
+        throw new Error(errorData.error || `Server returned ${tokenRes.status}`)
+      }
       const { token } = await tokenRes.json()
 
       // 2. Initialize Audio Context (24kHz is required for AssemblyAI Voice Agent)
