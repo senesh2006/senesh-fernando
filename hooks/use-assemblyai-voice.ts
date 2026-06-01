@@ -84,12 +84,23 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
       setStatus("connecting")
 
       // 1. Get temporary token
-      const tokenRes = await fetch("/api/voice-token", { method: "POST" })
+      console.log("Starting voice session, fetching token...")
+      const tokenRes = await fetch("/api/aai-token", { method: "POST" })
+      
       if (!tokenRes.ok) {
-        const errorData = await tokenRes.json().catch(() => ({}))
-        throw new Error(errorData.error || `Server returned ${tokenRes.status}`)
+        let errorMessage = `Server Error (${tokenRes.status})`
+        try {
+          const errorData = await tokenRes.json()
+          errorMessage = errorData.error || errorMessage
+        } catch (e) {
+          // Response was not JSON
+          console.error("Non-JSON response from token endpoint:", await tokenRes.text().catch(() => "Unknown body"))
+        }
+        throw new Error(errorMessage)
       }
+      
       const { token } = await tokenRes.json()
+      console.log("Token received successfully.")
 
       // 2. Initialize Audio Context (24kHz is required for AssemblyAI Voice Agent)
       const audioCtx = new AudioContext({ sampleRate: 24000 })
