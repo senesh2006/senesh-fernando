@@ -304,6 +304,12 @@ function ChatInterface() {
     if (status === "connected") {
       await endSession()
     } else {
+      if (!agentId) {
+        const errorMsg = "Error: NEXT_PUBLIC_ELEVENLABS_AGENT_ID is not set in the environment."
+        console.error(errorMsg)
+        handleSend(errorMsg)
+        return
+      }
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
         await startSession({ agentId })
