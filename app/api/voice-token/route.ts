@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 async function handleRequest() {
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
@@ -11,8 +12,10 @@ async function handleRequest() {
   }
 
   console.log("DEBUG: Attempting to fetch AssemblyAI token...");
-...
 
+  try {
+    // Voice Agent API requires "Bearer " prefix for authorization
+    const response = await fetch("https://agents.assemblyai.com/v1/token", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
