@@ -7,9 +7,7 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { 
-  ConversationProvider, 
-  useConversationControls, 
-  useConversationStatus 
+  useConversation 
 } from "@elevenlabs/react"
 
 // --- ORB COMPONENT ---
@@ -146,6 +144,8 @@ interface ContextShape {
   messages: Message[]
   isLoading: boolean
   handleSend: (content: string) => Promise<void>
+  conversation: any // Using any for simplicity as it's from ElevenLabs
+  agentId: string
 }
 
 const ChatContext = createContext({} as ContextShape)
@@ -161,6 +161,19 @@ export function ChatBot() {
   const [isLoading, setIsLoading] = useState(false)
   const pathname = usePathname()
   const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
+
+  // Initialize ElevenLabs Conversation
+  const conversation = useConversation({
+    onMessage: (msg) => {
+      setMessages((prev) => [
+        ...prev, 
+        { role: msg.source === "user" ? "user" : "assistant", content: msg.message }
+      ])
+    },
+    onError: (err) => console.error("ElevenLabs Error:", err),
+  })
 
   const triggerClose = useCallback(() => {
     setShowForm(false)
@@ -208,11 +221,9 @@ export function ChatBot() {
   }, [showForm, triggerClose])
 
   const ctx = useMemo(
-    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend }),
-    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend]
+    () => ({ showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, agentId }),
+    [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, agentId]
   )
-
-  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
@@ -235,12 +246,10 @@ export function ChatBot() {
           mass: 0.7,
         }}
       >
-        <ConversationProvider agentId={agentId}>
-          <ChatContext.Provider value={ctx}>
-            <DockBar />
-            <ChatInterface />
-          </ChatContext.Provider>
-        </ConversationProvider>
+        <ChatContext.Provider value={ctx}>
+          <DockBar />
+          <ChatInterface />
+        </ChatContext.Provider>
       </motion.div>
     </div>
   )
@@ -263,9 +272,8 @@ function DockBar() {
 }
 
 function ChatInterface() {
-  const { showForm, messages, isLoading, handleSend, triggerClose } = useChatContext()
-  const { startSession, endSession } = useConversationControls()
-  const { status } = useConversationStatus()
+  const { showForm, messages, isLoading, handleSend, triggerClose, conversation, agentId } = useChatContext()
+  const { status, startSession, endSession } = conversation
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
@@ -282,7 +290,7 @@ function ChatInterface() {
     } else {
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
-        await startSession()
+        await startSession({ agentId })
       } catch (err) {
         console.error("Failed to start voice session:", err)
       }
@@ -306,7 +314,7 @@ function ChatInterface() {
               "p-1 hover:bg-secondary rounded-md transition-colors",
               status === "connected" ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"
             )}
-            title={status === "connected" ? "End Voice" : "Start Voice"}
+            title={status === "connected" ? "End Voice (Talk to Senesh)" : "Start Voice (Talk to Senesh)"}
           >
             {status === "connected" ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
           </button>
@@ -324,7 +332,7 @@ function ChatInterface() {
         {status === "connected" && (
           <div className="flex justify-center mb-4">
             <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-full text-[10px] font-mono animate-pulse">
-              Voice Session Active
+              Voice Session Active: Start Talking!
             </div>
           </div>
         )}
@@ -373,7 +381,7 @@ function ChatInterface() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={status === "connected" ? "Listening..." : "Type message..."}
+          placeholder={status === "connected" ? "Listening to your voice..." : "Type message..."}
           disabled={status === "connected"}
           className="flex-1 bg-secondary/30 border border-border rounded-md px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-border transition-all"
         />
