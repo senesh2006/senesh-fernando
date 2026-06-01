@@ -173,10 +173,11 @@ export function ChatBot() {
       ])
     },
     onError: (err) => {
-      console.error("ElevenLabs Error:", err)
+      console.error("ElevenLabs Error Details:", err)
+      const message = typeof err === 'string' ? err : err.message || "Failed to connect to voice agent."
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: `Voice Error: ${err.message || "Failed to connect to voice agent."}` }
+        { role: "assistant", content: `Voice Error: ${message}. (Check console for full details)` }
       ])
     },
   })
