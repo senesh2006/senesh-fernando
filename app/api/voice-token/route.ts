@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function POST() {
+async function handleRequest() {
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
   if (!apiKey) {
@@ -42,4 +42,12 @@ export async function POST() {
       { status: 500 }
     );
   }
+}
+
+export async function POST() {
+  return handleRequest();
+}
+
+export async function GET() {
+  return handleRequest();
 }
