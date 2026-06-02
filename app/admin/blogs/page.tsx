@@ -5,6 +5,7 @@ import { Send, Loader2, BookOpen, Plus, Tag, Layers, Image as ImageIcon, Github,
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUploader } from "@/components/admin/image-uploader"
 
 interface BlogEntry {
   id: string
@@ -232,19 +233,15 @@ export default function BlogAdminPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <ImageUploader 
+                label="Cover Image"
+                currentImageUrl={formData.image_url}
+                onUploadComplete={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm text-foreground-muted flex items-center gap-2">
-                  <ImageIcon className="h-4 w-4" /> Image URL
-                </label>
-                <Input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
-                  placeholder="https://images.unsplash.com/..."
-                />
-              </div>
               <div className="space-y-2">
                 <label className="text-sm text-foreground-muted flex items-center gap-2">
                   <Github className="h-4 w-4" /> GitHub Project URL
@@ -341,14 +338,25 @@ export default function BlogAdminPage() {
             <div className="grid gap-4">
               {blogs.map((blog) => (
                 <div key={blog.id} className="glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
-                  <div className="min-w-0">
-                    <span className="text-[10px] text-primary uppercase tracking-widest font-mono block mb-1">
-                      {blog.category}
-                    </span>
-                    <h3 className="text-lg font-semibold text-foreground truncate">{blog.title}</h3>
-                    <p className="text-xs text-foreground-muted mt-1">
-                      {new Date(blog.created_at).toLocaleDateString()}
-                    </p>
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="h-12 w-12 rounded-lg overflow-hidden border border-white/5 shrink-0">
+                      {blog.image_url ? (
+                        <img src={blog.image_url} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full bg-secondary flex items-center justify-center">
+                          <BookOpen className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] text-primary uppercase tracking-widest font-mono block mb-1">
+                        {blog.category}
+                      </span>
+                      <h3 className="text-lg font-semibold text-foreground truncate">{blog.title}</h3>
+                      <p className="text-xs text-foreground-muted mt-1">
+                        {new Date(blog.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Button

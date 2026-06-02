@@ -5,6 +5,7 @@ import { Send, Loader2, Cpu, Plus, Tag, Layers, Image as ImageIcon, Github, Tras
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUploader } from "@/components/admin/image-uploader"
 
 interface Project {
   id: string
@@ -223,16 +224,10 @@ export default function ProjectAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm text-foreground-muted flex items-center gap-2">
-                  <ImageIcon className="h-4 w-4" /> Image URL
-                </label>
-                <Input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                  required
-                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
-                  placeholder="https://images.unsplash.com/..."
+                <ImageUploader 
+                  label="Project Thumbnail"
+                  currentImageUrl={formData.image_url}
+                  onUploadComplete={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
                 />
               </div>
               <div className="space-y-2">
@@ -243,23 +238,43 @@ export default function ProjectAdminPage() {
                   type="url"
                   value={formData.source_url}
                   onChange={(e) => setFormData(prev => ({ ...prev, source_url: e.target.value }))}
-                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
+                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl h-[120px]"
                   placeholder="https://github.com/..."
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               <label className="text-sm text-foreground-muted flex items-center gap-2">
-                <ImageIcon className="h-4 w-4" /> Screenshots (Gallery URLs, comma separated)
+                <ImageIcon className="h-4 w-4" /> Project Gallery
               </label>
-              <Textarea
-                value={formData.gallery}
-                onChange={(e) => setFormData(prev => ({ ...prev, gallery: e.target.value }))}
-                rows={3}
-                className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl resize-none"
-                placeholder="https://image1.com, https://image2.com..."
-              />
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {formData.gallery.split(",").filter(url => url.trim() !== "").map((url, idx) => (
+                  <div key={idx} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10">
+                    <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const urls = formData.gallery.split(",").filter(u => u.trim() !== "")
+                        urls.splice(idx, 1)
+                        setFormData(prev => ({ ...prev, gallery: urls.join(", ") }))
+                      }}
+                      className="absolute top-1 right-1 p-1 bg-destructive text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                
+                <ImageUploader 
+                  onUploadComplete={(url) => {
+                    const current = formData.gallery.split(",").filter(u => u.trim() !== "")
+                    setFormData(prev => ({ ...prev, gallery: [...current, url].join(", ") }))
+                  }}
+                  className="aspect-video"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -18,12 +18,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { title, description, date, order_index } = await request.json()
+    const { title, description, date, order_index, image_url } = await request.json()
     const achievement = await createDocument("achievements", {
       title,
       description,
       date,
       order_index: order_index || 0,
+      image_url: image_url || "",
     })
     return NextResponse.json(achievement, { status: 201 })
   } catch (error) {
@@ -33,12 +34,13 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const { id, title, description, date, order_index } = await request.json()
+    const { id, title, description, date, order_index, image_url } = await request.json()
     const achievement = await updateDocument("achievements", id, {
       title,
       description,
       date,
       order_index: order_index || 0,
+      image_url: image_url || "",
     })
     if (!achievement) {
       return NextResponse.json({ error: "Achievement not found" }, { status: 404 })

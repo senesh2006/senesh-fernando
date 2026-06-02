@@ -1,16 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Send, Loader2, Award, Plus, Hash, Trash2, Edit, X, Calendar } from "lucide-react"
+import { Send, Loader2, Award, Plus, Hash, Trash2, Edit, X, Calendar, Image as ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUploader } from "@/components/admin/image-uploader"
+import { cn } from "@/lib/utils"
 
 interface Achievement {
   id: string
   title: string
   description: string
   date: string
+  image_url: string
   order_index: number
   created_at: string
 }
@@ -23,6 +26,7 @@ export default function AchievementsAdminPage() {
     title: "",
     description: "",
     date: "",
+    image_url: "",
     order_index: 0,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -53,6 +57,7 @@ export default function AchievementsAdminPage() {
       title: ach.title,
       description: ach.description,
       date: ach.date,
+      image_url: ach.image_url || "",
       order_index: ach.order_index,
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -70,7 +75,7 @@ export default function AchievementsAdminPage() {
 
   const cancelEdit = () => {
     setEditingAch(null)
-    setFormData({ title: "", description: "", date: "", order_index: 0 })
+    setFormData({ title: "", description: "", date: "", image_url: "", order_index: 0 })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,6 +175,14 @@ export default function AchievementsAdminPage() {
             </div>
 
             <div className="space-y-2">
+              <ImageUploader 
+                label="Certificate / Badge Image"
+                currentImageUrl={formData.image_url}
+                onUploadComplete={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm text-foreground-muted">Description</label>
               <Textarea
                 value={formData.description}
@@ -181,33 +194,74 @@ export default function AchievementsAdminPage() {
               />
             </div>
 
-            {submitted && <p className="text-green-400 text-center">Success!</p>}
-            {error && <p className="text-red-400 text-center">{error}</p>}
+            {submitted && (
+              <p className="text-green-400 text-center bg-green-400/10 p-3 rounded-lg border border-green-400/20">
+                Achievement {editingAch ? "updated" : "added"} successfully!
+              </p>
+            )}
 
-            <Button type="submit" disabled={isSubmitting} className="w-full bg-primary text-white rounded-xl py-6">
+            {error && (
+              <p className="text-red-400 text-center bg-red-400/10 p-3 rounded-lg border border-red-400/20">
+                {error}
+              </p>
+            )}
+
+            <Button type="submit" disabled={isSubmitting} className="w-full bg-primary text-white hover:bg-primary/90 transition-all rounded-xl py-6 shadow-[0_0_20px_rgba(255,106,0,0.3)] gap-2">
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              <span className="ml-2">{editingAch ? "Update Achievement" : "Add Achievement"}</span>
+              <span>{editingAch ? "Update Achievement" : "Add Achievement"}</span>
             </Button>
           </form>
         </div>
 
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-foreground">Existing Achievements</h2>
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+            <Award className="h-5 w-5 text-primary" /> Existing Achievements
+          </h2>
+          
           {isLoading ? (
-            <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            </div>
+          ) : achievements.length === 0 ? (
+            <div className="glass-card p-10 text-center text-foreground-muted">
+              No achievements found.
+            </div>
           ) : (
             <div className="grid gap-4">
               {achievements.map((ach) => (
-                <div key={ach.id} className="glass-card p-6 flex items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">{ach.title}</h3>
-                    <p className="text-xs text-foreground-muted">{ach.date}</p>
+                <div key={ach.id} className="glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="h-12 w-12 rounded-lg overflow-hidden border border-white/5 shrink-0">
+                      {ach.image_url ? (
+                        <img src={ach.image_url} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full bg-secondary flex items-center justify-center">
+                          <Award className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] text-primary uppercase tracking-widest font-mono block mb-1">
+                        {ach.date}
+                      </span>
+                      <h3 className="text-lg font-semibold text-foreground truncate">{ach.title}</h3>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(ach)} className="hover:text-primary hover:bg-primary/10 rounded-xl">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(ach)}
+                      className="h-10 w-10 text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-xl"
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(ach.id)} className="hover:text-red-400 hover:bg-red-400/10 rounded-xl">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(ach.id)}
+                      className="h-10 w-10 text-foreground-muted hover:text-red-400 hover:bg-red-400/10 rounded-xl"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
