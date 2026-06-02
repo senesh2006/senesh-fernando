@@ -17,9 +17,9 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
   const processorRef = useRef<ScriptProcessorNode | null>(null)
   const micStreamRef = useRef<MediaStream | null>(null)
   
-  // Playback queue management
-  const audioQueueRef = useRef<Int16Array[]>([])
-  const isPlayingRef = useRef(false)
+  // Precise playback timing management
+  const nextStartTimeRef = useRef<number>(0)
+  const LOOKAHEAD = 0.1 // 100ms buffer for jitter
 
   const stopSession = useCallback(() => {
     if (socketRef.current) {
@@ -45,43 +45,42 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
 
     setStatus("inactive")
     setIsSpeaking(false)
-    audioQueueRef.current = []
-    isPlayingRef.current = false
+    nextStartTimeRef.current = 0
   }, [])
 
-  const playNextInQueue = useCallback(async () => {
-    if (audioQueueRef.current.length === 0 || isPlayingRef.current || !audioContextRef.current) {
-      isPlayingRef.current = false
-      return
+  const schedulePlayback = useCallback((pcm16: Int16Array) => {
+    const audioCtx = audioContextRef.current
+    if (!audioCtx) return
+
+    // Convert Int16 to Float32
+    const float32Data = new Float32Array(pcm16.length)
+    for (let i = 0; i < pcm16.length; i++) {
+      float32Data[i] = pcm16[i] / 32768.0
     }
 
-    isPlayingRef.current = true
-    const nextChunk = audioQueueRef.current.shift()!
-    
-    // Convert Int16 to Float32 for Web Audio API
-    const float32Data = new Float32Array(nextChunk.length)
-    for (let i = 0; i < nextChunk.length; i++) {
-      float32Data[i] = nextChunk[i] / 32768.0
-    }
-
-    const buffer = audioContextRef.current.createBuffer(1, float32Data.length, 24000)
+    const duration = float32Data.length / 24000
+    const buffer = audioCtx.createBuffer(1, float32Data.length, 24000)
     buffer.getChannelData(0).set(float32Data)
 
-    const source = audioContextRef.current.createBufferSource()
+    const source = audioCtx.createBufferSource()
     source.buffer = buffer
-    source.connect(audioContextRef.current.destination)
-    
-    source.onended = () => {
-      isPlayingRef.current = false
-      playNextInQueue()
+    source.connect(audioCtx.destination)
+
+    // Calculate start time
+    const currentTime = audioCtx.currentTime
+    if (nextStartTimeRef.current < currentTime) {
+      // If we're behind or just starting, schedule with a small lookahead
+      nextStartTimeRef.current = currentTime + LOOKAHEAD
     }
 
-    source.start()
+    source.start(nextStartTimeRef.current)
+    nextStartTimeRef.current += duration
   }, [])
 
   const startSession = useCallback(async () => {
     try {
       setStatus("connecting")
+      nextStartTimeRef.current = 0
 
       // 1. Get temporary token
       console.log("Starting voice session, fetching token...")
@@ -151,14 +150,17 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
 
           case "reply.audio":
             // Decode base64 to binary
-            const binaryString = atob(msg.data)
-            const bytes = new Uint8Array(binaryString.length)
-            for (let i = 0; i < binaryString.length; i++) {
-              bytes[i] = binaryString.charCodeAt(i)
+            try {
+              const binaryString = atob(msg.data)
+              const bytes = new Uint8Array(binaryString.length)
+              for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i)
+              }
+              const pcm16 = new Int16Array(bytes.buffer)
+              schedulePlayback(pcm16)
+            } catch (e) {
+              console.error("Failed to decode audio chunk:", e)
             }
-            const pcm16 = new Int16Array(bytes.buffer)
-            audioQueueRef.current.push(pcm16)
-            playNextInQueue()
             break
 
           case "error":
