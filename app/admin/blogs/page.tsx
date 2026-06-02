@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ImageUploader } from "@/components/admin/image-uploader"
+import { toast } from "sonner"
+import { Copy, Type, Heading1, Heading2, Link as LinkIcon, Bold, Italic, List, ListOrdered, Quote } from "lucide-react"
 
 interface BlogEntry {
   id: string
@@ -38,6 +40,7 @@ export default function BlogAdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [contentImages, setContentImages] = useState<string[]>([])
 
   useEffect(() => {
     fetchBlogs()
@@ -101,6 +104,33 @@ export default function BlogAdminPage() {
       linkedin_url: "",
       other_url: ""
     })
+  }
+
+  const insertMarkdown = (prefix: string, suffix: string = "") => {
+    const textarea = document.querySelector('textarea') as HTMLTextAreaElement
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = formData.content
+    const before = text.substring(0, start)
+    const selection = text.substring(start, end)
+    const after = text.substring(end)
+
+    const newContent = before + prefix + (selection || "text") + suffix + after
+    setFormData(prev => ({ ...prev, content: newContent }))
+    
+    // Focus back and set selection
+    setTimeout(() => {
+      textarea.focus()
+      const newCursorPos = start + prefix.length + (selection ? selection.length + suffix.length : 4)
+      textarea.setSelectionRange(newCursorPos, newCursorPos)
+    }, 0)
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    toast.success("Copied to clipboard")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -233,13 +263,45 @@ export default function BlogAdminPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <ImageUploader 
-                label="Cover Image"
-                currentImageUrl={formData.image_url}
-                onUploadComplete={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <ImageUploader 
+                  label="Cover Image"
+                  currentImageUrl={formData.image_url}
+                  onUploadComplete={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-mono uppercase text-muted-foreground">Content Image Helper</label>
+                <div className="flex flex-col gap-2">
+                  <ImageUploader 
+                    onUploadComplete={(url) => setContentImages(prev => [url, ...prev])}
+                  />
+                  <p className="text-[10px] text-foreground-muted italic">Upload images here to get Markdown snippets for your content.</p>
+                </div>
+              </div>
             </div>
+
+            {contentImages.length > 0 && (
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                <label className="text-xs font-mono uppercase text-muted-foreground">Recently Uploaded Images</label>
+                <div className="flex flex-wrap gap-3 p-4 bg-white/5 border border-white/10 rounded-xl">
+                  {contentImages.map((url, i) => (
+                    <div key={i} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-white/10">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(`![Image description](${url})`)}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-[10px] text-white"
+                      >
+                        <Copy className="h-4 w-4" />
+                        <span>Copy MD</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -266,35 +328,57 @@ export default function BlogAdminPage() {
                   placeholder="https://linkedin.com/posts/..."
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm text-foreground-muted flex items-center gap-2">
-                  <Globe className="h-4 w-4" /> Other Social / Live Link
-                </label>
-                <Input
-                  type="url"
-                  value={formData.other_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, other_url: e.target.value }))}
-                  className="bg-white/5 border-primary/20 text-foreground focus:border-primary rounded-xl"
-                  placeholder="https://twitter.com/..."
-                />
-              </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm text-foreground-muted">Content</label>
-              <p className="text-xs text-foreground-muted leading-relaxed">
-                Supports plain text, Markdown, or HTML (paste article body with editorial
-                classes like pull-quote, scoreboard, timeline). Separate plain paragraphs
-                with a blank line.
-              </p>
+              
+              {/* Markdown Toolbar */}
+              <div className="flex flex-wrap items-center gap-1 p-2 bg-white/5 border border-white/10 rounded-t-xl">
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('## ', '')} className="h-8 w-8 p-0" title="Heading 2">
+                  <Heading1 className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('### ', '')} className="h-8 w-8 p-0" title="Heading 3">
+                  <Heading2 className="h-4 w-4" />
+                </Button>
+                <div className="w-[1px] h-4 bg-white/10 mx-1" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('**', '**')} className="h-8 w-8 p-0" title="Bold">
+                  <Bold className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('_', '_')} className="h-8 w-8 p-0" title="Italic">
+                  <Italic className="h-4 w-4" />
+                </Button>
+                <div className="w-[1px] h-4 bg-white/10 mx-1" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('[', '](url)')} className="h-8 w-8 p-0" title="Link">
+                  <LinkIcon className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('> ', '')} className="h-8 w-8 p-0" title="Quote">
+                  <Quote className="h-4 w-4" />
+                </Button>
+                <div className="w-[1px] h-4 bg-white/10 mx-1" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('- ', '')} className="h-8 w-8 p-0" title="Unordered List">
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('1. ', '')} className="h-8 w-8 p-0" title="Ordered List">
+                  <ListOrdered className="h-4 w-4" />
+                </Button>
+                <div className="w-[1px] h-4 bg-white/10 mx-1" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => insertMarkdown('`', '`')} className="h-8 w-8 p-0" title="Inline Code">
+                  <Type className="h-4 w-4" />
+                </Button>
+              </div>
+
               <Textarea
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 required
                 rows={16}
-                className="bg-background border-border text-foreground focus:border-primary rounded-sm resize-y font-mono text-sm"
-                placeholder="Write Markdown, HTML, or plain text..."
+                className="bg-background border-t-0 border-border text-foreground focus:border-primary rounded-t-none rounded-b-xl resize-y font-mono text-sm"
+                placeholder="Write Markdown here. Use the toolbar above for sub-topics and images..."
               />
+              <p className="text-[10px] text-foreground-muted mt-2">
+                Now supports full Markdown including headings (##), images (![]()), and more.
+              </p>
             </div>
 
             {submitted && (

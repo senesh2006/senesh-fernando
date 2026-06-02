@@ -8,6 +8,12 @@ import { LikeButton } from "@/components/animate-ui/components/buttons/like-butt
 import { ContentSummarizer } from "@/components/content-summarizer";
 import { useReveal } from "@/hooks/use-reveal";
 import { recordBlogView } from "@/lib/client-api";
+import { cn } from "@/lib/utils";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
 
 export function WritingDetailPage({ post, posts }: { post: Post; posts: Post[] }) {
   useReveal();
@@ -55,7 +61,7 @@ export function WritingDetailPage({ post, posts }: { post: Post; posts: Post[] }
           </div>
         </figure>
 
-        <div className="prose-custom mt-14 space-y-8">
+        <div className="prose-custom mt-14">
           <PostBody post={post} />
         </div>
 
@@ -84,15 +90,60 @@ function PostBody({ post }: { post: Post }) {
   }
 
   if (post.contentMarkdown) {
-    return post.contentMarkdown
-      .split(/\n{2,}/)
-      .map((paragraph) => paragraph.trim())
-      .filter(Boolean)
-      .map((text, index) => (
-        <p key={index} className="text-[17px] leading-[1.8] reveal">
-          {text}
-        </p>
-      ));
+    return (
+      <div className="reveal space-y-6 text-[17px] leading-[1.8]">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw, rehypeSanitize]}
+          components={{
+            h2: ({ node, ...props }) => (
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mt-12 mb-6" {...props} />
+            ),
+            h3: ({ node, ...props }) => (
+              <h3 className="text-xl sm:text-2xl font-semibold tracking-tight mt-10 mb-4" {...props} />
+            ),
+            p: ({ node, ...props }) => <p className="mb-6" {...props} />,
+            ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-6 space-y-2" {...props} />,
+            ol: ({ node, ...props }) => <ol className="list-decimal pl-6 mb-6 space-y-2" {...props} />,
+            li: ({ node, ...props }) => <li className="" {...props} />,
+            blockquote: ({ node, ...props }) => (
+              <blockquote className="border-l-2 border-foreground pl-6 my-10 italic text-xl" {...props} />
+            ),
+            img: ({ node, ...props }) => (
+              <figure className="-mx-5 sm:mx-0 my-12">
+                <div className="overflow-hidden sm:rounded-md bg-secondary">
+                  <img
+                    {...props}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                {props.alt && (
+                  <figcaption className="mt-3 px-5 sm:px-0 font-mono text-xs text-muted-foreground text-center">
+                    {props.alt}
+                  </figcaption>
+                )}
+              </figure>
+            ),
+            code: ({ node, inline, className, children, ...props }: any) => {
+              return (
+                <code
+                  className={cn(
+                    "bg-secondary px-1.5 py-0.5 rounded text-sm font-mono",
+                    className
+                  )}
+                  {...props}
+                >
+                  {children}
+                </code>
+              );
+            },
+          }}
+        >
+          {post.contentMarkdown}
+        </ReactMarkdown>
+      </div>
+    );
   }
 
   if (post.blocks?.length) {
