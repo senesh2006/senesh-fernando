@@ -23,7 +23,7 @@ async function handleRequest() {
   console.log(`DEBUG: API Key found (starts with: ${apiKey.substring(0, 4)}...)`);
 
   try {
-    const response = await fetch("https://agents.assemblyai.com/v1/token", {
+    const response = await fetch("https://agents.assemblyai.com/v1/tokens", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey.trim()}`,
