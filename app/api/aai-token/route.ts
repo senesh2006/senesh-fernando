@@ -19,27 +19,26 @@ async function handleRequest() {
     );
   }
 
-  // Log a safe hint for debugging
-  console.log(`DEBUG: API Key found (starts with: ${apiKey.substring(0, 4)}...)`);
-
   try {
-    const response = await fetch("https://agents.assemblyai.com/v1/tokens", {
-      method: "POST",
+    // Correct way for Voice Agent API: GET with query params
+    const url = new URL("https://agents.assemblyai.com/v1/token");
+    url.searchParams.append("expires_in_seconds", "600");
+    url.searchParams.append("max_session_duration_seconds", "3600");
+
+    console.log("DEBUG: Fetching token from AssemblyAI...");
+    
+    const response = await fetch(url.toString(), {
+      method: "GET",
       headers: {
         "Authorization": `Bearer ${apiKey.trim()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        expires_in_seconds: 300,
-        max_session_duration_seconds: 3600,
-      }),
+      }
     });
 
     const data = await response.json();
 
     if (!response.ok) {
       console.error(`AssemblyAI API Error (Status: ${response.status}):`, data);
-      const specificError = data.error || data.message || JSON.stringify(data);
+      const specificError = data.error || data.message || data.detail || JSON.stringify(data);
       return NextResponse.json(
         { error: `AssemblyAI rejected the request: ${specificError}` },
         { status: response.status }
