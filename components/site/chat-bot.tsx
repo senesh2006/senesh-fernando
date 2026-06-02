@@ -191,7 +191,13 @@ export function ChatBot() {
   // Initialize AssemblyAI Voice Agent
   const assemblyVoice = useAssemblyAIVoice({
     onMessage: (msg) => {
-      setMessages((prev) => [...prev, msg])
+      setMessages((prev) => {
+        // Avoid duplicate user messages if the server echoes them back
+        if (msg.role === "user" && prev.length > 0 && prev[prev.length - 1].content === msg.content) {
+          return prev
+        }
+        return [...prev, msg]
+      })
     },
     onError: (err) => {
       console.error("AssemblyAI Error:", err)
@@ -222,6 +228,8 @@ export function ChatBot() {
         console.error("Failed to send message to ElevenLabs:", err)
       }
     } else if (voiceProvider === "assemblyai" && assemblyVoice.status === "active") {
+      // Add message manually for immediate feedback
+      setMessages(prev => [...prev, { role: "user", content }])
       assemblyVoice.sendText(content)
       return
     }
