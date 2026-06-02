@@ -128,11 +128,11 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
             break
           
           case "transcript.user":
-            onMessage?.({ role: "user", content: msg.transcript })
+            onMessage?.({ role: "user", content: msg.text })
             break
           
           case "transcript.agent":
-            onMessage?.({ role: "assistant", content: msg.transcript })
+            onMessage?.({ role: "assistant", content: msg.text })
             break
 
           case "reply.started":
