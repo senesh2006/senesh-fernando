@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useCallback } from "react"
 
 export type VoiceStatus = "inactive" | "connecting" | "active" | "error"
 
@@ -92,8 +92,7 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
           const errorData = await tokenRes.json()
           errorMessage = errorData.error || errorMessage
         } catch (e) {
-          // Response was not JSON
-          console.error("Non-JSON response from token endpoint:", await tokenRes.text().catch(() => "Unknown body"))
+          console.error("Non-JSON response from token endpoint")
         }
         throw new Error(errorMessage)
       }
@@ -110,7 +109,6 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
       socketRef.current = socket
 
       socket.onopen = () => {
-        // Send session update immediately
         socket.send(JSON.stringify({
           type: "session.update",
           session: {
@@ -144,12 +142,12 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
           case "reply.done":
             setIsSpeaking(false)
             if (msg.status === "interrupted") {
-              audioQueueRef.current = []
+              // Reset the timeline if interrupted to prevent playing stale audio
+              nextStartTimeRef.current = 0
             }
             break
 
           case "reply.audio":
-            // Decode base64 to binary
             try {
               const binaryString = atob(msg.data)
               const bytes = new Uint8Array(binaryString.length)
@@ -186,7 +184,6 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
       micStreamRef.current = stream
       const source = audioCtx.createMediaStreamSource(stream)
       
-      // ScriptProcessor is legacy but works well for this simple buffer conversion
       const processor = audioCtx.createScriptProcessor(4096, 1, 1)
       processorRef.current = processor
 
@@ -194,13 +191,11 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
         if (socket.readyState !== WebSocket.OPEN) return
 
         const inputData = e.inputBuffer.getChannelData(0)
-        // Convert Float32 to Int16
         const pcm16 = new Int16Array(inputData.length)
         for (let i = 0; i < inputData.length; i++) {
           pcm16[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF
         }
 
-        // Base64 encode and send
         const base64 = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)))
         socket.send(JSON.stringify({ type: "input.audio", audio: base64 }))
       }
@@ -213,7 +208,7 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
       setStatus("error")
       onError?.(err.message || "Failed to start session")
     }
-  }, [onMessage, onError, playNextInQueue, status, stopSession])
+  }, [onMessage, onError, schedulePlayback, stopSession])
 
   const sendText = useCallback((text: string) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
