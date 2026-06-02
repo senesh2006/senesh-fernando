@@ -1,4 +1,4 @@
-export const PRODUCTION_SITE_URL = "https://v0-senesh-fernando.vercel.app"
+export const PRODUCTION_SITE_URL = "https://senesh-fernando.vercel.app"
 
 function stripTrailingSlash(url: string) {
   return url.replace(/\/$/, "")
