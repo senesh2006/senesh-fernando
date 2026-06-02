@@ -14,6 +14,7 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
   const [isSpeaking, setIsSpeaking] = useState(false)
   const socketRef = useRef<WebSocket | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
+  const gainNodeRef = useRef<GainNode | null>(null)
   const processorRef = useRef<ScriptProcessorNode | null>(null)
   const micStreamRef = useRef<MediaStream | null>(null)
   
@@ -50,9 +51,10 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
 
   const schedulePlayback = useCallback((pcm16: Int16Array) => {
     const audioCtx = audioContextRef.current
-    if (!audioCtx) return
+    const gainNode = gainNodeRef.current
+    if (!audioCtx || !gainNode) return
 
-    // Ensure context is running (browsers often suspend it)
+    // Ensure context is running
     if (audioCtx.state === "suspended") {
       audioCtx.resume()
     }
@@ -63,23 +65,22 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
       float32Data[i] = pcm16[i] / 32768.0
     }
 
-    const duration = float32Data.length / 24000
+    // Match the buffer to the context's actual sample rate
     const buffer = audioCtx.createBuffer(1, float32Data.length, 24000)
     buffer.getChannelData(0).set(float32Data)
 
     const source = audioCtx.createBufferSource()
     source.buffer = buffer
-    source.connect(audioCtx.destination)
+    source.connect(gainNode)
 
     // Calculate start time
     const currentTime = audioCtx.currentTime
     if (nextStartTimeRef.current < currentTime) {
-      // If we're behind or just starting, schedule with a small lookahead
       nextStartTimeRef.current = currentTime + LOOKAHEAD
     }
 
     source.start(nextStartTimeRef.current)
-    nextStartTimeRef.current += duration
+    nextStartTimeRef.current += buffer.duration
   }, [])
 
   const startSession = useCallback(async () => {
@@ -105,9 +106,13 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
       const { token } = await tokenRes.json()
       console.log("Token received successfully.")
 
-      // 2. Initialize Audio Context (24kHz is required for AssemblyAI Voice Agent)
+      // 2. Initialize Audio Context & Gain Node
       const audioCtx = new AudioContext({ sampleRate: 24000 })
+      const gainNode = audioCtx.createGain()
+      gainNode.connect(audioCtx.destination)
+      
       audioContextRef.current = audioCtx
+      gainNodeRef.current = gainNode
 
       // 3. Connect WebSocket
       const socket = new WebSocket(`wss://agents.assemblyai.com/v1/ws?token=${token}`)
@@ -139,11 +144,11 @@ Rules:
         }))
       }
 
-  socket.onmessage = (event) => {
-    const msg = JSON.parse(event.data)
-    console.log(`DEBUG: Received message type: ${msg.type}`)
-    
-    switch (msg.type) {
+      socket.onmessage = (event) => {
+        const msg = JSON.parse(event.data)
+        console.log(`DEBUG: Received message type: ${msg.type}`)
+        
+        switch (msg.type) {
           case "session.ready":
             setStatus("active")
             break
@@ -170,20 +175,31 @@ Rules:
 
           case "reply.audio":
             try {
+              // Robust base64 to Int16Array conversion
               const binaryString = atob(msg.data)
-              const bytes = new Uint8Array(binaryString.length)
-              for (let i = 0; i < binaryString.length; i++) {
+              const len = binaryString.length
+              const bytes = new Uint8Array(len)
+              for (let i = 0; i < len; i++) {
                 bytes[i] = binaryString.charCodeAt(i)
               }
-              const pcm16 = new Int16Array(bytes.buffer)
+              const pcm16 = new Int16Array(bytes.buffer, 0, Math.floor(len / 2))
               schedulePlayback(pcm16)
             } catch (e) {
               console.error("Failed to decode audio chunk:", e)
             }
             break
 
+          case "session.error":
+            console.error("AssemblyAI Session Error:", msg)
+            onError?.(`Session Error: ${msg.message || "Unknown error"}`)
+            break
+          
+          case "session.warning":
+            console.warn("AssemblyAI Session Warning:", msg)
+            break
+
           case "error":
-            console.error("AssemblyAI Voice Error:", msg.message)
+            console.error("AssemblyAI Error Message:", msg.message)
             onError?.(msg.message)
             stopSession()
             break
