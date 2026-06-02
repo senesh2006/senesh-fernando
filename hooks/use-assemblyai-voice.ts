@@ -215,13 +215,10 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
 
   const sendText = useCallback((text: string) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
-      // For Voice Agent, text input is often handled via conversation context
-      // but if we want to force a text reply:
-      // Note: managed Voice Agent typically expects audio input.
-      // However, we can send a session update or similar if needed.
-      // For now, let's log that we might need a specific text-to-voice endpoint
-      // if we want full text support in this managed mode.
-      console.log("Text input in Voice Agent mode:", text)
+      socketRef.current.send(JSON.stringify({ 
+        type: "input.text", 
+        text: text 
+      }))
     }
   }, [])
 
