@@ -253,7 +253,7 @@ Rules:
     }
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify({ 
-        type: "input.text", 
+        type: "user.text", 
         text: text 
       }))
     }
