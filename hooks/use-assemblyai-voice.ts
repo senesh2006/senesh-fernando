@@ -52,6 +52,11 @@ export function useAssemblyAIVoice({ onMessage, onError }: UseAssemblyAIVoiceOpt
     const audioCtx = audioContextRef.current
     if (!audioCtx) return
 
+    // Ensure context is running (browsers often suspend it)
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume()
+    }
+
     // Convert Int16 to Float32
     const float32Data = new Float32Array(pcm16.length)
     for (let i = 0; i < pcm16.length; i++) {
@@ -134,10 +139,11 @@ Rules:
         }))
       }
 
-      socket.onmessage = (event) => {
-        const msg = JSON.parse(event.data)
-        
-        switch (msg.type) {
+  socket.onmessage = (event) => {
+    const msg = JSON.parse(event.data)
+    console.log(`DEBUG: Received message type: ${msg.type}`)
+    
+    switch (msg.type) {
           case "session.ready":
             setStatus("active")
             break
@@ -226,6 +232,9 @@ Rules:
   }, [onMessage, onError, schedulePlayback, stopSession])
 
   const sendText = useCallback((text: string) => {
+    if (audioContextRef.current?.state === "suspended") {
+      audioContextRef.current.resume()
+    }
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify({ 
         type: "input.text", 
