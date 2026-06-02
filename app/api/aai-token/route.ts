@@ -38,9 +38,10 @@ async function handleRequest() {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("AssemblyAI API Error:", data);
+      console.error(`AssemblyAI API Error (Status: ${response.status}):`, data);
+      const specificError = data.error || data.message || JSON.stringify(data);
       return NextResponse.json(
-        { error: data.error || "AssemblyAI rejected the request." },
+        { error: `AssemblyAI rejected the request: ${specificError}` },
         { status: response.status }
       );
     }
