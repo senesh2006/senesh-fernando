@@ -8,6 +8,7 @@ import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { RadialIntro, type OrbitItem } from "@/components/site/radial-intro";
 import { IMAGES } from "@/lib/images";
+import Beams from "@/components/site/Beams";
 import { PROFILE } from "@/lib/profile";
 
 interface GitHubSkill {
@@ -105,6 +106,9 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
       {/* HERO */}
       <section className="relative border-b border-border">
         <CursorSpotlight />
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <Beams beamWidth={3} beamHeight={30} beamNumber={20} lightColor="#ffffff" speed={2} noiseIntensity={1.75} scale={0.2} rotation={30} />
+        </div>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 grid md:grid-cols-5 gap-10 items-center relative">
           <div className="md:col-span-3 space-y-6">
             <div className="font-mono text-xs text-muted-foreground stagger">
