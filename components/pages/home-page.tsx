@@ -49,6 +49,12 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post, proje
           <p className="mt-10 max-w-2xl text-lg sm:text-xl text-muted-foreground leading-relaxed animate-fade-in-up">
             {PROFILE.tagline}
           </p>
+          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground animate-fade-in-up">
+            <span className="text-foreground">// stack</span>
+            {["Python", "SQL", "PostgreSQL", "React", "TypeScript", "C", "AI/ML"].map((s) => (
+              <span key={s}>{s}</span>
+            ))}
+          </div>
           <div className="mt-10 flex flex-wrap gap-2 font-mono text-xs">
             <Link href="/projects" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ projects</Link>
             <Link href="/writing" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ writing</Link>
@@ -64,6 +70,30 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post, proje
           "g then h · home", "g then p · projects", "[MODE: VISITOR]",
           "data · AI · analytics", "Negombo, Sri Lanka",
         ]} />
+      </section>
+
+      {/* NOW */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
+        <div className="border border-border rounded-md p-6 sm:p-8 bg-card/40">
+          <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground mb-5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            // now · updated {new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+          </div>
+          <ul className="grid sm:grid-cols-3 gap-x-10 gap-y-4 font-mono text-sm">
+            <li className="text-muted-foreground">
+              <span className="text-foreground">→ studying</span><br />
+              BIT @ Curtin University Colombo
+            </li>
+            <li className="text-muted-foreground">
+              <span className="text-foreground">→ building</span><br />
+              CarbonWise — sustainability &amp; data reporting
+            </li>
+            <li className="text-muted-foreground">
+              <span className="text-foreground">→ teaching</span><br />
+              C &amp; DS&amp;A as a tutor at Curtin
+            </li>
+          </ul>
+        </div>
       </section>
 
       {/* MANIFESTO IMAGE BAND */}
