@@ -12,17 +12,24 @@ import { PROFILE } from "@/lib/profile";
 // simpleicons.org serves a black SVG per slug; `dark:invert` flips it for dark mode.
 const ICON = (slug: string) => `https://cdn.simpleicons.org/${slug}/000000`;
 
+// First 8 → inner ring, last 7 → outer ring (split = Math.ceil(15/2) = 8)
 const TECH_ORBIT: OrbitItem[] = [
-  { id: "python",   name: "Python",      src: ICON("python") },
-  { id: "react",    name: "React",       src: ICON("react") },
-  { id: "ts",       name: "TypeScript",  src: ICON("typescript") },
-  { id: "pg",       name: "Postgres",    src: ICON("postgresql") },
-  { id: "rhel",     name: "RHEL",        src: ICON("redhat") },
-  { id: "node",     name: "Node",        src: ICON("nodedotjs") },
-  { id: "tw",       name: "Tailwind",    src: ICON("tailwindcss") },
-  { id: "next",     name: "Next.js",     src: ICON("nextdotjs") },
-  { id: "git",      name: "Git",         src: ICON("git") },
-  { id: "docker",   name: "Docker",      src: ICON("docker") },
+  { id: "python",     name: "Python",      src: ICON("python") },
+  { id: "react",      name: "React",       src: ICON("react") },
+  { id: "ts",         name: "TypeScript",  src: ICON("typescript") },
+  { id: "next",       name: "Next.js",     src: ICON("nextdotjs") },
+  { id: "pg",         name: "PostgreSQL",  src: ICON("postgresql") },
+  { id: "sql",        name: "MySQL",       src: ICON("mysql") },
+  { id: "node",       name: "Node.js",     src: ICON("nodedotjs") },
+  { id: "git",        name: "Git",         src: ICON("git") },
+  // outer ring
+  { id: "tw",         name: "Tailwind",    src: ICON("tailwindcss") },
+  { id: "rhel",       name: "Red Hat",     src: ICON("redhat") },
+  { id: "docker",     name: "Docker",      src: ICON("docker") },
+  { id: "tableau",    name: "Tableau",     src: ICON("tableau") },
+  { id: "powerbi",    name: "Power BI",    src: ICON("powerbi") },
+  { id: "jupyter",    name: "Jupyter",     src: ICON("jupyter") },
+  { id: "vscode",     name: "VS Code",     src: ICON("visualstudiocode") },
 ];
 
 export function AboutPage({ timeline, stack }: { timeline: [string, string][]; stack: string[] }) {
