@@ -4,6 +4,7 @@ import { Instrument_Serif, DM_Mono } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { MaintenanceScreen } from "@/components/maintenance-screen"
+import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { PROFILE } from "@/lib/profile"
 import { IMAGES } from "@/lib/images"
 import './globals.css'
@@ -73,6 +74,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${fontClasses} text-foreground`}>
+        <MagneticBlobCursor />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
