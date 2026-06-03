@@ -137,13 +137,10 @@ export function MagneticBlobCursor() {
       ring.style.height = `${s.h}px`
       ring.style.borderRadius = `${s.r}px`
       ring.style.transform = `translate(${s.x - s.w / 2}px, ${s.y - s.h / 2}px)`
-      // Brighten the fill slightly while enveloping an element.
-      ring.style.background = s.hovering
-        ? "rgba(255,255,255,0.14)"
-        : "rgba(255,255,255,0.28)"
+      // Outline-only so the element underneath stays fully visible.
       ring.style.borderColor = s.hovering
-        ? "rgba(255,255,255,0.35)"
-        : "rgba(255,255,255,0.55)"
+        ? "rgba(255,255,255,0.5)"
+        : "rgba(255,255,255,0.7)"
 
       raf = requestAnimationFrame(animate)
     }
@@ -169,9 +166,8 @@ export function MagneticBlobCursor() {
         width: IDLE_SIZE,
         height: IDLE_SIZE,
         borderRadius: "50%",
-        background: "rgba(255,255,255,0.28)",
-        border: "1px solid rgba(255,255,255,0.55)",
-        backdropFilter: "blur(2px)",
+        background: "transparent",
+        border: "1px solid rgba(255,255,255,0.7)",
         opacity: 0,
         willChange: "transform, width, height, border-radius, opacity",
       }}
