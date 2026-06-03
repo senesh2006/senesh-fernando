@@ -18,6 +18,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Filename is required" }, { status: 400 });
   }
 
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return NextResponse.json({ 
+      error: "Vercel Blob configuration missing", 
+      details: "BLOB_READ_WRITE_TOKEN is not defined in environment variables." 
+    }, { status: 500 });
+  }
+
   try {
     const body = request.body;
     if (!body) {
@@ -29,8 +36,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     return NextResponse.json(blob);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Upload Error:", error);
-    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Failed to upload file", 
+      details: error.message || String(error) 
+    }, { status: 500 });
   }
 }

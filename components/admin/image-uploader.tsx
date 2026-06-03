@@ -51,7 +51,8 @@ export function ImageUploader({
         toast.success("Image uploaded successfully")
       } else {
         const error = await response.json()
-        throw new Error(error.error || "Upload failed")
+        const errorMessage = error.details ? `${error.error}: ${error.details}` : (error.error || "Upload failed")
+        throw new Error(errorMessage)
       }
     } catch (error: any) {
       console.error("Upload failed:", error)
