@@ -19,24 +19,39 @@ interface GitHubSkill {
 // simpleicons.org serves a black SVG per slug; `dark:invert` flips it for dark mode.
 const ICON = (slug: string) => `https://cdn.simpleicons.org/${slug}/000000`;
 
-// First 8 → inner ring, last 7 → outer ring (split = Math.ceil(15/2) = 8)
-const TECH_ORBIT: OrbitItem[] = [
-  { id: "python",     name: "Python",      src: ICON("python") },
+// Curated frameworks / tools that GitHub's language stats don't surface.
+const TOOLS: OrbitItem[] = [
   { id: "react",      name: "React",       src: ICON("react") },
-  { id: "ts",         name: "TypeScript",  src: ICON("typescript") },
   { id: "next",       name: "Next.js",     src: ICON("nextdotjs") },
-  { id: "pg",         name: "PostgreSQL",  src: ICON("postgresql") },
-  { id: "sql",        name: "MySQL",       src: ICON("mysql") },
   { id: "node",       name: "Node.js",     src: ICON("nodedotjs") },
+  { id: "tailwindcss",name: "Tailwind",    src: ICON("tailwindcss") },
+  { id: "postgresql", name: "PostgreSQL",  src: ICON("postgresql") },
+  { id: "mysql",      name: "MySQL",       src: ICON("mysql") },
   { id: "git",        name: "Git",         src: ICON("git") },
-  // outer ring
-  { id: "tw",         name: "Tailwind",    src: ICON("tailwindcss") },
-  { id: "rhel",       name: "Red Hat",     src: ICON("redhat") },
   { id: "docker",     name: "Docker",      src: ICON("docker") },
+  { id: "redhat",     name: "Red Hat",     src: ICON("redhat") },
   { id: "tableau",    name: "Tableau",     src: ICON("tableau") },
   { id: "powerbi",    name: "Power BI",    src: ICON("powerbi") },
   { id: "jupyter",    name: "Jupyter",     src: ICON("jupyter") },
-  { id: "vscode",     name: "VS Code",     src: ICON("visualstudiocode") },
+  { id: "visualstudiocode", name: "VS Code", src: ICON("visualstudiocode") },
+];
+
+// Default orbit before GitHub data loads (Python/TS lead so it looks right pre-fetch).
+const TECH_ORBIT: OrbitItem[] = [
+  { id: "python", name: "Python",     src: ICON("python") },
+  { id: "typescript", name: "TypeScript", src: ICON("typescript") },
+  ...TOOLS,
+];
+
+// Skills / methodologies with no logo — shown as pills only.
+const OTHER_SKILLS = [
+  "Data Pipelines",
+  "Data Science & Analytics",
+  "Artificial Intelligence",
+  "Machine Learning",
+  "REST APIs",
+  "Linux / RHEL",
+  "Agile Project Management",
 ];
 
 export function AboutPage({ timeline, stack }: { timeline: [string, string][]; stack: string[] }) {
@@ -54,18 +69,18 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
       .then((data: { skills?: GitHubSkill[] }) => {
         if (cancelled || !data.skills?.length) return;
 
-        // Ranked list of language names for the pills.
+        // Ranked list of detected language names (for the pills).
         setGhStack(data.skills.map((s) => s.name));
 
-        // Merge detected languages (that have a logo) into the curated orbit,
-        // GitHub-detected first, de-duped by icon slug, capped at 15.
+        // Orbit = GitHub-detected languages (with logos) FIRST, then the
+        // curated frameworks/tools, de-duped by icon slug, capped at 15.
         const detected: OrbitItem[] = data.skills
           .filter((s) => s.icon)
           .map((s) => ({ id: s.icon!, name: s.name, src: ICON(s.icon!) }));
 
         const seen = new Set<string>();
         const merged: OrbitItem[] = [];
-        for (const item of [...detected, ...TECH_ORBIT]) {
+        for (const item of [...detected, ...TOOLS]) {
           if (seen.has(item.id as string)) continue;
           seen.add(item.id as string);
           merged.push(item);
@@ -79,7 +94,9 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
     };
   }, []);
 
-  const stackPills = ghStack ?? stack;
+  // Pills: detected languages (from GitHub) + curated tools + non-logo skills.
+  const languagePills = ghStack ?? stack;
+  const toolNames = TOOLS.map((t) => t.name);
 
   return (
     <>
@@ -188,10 +205,27 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
               From data pipelines and analytics to full-stack web development
               and Linux system administration — always learning, always building.
             </p>
-            <div className="flex flex-wrap gap-1.5 pt-2 font-mono text-[11px]">
-              {stackPills.map((s) => (
-                <span key={s} className="px-2 py-0.5 border border-border rounded-full text-muted-foreground">{s}</span>
-              ))}
+            <div className="space-y-3 pt-2">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
+                  languages {ghStack ? "· from github" : ""}
+                </div>
+                <div className="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                  {languagePills.map((s) => (
+                    <span key={s} className="px-2 py-0.5 border border-border rounded-full text-muted-foreground">{s}</span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
+                  tools &amp; skills
+                </div>
+                <div className="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                  {Array.from(new Set([...toolNames, ...OTHER_SKILLS])).map((s) => (
+                    <span key={s} className="px-2 py-0.5 border border-border rounded-full text-muted-foreground">{s}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
           <div className="md:col-span-7">
