@@ -1,131 +1,235 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Reveal } from "@/components/reveal"
-import { 
-  BookOpen, 
-  Cpu, 
-  Briefcase, 
-  GraduationCap, 
-  Award, 
-  User, 
-  ArrowUpRight, 
-  Activity,
-  Plus
+import {
+  BookOpen,
+  Cpu,
+  Briefcase,
+  GraduationCap,
+  Award,
+  ArrowUpRight,
+  Eye,
+  Users,
+  TrendingUp,
+  Plus,
+  Heart,
 } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 
-const stats = [
-  { label: "Total Blogs", icon: BookOpen, href: "/admin/blogs", key: "blogs" },
-  { label: "Projects", icon: Cpu, href: "/admin/projects", key: "projects" },
-  { label: "Experience", icon: Briefcase, href: "/admin/experience", key: "experience" },
-  { label: "Education", icon: GraduationCap, href: "/admin/education", key: "education" },
-  { label: "Achievements", icon: Award, href: "/admin/achievements", key: "achievements" },
-]
+interface SiteStats {
+  totalViews: number
+  uniqueVisitors: number
+}
+
+interface BlogPost {
+  id: string
+  title: string
+  category: string
+  views: number
+  likes?: number
+  created_at?: string
+}
+
+interface ContentCounts {
+  blogs: number
+  projects: number
+  experience: number
+  education: number
+  achievements: number
+}
 
 export default function AdminDashboard() {
-  const [counts, setCounts] = useState<Record<string, number>>({})
+  const [siteStats, setSiteStats] = useState<SiteStats>({ totalViews: 0, uniqueVisitors: 0 })
+  const [counts, setCounts] = useState<ContentCounts>({ blogs: 0, projects: 0, experience: 0, education: 0, achievements: 0 })
+  const [topPosts, setTopPosts] = useState<BlogPost[]>([])
+  const [totalBlogViews, setTotalBlogViews] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchCounts() {
-      // Mocking counts for now, in a real scenario we'd have an API for this
-      const endpoints = ["blogs", "projects", "experience", "education", "achievements"]
-      const newCounts: Record<string, number> = {}
-      
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(`/api/${endpoint}`)
-          if (res.ok) {
-            const data = await res.json()
-            newCounts[endpoint] = data.length
-          }
-        } catch (e) {
-          newCounts[endpoint] = 0
+    async function fetchAll() {
+      try {
+        const [visitorRes, blogsRes, projectsRes, expRes, eduRes, achRes] = await Promise.allSettled([
+          fetch("/api/visitors"),
+          fetch("/api/blogs"),
+          fetch("/api/projects"),
+          fetch("/api/experience"),
+          fetch("/api/education"),
+          fetch("/api/achievements"),
+        ])
+
+        if (visitorRes.status === "fulfilled" && visitorRes.value.ok) {
+          setSiteStats(await visitorRes.value.json())
         }
+
+        if (blogsRes.status === "fulfilled" && blogsRes.value.ok) {
+          const blogs: BlogPost[] = await blogsRes.value.json()
+          const sorted = [...blogs].sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
+          setTopPosts(sorted.slice(0, 5))
+          setTotalBlogViews(blogs.reduce((sum, b) => sum + (b.views ?? 0), 0))
+          setCounts((c: ContentCounts) => ({ ...c, blogs: blogs.length }))
+        }
+
+        if (projectsRes.status === "fulfilled" && projectsRes.value.ok) {
+          const d = await projectsRes.value.json()
+          setCounts((c: ContentCounts) => ({ ...c, projects: Array.isArray(d) ? d.length : 0 }))
+        }
+        if (expRes.status === "fulfilled" && expRes.value.ok) {
+          const d = await expRes.value.json()
+          setCounts((c: ContentCounts) => ({ ...c, experience: Array.isArray(d) ? d.length : 0 }))
+        }
+        if (eduRes.status === "fulfilled" && eduRes.value.ok) {
+          const d = await eduRes.value.json()
+          setCounts((c: ContentCounts) => ({ ...c, education: Array.isArray(d) ? d.length : 0 }))
+        }
+        if (achRes.status === "fulfilled" && achRes.value.ok) {
+          const d = await achRes.value.json()
+          setCounts((c: ContentCounts) => ({ ...c, achievements: Array.isArray(d) ? d.length : 0 }))
+        }
+      } finally {
+        setLoading(false)
       }
-      setCounts(newCounts)
     }
-    fetchCounts()
+    fetchAll()
   }, [])
 
   return (
-    <div className="p-8">
-      <Reveal>
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back, Peter</h1>
-          <p className="text-foreground-muted">Manage your portfolio content and track your activity.</p>
-        </div>
-      </Reveal>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {stats.map((stat, i) => (
-          <Reveal key={stat.key} delay={i * 100}>
-            <Link 
-              href={stat.href}
-              className="glass-card p-6 flex items-center justify-between group hover:border-primary/40 transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
-                  <stat.icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-sm text-foreground-muted mb-1">{stat.label}</p>
-                  <p className="text-2xl font-bold text-foreground">{counts[stat.key] || 0}</p>
-                </div>
-              </div>
-              <ArrowUpRight className="h-5 w-5 text-foreground-muted group-hover:text-primary transition-colors" />
-            </Link>
-          </Reveal>
-        ))}
+    <div className="p-6 sm:p-8 space-y-10 max-w-6xl">
+      {/* Header */}
+      <div>
+        <div className="font-mono text-xs text-muted-foreground mb-1">// admin.dashboard</div>
+        <h1 className="text-2xl font-semibold tracking-tight">Welcome back, Peter</h1>
       </div>
 
-      <Reveal delay={400}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="glass-card p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <Activity className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-bold">Quick Actions</h2>
+      {/* Site analytics */}
+      <section>
+        <div className="font-mono text-xs text-muted-foreground mb-4">// site.analytics</div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "Total Page Views", value: siteStats.totalViews, icon: Eye, sub: "all time" },
+            { label: "Unique Visitors", value: siteStats.uniqueVisitors, icon: Users, sub: "all time" },
+            { label: "Blog Views", value: totalBlogViews, icon: TrendingUp, sub: "across all posts" },
+            { label: "Total Posts", value: counts.blogs, icon: BookOpen, sub: "published", href: "/admin/blogs" },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={`border border-border rounded-md p-5 bg-card/40 ${s.href ? "cursor-pointer hover:border-foreground/30 transition-colors" : ""}`}
+              onClick={s.href ? () => window.location.href = s.href! : undefined}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-mono text-xs text-muted-foreground">{s.label}</span>
+                <s.icon className="h-4 w-4 text-muted-foreground" />
               </div>
+              <div className="text-3xl font-semibold tabular-nums">
+                {loading ? <span className="text-muted-foreground text-lg">—</span> : s.value.toLocaleString()}
+              </div>
+              <div className="font-mono text-[10px] text-muted-foreground mt-1">{s.sub}</div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Link 
-                href="/admin/blogs"
-                className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all group"
-              >
-                <Plus className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">New Blog Post</span>
-              </Link>
-              <Link 
-                href="/admin/projects"
-                className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all group"
-              >
-                <Plus className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Add Project</span>
-              </Link>
-              <Link 
-                href="/admin/experience"
-                className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all group"
-              >
-                <Plus className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Add Experience</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="glass-card p-8 border-dashed border-white/10 flex flex-col items-center justify-center text-center">
-            <User className="h-12 w-12 text-primary/20 mb-4" />
-            <h3 className="text-lg font-bold mb-2">Live Status</h3>
-            <p className="text-sm text-foreground-muted mb-6 max-w-xs">
-              Your status is currently set to <span className="text-green-500 font-bold">Available for work</span>.
-            </p>
-            <Button variant="outline" className="rounded-xl border-white/10 text-foreground-muted">
-              Update Status
-            </Button>
-          </div>
+          ))}
         </div>
-      </Reveal>
+      </section>
+
+      {/* Content counts */}
+      <section>
+        <div className="font-mono text-xs text-muted-foreground mb-4">// content.inventory</div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "Projects", value: counts.projects, icon: Cpu, href: "/admin/projects" },
+            { label: "Experience", value: counts.experience, icon: Briefcase, href: "/admin/experience" },
+            { label: "Education", value: counts.education, icon: GraduationCap, href: "/admin/education" },
+            { label: "Achievements", value: counts.achievements, icon: Award, href: "/admin/achievements" },
+          ].map((s) => (
+            <Link
+              key={s.label}
+              href={s.href}
+              className="border border-border rounded-md p-5 bg-card/40 flex items-center justify-between hover:border-foreground/30 transition-colors group"
+            >
+              <div>
+                <div className="font-mono text-xs text-muted-foreground mb-2">{s.label}</div>
+                <div className="text-2xl font-semibold tabular-nums">
+                  {loading ? <span className="text-muted-foreground text-lg">—</span> : s.value}
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <s.icon className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Bottom row */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Top posts */}
+        <section>
+          <div className="flex items-baseline justify-between mb-4">
+            <div className="font-mono text-xs text-muted-foreground">// top.posts.by.views</div>
+            <Link href="/admin/blogs" className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors">
+              all posts →
+            </Link>
+          </div>
+          <div className="border border-border rounded-md overflow-hidden">
+            {loading ? (
+              <div className="p-6 text-center font-mono text-xs text-muted-foreground">loading...</div>
+            ) : topPosts.length === 0 ? (
+              <div className="p-6 text-center font-mono text-xs text-muted-foreground">no posts yet</div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground font-normal">title</th>
+                    <th className="text-right px-4 py-3 font-mono text-xs text-muted-foreground font-normal">
+                      <Eye className="h-3 w-3 inline mr-1" />views
+                    </th>
+                    <th className="text-right px-4 py-3 font-mono text-xs text-muted-foreground font-normal">
+                      <Heart className="h-3 w-3 inline mr-1" />likes
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topPosts.map((post: BlogPost, i: number) => (
+                    <tr key={post.id} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[10px] text-muted-foreground w-4">{i + 1}</span>
+                          <span className="truncate max-w-[200px]" title={post.title}>{post.title}</span>
+                        </div>
+                        <div className="font-mono text-[10px] text-muted-foreground pl-6">{post.category}</div>
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums font-mono text-xs">{(post.views ?? 0).toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right tabular-nums font-mono text-xs text-muted-foreground">{post.likes ?? 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
+
+        {/* Quick actions */}
+        <section>
+          <div className="font-mono text-xs text-muted-foreground mb-4">// quick.actions</div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "New Blog Post", href: "/admin/blogs", icon: BookOpen },
+              { label: "Add Project", href: "/admin/projects", icon: Cpu },
+              { label: "Add Experience", href: "/admin/experience", icon: Briefcase },
+              { label: "Add Achievement", href: "/admin/achievements", icon: Award },
+              { label: "Update Education", href: "/admin/education", icon: GraduationCap },
+              { label: "Manage Skills", href: "/admin/skills", icon: Users },
+            ].map((a) => (
+              <Link
+                key={a.label}
+                href={a.href}
+                className="flex items-center gap-3 border border-border rounded-md p-4 hover:border-foreground/30 hover:bg-card/40 transition-colors group"
+              >
+                <Plus className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+                <span className="text-sm">{a.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   )
 }
