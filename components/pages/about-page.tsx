@@ -8,7 +8,6 @@ import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { RadialIntro, type OrbitItem } from "@/components/site/radial-intro";
 import { IMAGES } from "@/lib/images";
-import { WaveBackground } from "@/components/site/wave-background";
 import { PROFILE } from "@/lib/profile";
 
 interface GitHubSkill {
@@ -106,7 +105,7 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
       {/* HERO */}
       <section className="relative border-b border-border">
         <CursorSpotlight />
-        <WaveBackground className="absolute inset-0 z-0" />
+        <div className="pattern-bg z-0 pointer-events-none" />
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 grid md:grid-cols-5 gap-10 items-center relative">
           <div className="md:col-span-3 space-y-6">
             <div className="font-mono text-xs text-muted-foreground stagger">

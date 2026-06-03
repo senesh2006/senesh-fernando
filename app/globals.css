@@ -591,3 +591,33 @@
     clip-path: polygon(50% 50%, 100% 65%, 100% 0, 0 0, 0 100%, 100% 100%, 100% 35%);
   }
 }
+
+/* Themed dotted-grid pattern background — adapted from Uiverse.io by Ratinax */
+.pattern-bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--background);
+  background-image:
+    linear-gradient(
+      45deg,
+      color-mix(in oklab, var(--primary) 12%, transparent),
+      transparent 90%
+    ),
+    radial-gradient(
+      color-mix(in oklab, var(--primary) 22%, transparent) 68%,
+      transparent 5%
+    );
+  background-size: 4em 4em;
+}
+
+.pattern-bg::after {
+  /* soften toward the page background so content stays readable */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    var(--background) 100%
+  );
+}
