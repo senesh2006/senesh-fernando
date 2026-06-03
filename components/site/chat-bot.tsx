@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from "react"
-import { motion } from "motion/react"
+import { motion, AnimatePresence } from "motion/react"
 import { Bot, Sparkles, Loader2, Send, X, Mic, MicOff, Volume2, VolumeX } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -481,11 +481,17 @@ function ChatInterface() {
           </div>
         )}
         {messages.map((m, i) => (
-          <div key={i} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 32 }}
+            className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}
+          >
             <div className={cn(
               "max-w-[85%] px-3 py-2 rounded-lg leading-relaxed border relative group",
-              m.role === "user" 
-                ? "bg-foreground text-background border-foreground" 
+              m.role === "user"
+                ? "bg-foreground text-background border-foreground"
                 : "bg-secondary/40 text-foreground border-border/50"
             )}>
               {m.content}
@@ -502,16 +508,29 @@ function ChatInterface() {
                 </button>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-secondary/40 border border-border/50 px-3 py-2 rounded-lg flex items-center gap-2">
-              <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-              <span className="text-[10px] opacity-70">Computing...</span>
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="flex justify-start"
+            >
+              <div className="bg-secondary/40 border border-border/50 px-3 py-2.5 rounded-lg flex items-center gap-1.5">
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="h-1.5 w-1.5 rounded-full bg-muted-foreground"
+                    animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Quick Actions */}

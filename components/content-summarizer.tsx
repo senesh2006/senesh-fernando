@@ -61,7 +61,12 @@ export function ContentSummarizer({ id, type, className }: SummarizerProps) {
             : "text-muted-foreground border border-border hover:text-foreground hover:border-foreground"
         )}
       >
-        <Sparkles className={cn("h-3.5 w-3.5", summary && "fill-current")} />
+        <motion.span
+          animate={isLoading ? { rotate: 360, scale: [1, 1.2, 1] } : { rotate: 0, scale: 1 }}
+          transition={isLoading ? { rotate: { duration: 1.2, repeat: Infinity, ease: "linear" }, scale: { duration: 1, repeat: Infinity } } : { duration: 0.3 }}
+        >
+          <Sparkles className={cn("h-3.5 w-3.5", summary && "fill-current")} />
+        </motion.span>
         {isLoading ? "Analyzing content..." : summary ? (isOpen ? "Hide Summary" : "Show AI Summary") : "AI Summarize"}
         {summary && (
           isOpen ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />
@@ -92,9 +97,29 @@ export function ContentSummarizer({ id, type, className }: SummarizerProps) {
                 </div>
               ) : (
                 <div className="prose-summary prose-invert max-w-none">
-                  <div className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                    {summary}
-                  </div>
+                  <motion.div
+                    className="text-sm text-foreground/90 leading-relaxed"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: {},
+                      visible: { transition: { staggerChildren: 0.015 } },
+                    }}
+                  >
+                    {(summary ?? "").split(/(\s+)/).map((word, i) => (
+                      <motion.span
+                        key={i}
+                        variants={{
+                          hidden: { opacity: 0, filter: "blur(4px)", y: 4 },
+                          visible: { opacity: 1, filter: "blur(0px)", y: 0 },
+                        }}
+                        transition={{ duration: 0.25 }}
+                        style={{ whiteSpace: "pre-wrap" }}
+                      >
+                        {word}
+                      </motion.span>
+                    ))}
+                  </motion.div>
                 </div>
               )}
             </div>

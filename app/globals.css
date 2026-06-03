@@ -504,3 +504,12 @@
     @apply text-muted-foreground;
   }
 }
+
+/* Hide native cursor everywhere when the custom magnetic cursor is active
+   (overrides Tailwind cursor-pointer / cursor-default on links and buttons) */
+@media (hover: hover) and (pointer: fine) {
+  body.custom-cursor-active,
+  body.custom-cursor-active * {
+    cursor: none !important;
+  }
+}

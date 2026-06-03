@@ -65,6 +65,7 @@ export function MagneticBlobCursor() {
     if (!window.matchMedia("(hover: hover)").matches) return
 
     document.body.style.cursor = "none"
+    document.body.classList.add("custom-cursor-active")
 
     const blob = blobRef.current
     const dot = dotRef.current
@@ -199,6 +200,7 @@ export function MagneticBlobCursor() {
       clearInterval(interval)
       cancelAnimationFrame(raf)
       document.body.style.cursor = "auto"
+      document.body.classList.remove("custom-cursor-active")
     }
   }, [updateMagneticElements])
 
@@ -209,8 +211,8 @@ export function MagneticBlobCursor() {
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
         style={{
-          width: isHovering ? "38px" : "12px",
-          height: isHovering ? "38px" : "12px",
+          width: isHovering ? "52px" : "18px",
+          height: isHovering ? "52px" : "18px",
           background: "transparent",
           border: "1px solid rgba(255,255,255,0.7)",
           borderRadius: "50%",
@@ -245,8 +247,8 @@ export function MagneticBlobCursor() {
         ref={dotRef}
         className="fixed top-0 left-0 pointer-events-none z-[10000]"
         style={{
-          width: "4px",
-          height: "4px",
+          width: "6px",
+          height: "6px",
           background: "#ffffff",
           border: "1px solid #ffffff",
           borderRadius: "50%",
