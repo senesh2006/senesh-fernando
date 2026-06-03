@@ -89,30 +89,32 @@ export function ProjectDetailPage({ project, projects }: { project: Project; pro
         </section>
 
         {/* DESCRIPTION + FILES */}
-        <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 grid md:grid-cols-12 gap-10 reveal">
-          <div className="md:col-span-7 space-y-6">
-            <div className="font-mono text-xs text-muted-foreground">// about.project</div>
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">What it is, and why it exists.</h2>
-            <p className="text-[17px] leading-[1.8] text-muted-foreground">{p.longDescription}</p>
+        <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 reveal">
+          <div className="grid md:grid-cols-12 gap-10 mb-10">
+            <div className="md:col-span-7 space-y-6">
+              <div className="font-mono text-xs text-muted-foreground">// about.project</div>
+              <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">What it is, and why it exists.</h2>
+              <p className="text-[17px] leading-[1.8] text-muted-foreground">{p.longDescription}</p>
 
-            <ContentSummarizer id={p.slug} type="projects" className="pt-2" />
+              <ContentSummarizer id={p.slug} type="projects" className="pt-2" />
 
-            <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-mono text-sm pt-6">
-              <ul className="space-y-1">{p.pros.map((x) => <li key={x}><span className="text-foreground">+</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
-              <ul className="space-y-1">{p.cons.map((x) => <li key={x}><span className="text-foreground">-</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
-            </div>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-mono text-sm pt-6">
+                <ul className="space-y-1">{p.pros.map((x) => <li key={x}><span className="text-foreground">+</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
+                <ul className="space-y-1">{p.cons.map((x) => <li key={x}><span className="text-foreground">-</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
+              </div>
 
-            <div className="pt-4">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">// stack</div>
-              <div className="flex flex-wrap gap-2">
-                {p.stack.map((s) => (
-                  <span key={s} className="font-mono text-xs px-2 py-1 border border-border rounded-sm bg-secondary/50">{s}</span>
-                ))}
+              <div className="pt-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">// stack</div>
+                <div className="flex flex-wrap gap-2">
+                  {p.stack.map((s) => (
+                    <span key={s} className="font-mono text-xs px-2 py-1 border border-border rounded-sm bg-secondary/50">{s}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="md:col-span-5">
+          <div>
             <div className="font-mono text-xs text-muted-foreground mb-3">// repo.tree</div>
             <FilesTree tree={p.tree} isPrivate={p.isPrivate} repo={p.repo} />
           </div>

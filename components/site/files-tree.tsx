@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronRight, Folder, FolderOpen, FileText, FileJson, FileCode, Lock, Loader2, X } from "lucide-react";
+import { ChevronRight, Folder, FolderOpen, FileText, FileJson, FileCode, Lock, Loader2, X, FolderInput } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CodeTabs } from "@/components/animate-ui/components/animate/code-tabs";
 
@@ -31,14 +31,10 @@ function Node({ node, depth = 0, activePath, loadingPath, onSelectFile }: NodePr
     const isActive = node.path != null && node.path === activePath;
     const isLoading = node.path != null && node.path === loadingPath;
     return (
-      <button
-        type="button"
-        disabled={!clickable}
-        onClick={clickable ? () => onSelectFile!(node.path!) : undefined}
+      <div
         className={cn(
-          "group w-full text-left flex items-center gap-2 py-1 px-2 rounded-sm font-mono text-xs transition-colors",
-          clickable ? "cursor-pointer hover:text-foreground hover:bg-secondary/60" : "cursor-default",
-          isActive ? "text-foreground bg-secondary/70" : "text-muted-foreground"
+          "group flex items-center gap-2 py-1 px-2 rounded-sm font-mono text-xs transition-colors",
+          isActive ? "text-foreground bg-secondary/70" : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
         )}
         style={{ paddingLeft: `${depth * 14 + 8}px` }}
       >
@@ -47,8 +43,24 @@ function Node({ node, depth = 0, activePath, loadingPath, onSelectFile }: NodePr
         ) : (
           <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
         )}
-        <span className="truncate">{node.name}</span>
-      </button>
+        <span className="truncate flex-1">{node.name}</span>
+        {clickable && !isLoading && (
+          <button
+            type="button"
+            onClick={() => onSelectFile!(node.path!)}
+            className={cn(
+              "shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] border transition-colors",
+              isActive
+                ? "opacity-100 border-border text-muted-foreground"
+                : "opacity-0 group-hover:opacity-100 border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30"
+            )}
+            aria-label={`Open ${node.name}`}
+          >
+            <FolderInput className="h-3 w-3" />
+            open file
+          </button>
+        )}
+      </div>
     );
   }
   return (
@@ -138,18 +150,18 @@ export function FilesTree({
     [repo]
   );
 
-  return (
-    <div className={cn("space-y-3", className)}>
-      <div className="rounded-md border border-border bg-background/60 backdrop-blur p-2 font-mono text-xs">
-        <div className="flex items-center gap-1.5 px-2 py-1.5 border-b border-border mb-1">
-          <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
-          <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
-          <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
-          <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-            {isPrivate && <Lock className="h-2.5 w-2.5 text-amber-500/80" />}
-            {isPrivate ? "private repository" : "repository"}
-          </span>
-        </div>
+  const treePanel = (
+    <div className="rounded-md border border-border bg-background/60 backdrop-blur p-2 font-mono text-xs h-full">
+      <div className="flex items-center gap-1.5 px-2 py-1.5 border-b border-border mb-1">
+        <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
+        <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
+        <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
+        <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+          {isPrivate && <Lock className="h-2.5 w-2.5 text-amber-500/80" />}
+          {isPrivate ? "private repository" : "repository"}
+        </span>
+      </div>
+      <div className={cn(openFile ? "max-h-[420px] overflow-y-auto" : "")}>
         {tree.map((n, i) => (
           <Node
             key={`${n.type}-${n.name}-${i}`}
@@ -159,33 +171,38 @@ export function FilesTree({
             onSelectFile={canBrowse ? handleSelectFile : undefined}
           />
         ))}
-        {canBrowse && (
-          <div className="px-2 pt-1.5 mt-1 border-t border-border text-[10px] text-muted-foreground/70">
-            click a file to view its contents
-          </div>
-        )}
       </div>
+    </div>
+  );
 
+  return (
+    <div className={cn("space-y-3", className)}>
       {error && (
         <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 font-mono text-xs text-amber-600 dark:text-amber-400">
           {error}
         </div>
       )}
 
-      {openFile && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground px-1">
-            <span className="truncate">{openFile.path}</span>
-            <button
-              onClick={() => setOpenFile(null)}
-              className="flex items-center gap-1 hover:text-foreground transition-colors shrink-0"
-              aria-label="Close file"
-            >
-              <X className="h-3 w-3" /> close
-            </button>
+      {openFile ? (
+        /* Side-by-side: tree on left, code on right */
+        <div className="grid grid-cols-[280px_1fr] gap-3 items-start">
+          <div>{treePanel}</div>
+          <div className="space-y-2 min-w-0">
+            <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground px-1">
+              <span className="truncate">{openFile.path}</span>
+              <button
+                onClick={() => setOpenFile(null)}
+                className="flex items-center gap-1 hover:text-foreground transition-colors shrink-0 ml-3"
+                aria-label="Close file"
+              >
+                <X className="h-3 w-3" /> close
+              </button>
+            </div>
+            <CodeTabs lang={openFile.ext} codes={{ [openFile.name]: openFile.content }} />
           </div>
-          <CodeTabs lang={openFile.ext} codes={{ [openFile.name]: openFile.content }} />
         </div>
+      ) : (
+        treePanel
       )}
     </div>
   );
