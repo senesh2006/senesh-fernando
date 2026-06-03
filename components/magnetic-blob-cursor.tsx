@@ -1,65 +1,43 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef } from "react"
 
-interface MagneticElement {
-  element: HTMLElement
-  rect: DOMRect
-  centerX: number
-  centerY: number
-  label: string
-}
+const INTERACTIVE_SELECTOR =
+  'a, button, [role="button"], .project-card, [data-magnetic], [data-cursor], summary, label[for], [data-cursor-label]'
 
-function getLabel(el: HTMLElement): string {
-  const attr = el.getAttribute("data-cursor-label")
-  if (attr) return attr
-  if (el.closest(".project-card, [data-cursor='view']")) return "View"
-  if (el.tagName === "A") return "Go"
-  if (el.tagName === "BUTTON" || el.getAttribute("role") === "button") return "Press"
-  if (el.closest("[data-magnetic]")) return "Drag"
-  return "View"
+const IDLE_SIZE = 24 // diameter of the resting dot
+const PAD = 6 // how far the highlight extends past the element edges
+const LEAN = 0.14 // how strongly the highlight leans toward the pointer
+const MAX_LEAN = 7 // px cap on the lean offset
+
+function readRadius(el: HTMLElement, h: number): number {
+  const r = parseFloat(getComputedStyle(el).borderTopLeftRadius || "0")
+  if (Number.isFinite(r) && r > 0) return r + PAD
+  return Math.min(12, h / 2 + PAD) // soft default
 }
 
 export function MagneticBlobCursor() {
-  const blobRef = useRef<HTMLDivElement>(null)
-  const dotRef = useRef<HTMLDivElement>(null)
-  const labelRef = useRef<HTMLSpanElement>(null)
-  const [isHovering, setIsHovering] = useState(false)
-  const [cursorText, setCursorText] = useState("")
+  const ringRef = useRef<HTMLDivElement>(null)
 
   const state = useRef({
-    blobX: -200,
-    blobY: -200,
-    dotX: -200,
-    dotY: -200,
-    targetX: -200,
-    targetY: -200,
-    prevX: -200,
-    prevY: -200,
-    rawX: -200,
-    rawY: -200,
+    // current animated geometry (center x/y, width, height, radius)
+    x: -200,
+    y: -200,
+    w: IDLE_SIZE,
+    h: IDLE_SIZE,
+    r: IDLE_SIZE / 2,
+    // targets
+    tx: -200,
+    ty: -200,
+    tw: IDLE_SIZE,
+    th: IDLE_SIZE,
+    tr: IDLE_SIZE / 2,
+    pointerX: -200,
+    pointerY: -200,
     visible: false,
     needsReset: true,
-    angle: 0,
+    hovering: false,
   })
-
-  const magneticElements = useRef<MagneticElement[]>([])
-
-  const updateMagneticElements = useCallback(() => {
-    const elements = document.querySelectorAll(
-      '[data-magnetic], .glass-card-hover, .project-card, a, button, [role="button"]'
-    )
-    magneticElements.current = Array.from(elements).map((el) => {
-      const rect = el.getBoundingClientRect()
-      return {
-        element: el as HTMLElement,
-        rect,
-        centerX: rect.left + rect.width / 2,
-        centerY: rect.top + rect.height / 2,
-        label: getLabel(el as HTMLElement),
-      }
-    })
-  }, [])
 
   useEffect(() => {
     if (!window.matchMedia("(hover: hover)").matches) return
@@ -67,127 +45,108 @@ export function MagneticBlobCursor() {
     document.body.style.cursor = "none"
     document.body.classList.add("custom-cursor-active")
 
-    const blob = blobRef.current
-    const dot = dotRef.current
-    if (!blob || !dot) return
+    const ring = ringRef.current
+    if (!ring) return
 
-    const MAGNETIC_RADIUS = 90
-    const PULL_STRENGTH = 0.38
-    const SPRING = 0.14
-    const DOT_SPRING = 0.28
+    // Spring constants — geometry snaps a touch faster than position.
+    const POS_SPRING = 0.22
+    const GEO_SPRING = 0.30
+
+    // Recompute the target geometry from the element under the pointer.
+    const resolveTarget = (px: number, py: number) => {
+      const s = state.current
+      const under = document.elementFromPoint(px, py) as HTMLElement | null
+      const el = under?.closest(INTERACTIVE_SELECTOR) as HTMLElement | null
+
+      if (el) {
+        const rect = el.getBoundingClientRect()
+        const cx = rect.left + rect.width / 2
+        const cy = rect.top + rect.height / 2
+        // lean the highlight toward the pointer, clamped
+        const leanX = Math.max(-MAX_LEAN, Math.min(MAX_LEAN, (px - cx) * LEAN))
+        const leanY = Math.max(-MAX_LEAN, Math.min(MAX_LEAN, (py - cy) * LEAN))
+        s.tx = cx + leanX
+        s.ty = cy + leanY
+        s.tw = rect.width + PAD * 2
+        s.th = rect.height + PAD * 2
+        s.tr = readRadius(el, rect.height)
+        s.hovering = true
+      } else {
+        s.tx = px
+        s.ty = py
+        s.tw = IDLE_SIZE
+        s.th = IDLE_SIZE
+        s.tr = IDLE_SIZE / 2
+        s.hovering = false
+      }
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
       const s = state.current
-
-      s.rawX = e.clientX
-      s.rawY = e.clientY
+      s.pointerX = e.clientX
+      s.pointerY = e.clientY
 
       if (s.needsReset) {
-        s.blobX = e.clientX
-        s.blobY = e.clientY
-        s.dotX = e.clientX
-        s.dotY = e.clientY
-        s.targetX = e.clientX
-        s.targetY = e.clientY
-        s.prevX = e.clientX
-        s.prevY = e.clientY
+        s.x = e.clientX
+        s.y = e.clientY
+        s.tx = e.clientX
+        s.ty = e.clientY
         s.needsReset = false
       }
-
       s.visible = true
-      s.targetX = e.clientX
-      s.targetY = e.clientY
-
-      let closestEl: MagneticElement | null = null
-      let closestDist = Infinity
-
-      for (const m of magneticElements.current) {
-        const dx = e.clientX - m.centerX
-        const dy = e.clientY - m.centerY
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < MAGNETIC_RADIUS && dist < closestDist) {
-          closestDist = dist
-          closestEl = m
-        }
-      }
-
-      if (closestEl) {
-        const pull = (1 - closestDist / MAGNETIC_RADIUS) * PULL_STRENGTH
-        s.targetX = e.clientX + (closestEl.centerX - e.clientX) * pull
-        s.targetY = e.clientY + (closestEl.centerY - e.clientY) * pull
-        setIsHovering(true)
-        setCursorText(closestEl.label)
-      } else {
-        setIsHovering(false)
-        setCursorText("")
-      }
+      resolveTarget(e.clientX, e.clientY)
     }
 
     const handleMouseLeave = () => {
       state.current.visible = false
       state.current.needsReset = true
     }
-
     const handleMouseEnter = () => {
       state.current.needsReset = true
     }
-
     const handleVisibilityChange = () => {
       if (document.hidden) {
         state.current.visible = false
         state.current.needsReset = true
       }
     }
-
-    const handleScrollResize = () => updateMagneticElements()
+    // Keep the highlight glued to the element while scrolling without mouse movement.
+    const handleScroll = () => {
+      const s = state.current
+      if (s.visible) resolveTarget(s.pointerX, s.pointerY)
+    }
 
     document.addEventListener("mousemove", handleMouseMove)
     document.addEventListener("mouseenter", handleMouseEnter)
     document.addEventListener("mouseleave", handleMouseLeave)
     document.addEventListener("visibilitychange", handleVisibilityChange)
-    window.addEventListener("scroll", handleScrollResize, { passive: true })
-    window.addEventListener("resize", handleScrollResize)
-
-    updateMagneticElements()
-    const interval = setInterval(updateMagneticElements, 800)
+    window.addEventListener("scroll", handleScroll, { passive: true })
 
     let raf: number
-
     const animate = () => {
       const s = state.current
 
-      // Blob spring
-      s.blobX += (s.targetX - s.blobX) * SPRING
-      s.blobY += (s.targetY - s.blobY) * SPRING
+      s.x += (s.tx - s.x) * POS_SPRING
+      s.y += (s.ty - s.y) * POS_SPRING
+      s.w += (s.tw - s.w) * GEO_SPRING
+      s.h += (s.th - s.h) * GEO_SPRING
+      s.r += (s.tr - s.r) * GEO_SPRING
 
-      // Dot tracks raw mouse
-      s.dotX += (s.rawX - s.dotX) * DOT_SPRING
-      s.dotY += (s.rawY - s.dotY) * DOT_SPRING
-
-      const moveX = s.blobX - s.prevX
-      const moveY = s.blobY - s.prevY
-      const speed = Math.sqrt(moveX * moveX + moveY * moveY)
-      const stretch = Math.min(speed / 22, 0.28)
-      const scaleX = 1 + stretch
-      const scaleY = 1 - stretch * 0.35
-      const angle = Math.atan2(moveY, moveX) * (180 / Math.PI)
-      s.angle = angle
-      s.prevX = s.blobX
-      s.prevY = s.blobY
-
-      blob.style.opacity = s.visible ? "1" : "0"
-      blob.style.transform = `translate(${s.blobX}px,${s.blobY}px) translate(-50%,-50%) rotate(${angle}deg) scale(${scaleX},${scaleY})`
-
-      dot.style.opacity = s.visible ? "1" : "0"
-      dot.style.transform = `translate(${s.dotX}px,${s.dotY}px) translate(-50%,-50%)`
-
-      if (labelRef.current) {
-        labelRef.current.style.transform = `rotate(${-angle}deg)`
-      }
+      ring.style.opacity = s.visible ? "1" : "0"
+      ring.style.width = `${s.w}px`
+      ring.style.height = `${s.h}px`
+      ring.style.borderRadius = `${s.r}px`
+      ring.style.transform = `translate(${s.x - s.w / 2}px, ${s.y - s.h / 2}px)`
+      // Brighten the fill slightly while enveloping an element.
+      ring.style.background = s.hovering
+        ? "rgba(255,255,255,0.14)"
+        : "rgba(255,255,255,0.28)"
+      ring.style.borderColor = s.hovering
+        ? "rgba(255,255,255,0.35)"
+        : "rgba(255,255,255,0.55)"
 
       raf = requestAnimationFrame(animate)
     }
-
     animate()
 
     return () => {
@@ -195,68 +154,27 @@ export function MagneticBlobCursor() {
       document.removeEventListener("mouseenter", handleMouseEnter)
       document.removeEventListener("mouseleave", handleMouseLeave)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
-      window.removeEventListener("scroll", handleScrollResize)
-      window.removeEventListener("resize", handleScrollResize)
-      clearInterval(interval)
+      window.removeEventListener("scroll", handleScroll)
       cancelAnimationFrame(raf)
       document.body.style.cursor = "auto"
       document.body.classList.remove("custom-cursor-active")
     }
-  }, [updateMagneticElements])
+  }, [])
 
   return (
-    <>
-      {/* Magnetic blob */}
-      <div
-        ref={blobRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
-        style={{
-          width: isHovering ? "52px" : "18px",
-          height: isHovering ? "52px" : "18px",
-          background: "transparent",
-          border: "1px solid rgba(255,255,255,0.7)",
-          borderRadius: "50%",
-          opacity: 0,
-          backdropFilter: "blur(6px)",
-          boxShadow: "none",
-          transition:
-            "width 0.35s cubic-bezier(0.23,1,0.32,1), height 0.35s cubic-bezier(0.23,1,0.32,1), background 0.25s ease, box-shadow 0.25s ease, border 0.25s ease, backdrop-filter 0.25s ease",
-          willChange: "transform, width, height, opacity",
-        }}
-      >
-        <span
-          ref={labelRef}
-          style={{
-            fontFamily: "var(--font-dm-mono), monospace",
-            fontSize: "7px",
-            fontWeight: 500,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "transparent",
-            opacity: isHovering && cursorText ? 1 : 0,
-            transition: "opacity 0.2s ease",
-            userSelect: "none",
-          }}
-        >
-          {cursorText}
-        </span>
-      </div>
-
-      {/* Precise dot */}
-      <div
-        ref={dotRef}
-        className="fixed top-0 left-0 pointer-events-none z-[10000]"
-        style={{
-          width: "6px",
-          height: "6px",
-          background: "#ffffff",
-          border: "1px solid #ffffff",
-          borderRadius: "50%",
-          opacity: 0,
-          transition: "background 0.2s ease",
-          willChange: "transform, opacity",
-        }}
-      />
-    </>
+    <div
+      ref={ringRef}
+      className="fixed top-0 left-0 pointer-events-none z-[9999]"
+      style={{
+        width: IDLE_SIZE,
+        height: IDLE_SIZE,
+        borderRadius: "50%",
+        background: "rgba(255,255,255,0.28)",
+        border: "1px solid rgba(255,255,255,0.55)",
+        backdropFilter: "blur(2px)",
+        opacity: 0,
+        willChange: "transform, width, height, border-radius, opacity",
+      }}
+    />
   )
 }
