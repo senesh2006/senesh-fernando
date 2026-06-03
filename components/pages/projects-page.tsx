@@ -7,7 +7,7 @@ import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
 import type { Project } from "@/data/projects";
-import Beams from "@/components/site/Beams";
+import { RetroGrid } from "@/components/ui/retro-grid";
 
 export function ProjectsPage({ projects }: { projects: Project[] }) {
   useReveal();
@@ -20,7 +20,7 @@ export function ProjectsPage({ projects }: { projects: Project[] }) {
       <section className="relative border-b border-border">
         <CursorSpotlight />
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <Beams beamWidth={3} beamHeight={30} beamNumber={20} lightColor="#ffffff" speed={2} noiseIntensity={1.75} scale={0.2} rotation={30} />
+          <RetroGrid angle={65} cellSize={55} opacity={0.4} />
         </div>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">

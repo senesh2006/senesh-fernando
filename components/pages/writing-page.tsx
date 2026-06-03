@@ -7,7 +7,7 @@ import type { Post } from "@/data/posts";
 import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
-import Beams from "@/components/site/Beams";
+import { AnimatedLiquidBackground } from "@/components/site/animated-liquid-background";
 
 const TAGS = ["all", "data science", "startups", "education", "hackathons", "linux"];
 
@@ -22,8 +22,8 @@ export function WritingPage({ posts }: { posts: Post[] }) {
       {/* HERO */}
       <section className="border-b border-border relative">
         <CursorSpotlight />
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <Beams beamWidth={3} beamHeight={30} beamNumber={20} lightColor="#ffffff" speed={2} noiseIntensity={1.75} scale={0.2} rotation={30} />
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+          <AnimatedLiquidBackground preset="Mist" speed={22} className="absolute inset-0" />
         </div>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-32 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
