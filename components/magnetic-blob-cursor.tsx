@@ -209,18 +209,18 @@ export function MagneticBlobCursor() {
         ref={blobRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center"
         style={{
-          width: isHovering ? "52px" : "22px",
-          height: isHovering ? "52px" : "22px",
+          width: isHovering ? "38px" : "12px",
+          height: isHovering ? "38px" : "12px",
           background: isHovering
-            ? "rgba(255, 255, 255, 0.08)"
-            : "radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0.3) 100%)",
-          border: isHovering ? "1.5px solid rgba(255,255,255,0.5)" : "none",
+            ? "rgba(255, 255, 255, 0.06)"
+            : "rgba(255, 255, 255, 0.18)",
+          border: isHovering ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(255,255,255,0.4)",
           borderRadius: "50%",
           opacity: 0,
-          backdropFilter: isHovering ? "blur(6px)" : "none",
+          backdropFilter: isHovering ? "blur(8px)" : "blur(2px)",
           boxShadow: isHovering
-            ? "0 0 0 1px rgba(255,255,255,0.1), 0 0 24px rgba(255,255,255,0.12)"
-            : "0 0 12px rgba(255,255,255,0.4), 0 0 28px rgba(255,255,255,0.15)",
+            ? "0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(255,255,255,0.06)"
+            : "0 0 8px rgba(255,255,255,0.15)",
           transition:
             "width 0.35s cubic-bezier(0.23,1,0.32,1), height 0.35s cubic-bezier(0.23,1,0.32,1), background 0.25s ease, box-shadow 0.25s ease, border 0.25s ease, backdrop-filter 0.25s ease",
           willChange: "transform, width, height, opacity",
@@ -251,7 +251,7 @@ export function MagneticBlobCursor() {
         style={{
           width: "4px",
           height: "4px",
-          background: isHovering ? "transparent" : "#ffffff",
+          background: isHovering ? "transparent" : "rgba(255,255,255,0.5)",
           borderRadius: "50%",
           opacity: 0,
           transition: "background 0.2s ease",
