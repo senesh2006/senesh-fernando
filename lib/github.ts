@@ -140,7 +140,7 @@ function buildTreeFromItems(items: GitHubTreeItem[]): FileNode[] {
     const node: FileNode =
       item.type === "tree"
         ? { type: "folder", name: fileName, children: [] }
-        : { type: "file", name: fileName }
+        : { type: "file", name: fileName, path: item.path }
 
     if (folderPath === "") {
       root.push(node)
