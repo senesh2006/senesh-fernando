@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git config user.email seneshfernando55@gmail.com && git config user.name \"Senesh Fernando\"",
+            "if": "Bash(git commit*)"
+          }
+        ]
+      }
+    ]
+  }
+}
