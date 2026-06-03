@@ -21,6 +21,7 @@ export function MagneticBlobCursor() {
   const wrapRef = useRef<HTMLDivElement>(null)
   // Four corners: TL, TR, BR, BL
   const cornersRef = useRef<HTMLDivElement[]>([])
+  const dotRef = useRef<HTMLDivElement>(null)
 
   const state = useRef({
     x: -200, y: -200, w: IDLE_SIZE, h: IDLE_SIZE, r: IDLE_SIZE / 2,
@@ -37,7 +38,8 @@ export function MagneticBlobCursor() {
 
     const wrap = wrapRef.current
     const corners = cornersRef.current
-    if (!wrap || corners.length < 4) return
+    const dot = dotRef.current
+    if (!wrap || corners.length < 4 || !dot) return
 
     const POS_SPRING = 0.22
     const GEO_SPRING = 0.30
@@ -107,11 +109,16 @@ export function MagneticBlobCursor() {
       const op = s.visible ? "1" : "0"
       const hw = s.w / 2
       const hh = s.h / 2
-      // corner bracket arm length — shorter when in idle dot mode
-      const arm = s.hovering ? BRACKET_LEN : 5
+      // At rest the arms equal the half-size so the four quarter-circles
+      // close into a full ring; on hover they shrink into corner brackets.
+      const arm = s.hovering ? BRACKET_LEN : Math.min(hw, hh)
       const borderColor = s.hovering
         ? "rgba(255,255,255,0.65)"
         : "rgba(255,255,255,0.8)"
+
+      // Center pointer dot — visible only at rest.
+      dot.style.opacity = s.visible && !s.hovering ? "1" : "0"
+      dot.style.transform = `translate(${s.x}px, ${s.y}px) translate(-50%, -50%)`
       const bw = "1.5px"
 
       // positions: [left, top] for each corner
@@ -180,6 +187,18 @@ export function MagneticBlobCursor() {
           style={{ opacity: 0, willChange: "transform, width, height, opacity" }}
         />
       ))}
+      <div
+        ref={dotRef}
+        className="absolute top-0 left-0"
+        style={{
+          width: "4px",
+          height: "4px",
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.9)",
+          opacity: 0,
+          willChange: "transform, opacity",
+        }}
+      />
     </div>
   )
 }
