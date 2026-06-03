@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from "react"
 import { motion } from "motion/react"
-import { Bot, Sparkles, Loader2, Send, X, Mic, MicOff } from "lucide-react"
+import { Bot, Sparkles, Loader2, Send, X, Mic, MicOff, Volume2, VolumeX } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -331,8 +331,35 @@ function ChatInterface() {
   } = useChatContext()
   
   const [input, setInput] = useState("")
+  const [currentlyReading, setCurrentlyReading] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+
+  const stopReading = useCallback(() => {
+    window.speechSynthesis.cancel()
+    setCurrentlyReading(null)
+  }, [])
+
+  const toggleReadAloud = (text: string) => {
+    if (currentlyReading === text) {
+      stopReading()
+      return
+    }
+
+    stopReading()
+    const utterance = new SpeechSynthesisUtterance(text)
+    
+    // Find a nice voice if available
+    const voices = window.speechSynthesis.getVoices()
+    const preferredVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha")) || voices[0]
+    if (preferredVoice) utterance.voice = preferredVoice
+
+    utterance.onend = () => setCurrentlyReading(null)
+    utterance.onerror = () => setCurrentlyReading(null)
+    
+    setCurrentlyReading(text)
+    window.speechSynthesis.speak(utterance)
+  }
 
   // Computed voice state based on provider
   const isVoiceActive = voiceProvider === "elevenlabs" 
@@ -454,14 +481,26 @@ function ChatInterface() {
           </div>
         )}
         {messages.map((m, i) => (
-          <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+          <div key={i} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
             <div className={cn(
-              "max-w-[85%] px-3 py-2 rounded-lg leading-relaxed border",
+              "max-w-[85%] px-3 py-2 rounded-lg leading-relaxed border relative group",
               m.role === "user" 
                 ? "bg-foreground text-background border-foreground" 
                 : "bg-secondary/40 text-foreground border-border/50"
             )}>
               {m.content}
+              {m.role === "assistant" && (
+                <button 
+                  onClick={() => toggleReadAloud(m.content)}
+                  className={cn(
+                    "absolute -right-7 top-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
+                    currentlyReading === m.content ? "text-primary opacity-100" : "text-muted-foreground hover:text-foreground"
+                  )}
+                  title={currentlyReading === m.content ? "Stop reading" : "Read aloud"}
+                >
+                  {currentlyReading === m.content ? <VolumeX className="h-3.5 w-3.5 animate-pulse" /> : <Volume2 className="h-3.5 w-3.5" />}
+                </button>
+              )}
             </div>
           </div>
         ))}
