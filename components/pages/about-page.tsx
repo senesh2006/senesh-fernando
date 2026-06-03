@@ -8,7 +8,7 @@ import { ScrollProgress } from "@/components/site/scroll-progress";
 import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { RadialIntro, type OrbitItem } from "@/components/site/radial-intro";
 import { IMAGES } from "@/lib/images";
-import DotField from "@/components/DotField";
+import { FireParticles } from "@/components/site/FireParticles";
 import { PROFILE } from "@/lib/profile";
 
 interface GitHubSkill {
@@ -107,7 +107,7 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
       <section className="relative border-b border-border">
         <CursorSpotlight />
         <div className="absolute inset-0 z-0 pointer-events-none opacity-70">
-          <DotField dotRadius={1.5} dotSpacing={16} bulgeOnly bulgeStrength={60} glowRadius={160} waveAmplitude={0} />
+          <FireParticles intensity={4} />
         </div>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 grid md:grid-cols-5 gap-10 items-center relative">
           <div className="md:col-span-3 space-y-6">
