@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useReveal } from "@/hooks/use-reveal";
 import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
@@ -8,6 +9,12 @@ import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { RadialIntro, type OrbitItem } from "@/components/site/radial-intro";
 import { IMAGES } from "@/lib/images";
 import { PROFILE } from "@/lib/profile";
+
+interface GitHubSkill {
+  name: string;
+  bytes: number;
+  icon: string | null;
+}
 
 // simpleicons.org serves a black SVG per slug; `dark:invert` flips it for dark mode.
 const ICON = (slug: string) => `https://cdn.simpleicons.org/${slug}/000000`;
@@ -34,6 +41,46 @@ const TECH_ORBIT: OrbitItem[] = [
 
 export function AboutPage({ timeline, stack }: { timeline: [string, string][]; stack: string[] }) {
   useReveal();
+
+  // Pull real languages detected across the user's GitHub repos and fold any
+  // logo-able ones into the orbit; falls back to the curated list on failure.
+  const [orbit, setOrbit] = useState<OrbitItem[]>(TECH_ORBIT);
+  const [ghStack, setGhStack] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/github/skills")
+      .then((r) => r.json())
+      .then((data: { skills?: GitHubSkill[] }) => {
+        if (cancelled || !data.skills?.length) return;
+
+        // Ranked list of language names for the pills.
+        setGhStack(data.skills.map((s) => s.name));
+
+        // Merge detected languages (that have a logo) into the curated orbit,
+        // GitHub-detected first, de-duped by icon slug, capped at 15.
+        const detected: OrbitItem[] = data.skills
+          .filter((s) => s.icon)
+          .map((s) => ({ id: s.icon!, name: s.name, src: ICON(s.icon!) }));
+
+        const seen = new Set<string>();
+        const merged: OrbitItem[] = [];
+        for (const item of [...detected, ...TECH_ORBIT]) {
+          if (seen.has(item.id as string)) continue;
+          seen.add(item.id as string);
+          merged.push(item);
+          if (merged.length >= 15) break;
+        }
+        setOrbit(merged);
+      })
+      .catch(() => {/* keep curated fallback */});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const stackPills = ghStack ?? stack;
+
   return (
     <>
       <ScrollProgress />
@@ -142,13 +189,13 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
               and Linux system administration — always learning, always building.
             </p>
             <div className="flex flex-wrap gap-1.5 pt-2 font-mono text-[11px]">
-              {stack.map((s) => (
+              {stackPills.map((s) => (
                 <span key={s} className="px-2 py-0.5 border border-border rounded-full text-muted-foreground">{s}</span>
               ))}
             </div>
           </div>
           <div className="md:col-span-7">
-            <RadialIntro orbitItems={TECH_ORBIT} />
+            <RadialIntro orbitItems={orbit} />
           </div>
         </div>
       </section>
