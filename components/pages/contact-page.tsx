@@ -10,7 +10,7 @@ import type { ChromaGridItem } from "@/components/site/ChromaGrid";
 import { submitContact } from "@/lib/client-api";
 import { PROFILE } from "@/lib/profile";
 import { useState } from "react";
-import { Github, Linkedin, Twitter, GraduationCap } from "lucide-react";
+import { Github, Linkedin, Twitter, GraduationCap, Mail, Phone, MapPin, FileDown } from "lucide-react";
 
 const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL || PROFILE.email;
@@ -18,14 +18,11 @@ const CONTACT_EMAIL =
 const GITHUB_USER =
   process.env.NEXT_PUBLIC_GITHUB_USERNAME || "senesh2006";
 
-const CHANNELS = [
-  ["01", "Email.", CONTACT_EMAIL, `mailto:${CONTACT_EMAIL}`, "→", "fastest"],
-  ["02", "Phone.", PROFILE.phoneDisplay, `tel:${PROFILE.phone}`, "→", "mobile"],
-  ["03", "LinkedIn.", PROFILE.linkedinHandle, PROFILE.linkedin, "↗", "work"],
-  ["04", "GitHub.", `github.com/${GITHUB_USER}`, PROFILE.github, "↗", "code"],
-  ["05", "Portfolio.", "v0-senesh-fernando.vercel.app", PROFILE.website, "↗", "personal"],
-  ["06", "Resume/CV.", "Senesh_Fernando_CV.pdf", "/Senesh_Fernando_CV.pdf", "↓", "document"],
-  ["07", "Location.", PROFILE.address, `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, "↗", "map"],
+const DIRECT = [
+  { icon: Mail, label: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, hint: "fastest · < 48h" },
+  { icon: Phone, label: "Phone", value: PROFILE.phoneDisplay, href: `tel:${PROFILE.phone}`, hint: "mobile" },
+  { icon: MapPin, label: "Location", value: PROFILE.address, href: `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, hint: PROFILE.location },
+  { icon: FileDown, label: "Resume / CV", value: "Senesh_Fernando_CV.pdf", href: "/Senesh_Fernando_CV.pdf", hint: "download" },
 ] as const;
 
 const SOCIAL_ITEMS: ChromaGridItem[] = [
@@ -102,24 +99,22 @@ export function ContactPage() {
       {/* HERO */}
       <section className="relative border-b border-border">
         <CursorSpotlight />
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-32 relative">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
             <div>// contact.landing</div>
-            <div>[MODE: OPEN] · {PROFILE.location} · response &lt; 48h</div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              [MODE: OPEN] · {PROFILE.location} · response &lt; 48h
+            </div>
           </div>
           <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95] max-w-5xl">
-            <span className="caret">Get in touch.</span>{" "}
-            <span className="text-muted-foreground block">Email or call — either works.</span>
+            <span className="caret">Let's talk.</span>{" "}
+            <span className="text-muted-foreground block">Tech, education, or AI.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed animate-fade-in-up">
-            If you're working on something exciting in tech, education, or AI — or
-            just want to connect and chat ideas — I'd love to hear from you.
+            If you're working on something exciting — or just want to connect and
+            trade ideas — drop a message below, or reach me directly. I read everything.
           </p>
-          <div className="mt-10 flex flex-wrap gap-2 font-mono text-xs">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {CONTACT_EMAIL}</a>
-            <a href={`tel:${PROFILE.phone}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {PROFILE.phoneDisplay}</a>
-            <Link href="/projects" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ see the work first</Link>
-          </div>
         </div>
         <MarqueeStrip items={[
           "open to collaborations", "response within 48h", "[MODE: OPEN]",
@@ -127,49 +122,79 @@ export function ContactPage() {
         ]} />
       </section>
 
-      {/* CONTACT FORM */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// send.message</div>
-        <form onSubmit={handleSubmit} className="space-y-4 border border-border rounded-md p-6 sm:p-8">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <label className="block space-y-2 font-mono text-xs">
-              <span className="text-muted-foreground">name</span>
-              <input required name="name" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm" />
-            </label>
-            <label className="block space-y-2 font-mono text-xs">
-              <span className="text-muted-foreground">email</span>
-              <input required type="email" name="email" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm" />
-            </label>
+      {/* FORM + DIRECT CONTACT (two-column centerpiece) */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          {/* Form */}
+          <div className="lg:col-span-7">
+            <div className="font-mono text-xs text-muted-foreground mb-6">// send.message</div>
+            <form onSubmit={handleSubmit} className="space-y-4 border border-border rounded-md p-6 sm:p-8 bg-card/40">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <label className="block space-y-2 font-mono text-xs">
+                  <span className="text-muted-foreground">name</span>
+                  <input required name="name" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
+                </label>
+                <label className="block space-y-2 font-mono text-xs">
+                  <span className="text-muted-foreground">email</span>
+                  <input required type="email" name="email" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
+                </label>
+              </div>
+              <label className="block space-y-2 font-mono text-xs">
+                <span className="text-muted-foreground">subject</span>
+                <input name="subject" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
+              </label>
+              <label className="block space-y-2 font-mono text-xs">
+                <span className="text-muted-foreground">message</span>
+                <textarea required name="message" rows={7} className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm resize-y focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="font-mono text-xs px-4 py-2 border border-border rounded-sm bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {status === "sending" ? "sending…" : "→ send message"}
+                </button>
+                {status === "sent" && (
+                  <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">message sent — talk soon</span>
+                )}
+                {status === "error" && (
+                  <span className="font-mono text-xs text-red-500">{errorMessage}</span>
+                )}
+              </div>
+            </form>
           </div>
-          <label className="block space-y-2 font-mono text-xs">
-            <span className="text-muted-foreground">subject</span>
-            <input name="subject" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm" />
-          </label>
-          <label className="block space-y-2 font-mono text-xs">
-            <span className="text-muted-foreground">message</span>
-            <textarea required name="message" rows={6} className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm resize-y" />
-          </label>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              disabled={status === "sending"}
-              className="font-mono text-xs px-3 py-1.5 border border-border rounded-sm link-hover disabled:opacity-50"
-            >
-              {status === "sending" ? "sending…" : "→ send message"}
-            </button>
-            {status === "sent" && (
-              <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">message sent</span>
-            )}
-            {status === "error" && (
-              <span className="font-mono text-xs text-red-500">{errorMessage}</span>
-            )}
+
+          {/* Direct channels */}
+          <div className="lg:col-span-5">
+            <div className="font-mono text-xs text-muted-foreground mb-6">// or.reach.directly</div>
+            <div className="space-y-3">
+              {DIRECT.map(({ icon: Icon, label, value, href, hint }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith("mailto:") || href.startsWith("tel:") ? undefined : "_blank"}
+                  rel="noreferrer"
+                  className="group flex items-start gap-3 border border-border rounded-md p-4 bg-card/40 hover:border-foreground/30 transition-colors"
+                >
+                  <div className="p-2 rounded-sm border border-border bg-background shrink-0 group-hover:border-foreground/30 transition-colors">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
+                    <div className="text-sm truncate group-hover:text-foreground transition-colors">{value}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground mt-0.5">{hint}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
-        </form>
+        </div>
       </section>
 
-      {/* SOCIAL CHROMA GRID */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-12 sm:mt-16 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// social.cards</div>
+      {/* SOCIALS */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
+        <div className="font-mono text-xs text-muted-foreground mb-6">// find.me.elsewhere</div>
         <div className="relative min-h-[350px]">
           <ChromaGrid
             items={SOCIAL_ITEMS}
@@ -180,21 +205,6 @@ export function ContactPage() {
             columns={2}
           />
         </div>
-      </section>
-
-      {/* CHANNELS */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-12 sm:mt-16 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// channels</div>
-        <ul className="divide-y divide-border border-y border-border font-mono text-sm stagger">
-          {CHANNELS.map(([n, label, val, href, arrow, hint]) => (
-            <li key={n} className="grid grid-cols-[2rem_8rem_1fr_auto] gap-4 items-baseline py-4 row-hover rounded-sm">
-              <span className="text-muted-foreground">{n}</span>
-              <span className="text-foreground">{label}</span>
-              <a href={href} className="story-link truncate">{val} {arrow}</a>
-              <span className="text-muted-foreground hidden sm:inline text-xs">[{hint}]</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       {/* GOOD FIT */}
@@ -223,7 +233,7 @@ export function ContactPage() {
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
+      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 mb-24 reveal">
         <div className="font-mono text-xs text-muted-foreground mb-6">// frequently.asked</div>
         <div className="divide-y divide-border border-y border-border">
           {[
@@ -241,19 +251,6 @@ export function ContactPage() {
               <p className="mt-3 pl-6 text-muted-foreground text-sm leading-relaxed">{a}</p>
             </details>
           ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-32 reveal">
-        <div className="border-t border-b border-border py-16 text-center">
-          <div className="font-mono text-xs text-muted-foreground mb-4">// end.of.contact</div>
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight">Still here? Just send the email.</h2>
-          <p className="mt-4 text-muted-foreground max-w-lg mx-auto">Or call {PROFILE.phoneDisplay} — happy to chat.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {CONTACT_EMAIL}</a>
-            <a href={`tel:${PROFILE.phone}`} className="px-3 py-1.5 border border-border rounded-sm link-hover">→ {PROFILE.phoneDisplay}</a>
-          </div>
         </div>
       </section>
     </>
