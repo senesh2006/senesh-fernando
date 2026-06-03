@@ -513,3 +513,81 @@
     cursor: none !important;
   }
 }
+
+/* Pac-Man site preloader — From Uiverse.io by Ratinax */
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.site-preloader--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.site-preloader .loader {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.site-preloader .pac-man {
+  width: 5em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #000 98%, #0000) 1.7em 0.61em/.8em .8em no-repeat,
+    #ffcc00;
+  box-shadow: .2em -.6em 1.2em 0em inset rgba(0, 0, 0, 0.7);
+  animation: pac-l4 .5s infinite steps(5) alternate;
+  z-index: 999;
+}
+
+.site-preloader .point {
+  margin-top: 2em;
+  position: absolute;
+  margin-left: .4em;
+  width: 1em;
+  height: 1em;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+.dark .site-preloader .point {
+  background-color: #fff;
+}
+
+.site-preloader .p1 {
+  margin-left: 8em;
+  animation: pac-moove-p1 2s linear infinite;
+}
+
+.site-preloader .p2 {
+  margin-left: 15em;
+  animation: pac-moove-p2 2s linear infinite;
+}
+
+@keyframes pac-moove-p1 {
+  0% { margin-left: 8em; }
+  100% { margin-left: 0em; }
+}
+
+@keyframes pac-moove-p2 {
+  0% { margin-left: 16em; }
+  100% { margin-left: 8em; }
+}
+
+@keyframes pac-l4 {
+  0% {
+    clip-path: polygon(50% 50%, 100% 0, 100% 0, 0 0, 0 100%, 100% 100%, 100% 100%);
+  }
+  100% {
+    clip-path: polygon(50% 50%, 100% 65%, 100% 0, 0 0, 0 100%, 100% 100%, 100% 35%);
+  }
+}

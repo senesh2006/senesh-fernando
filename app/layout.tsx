@@ -5,6 +5,7 @@ import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { MaintenanceScreen } from "@/components/maintenance-screen"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
+import { SitePreloader } from "@/components/site/site-preloader"
 import { PROFILE } from "@/lib/profile"
 import { IMAGES } from "@/lib/images"
 import './globals.css'
@@ -74,6 +75,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${fontClasses} text-foreground`}>
+        <SitePreloader />
         <MagneticBlobCursor />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
