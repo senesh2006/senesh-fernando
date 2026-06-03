@@ -212,15 +212,15 @@ export function MagneticBlobCursor() {
           width: isHovering ? "52px" : "22px",
           height: isHovering ? "52px" : "22px",
           background: isHovering
-            ? "rgba(255, 106, 0, 0.08)"
-            : "radial-gradient(circle, #ff6a00 0%, rgba(255,106,0,0.75) 60%, rgba(255,106,0,0.3) 100%)",
-          border: isHovering ? "1.5px solid rgba(255,106,0,0.7)" : "none",
+            ? "rgba(255, 255, 255, 0.08)"
+            : "radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0.3) 100%)",
+          border: isHovering ? "1.5px solid rgba(255,255,255,0.5)" : "none",
           borderRadius: "50%",
           opacity: 0,
           backdropFilter: isHovering ? "blur(6px)" : "none",
           boxShadow: isHovering
-            ? "0 0 0 1px rgba(255,106,0,0.15), 0 0 24px rgba(255,106,0,0.2)"
-            : "0 0 12px rgba(255,106,0,0.6), 0 0 28px rgba(255,106,0,0.2)",
+            ? "0 0 0 1px rgba(255,255,255,0.1), 0 0 24px rgba(255,255,255,0.12)"
+            : "0 0 12px rgba(255,255,255,0.4), 0 0 28px rgba(255,255,255,0.15)",
           transition:
             "width 0.35s cubic-bezier(0.23,1,0.32,1), height 0.35s cubic-bezier(0.23,1,0.32,1), background 0.25s ease, box-shadow 0.25s ease, border 0.25s ease, backdrop-filter 0.25s ease",
           willChange: "transform, width, height, opacity",
@@ -234,7 +234,7 @@ export function MagneticBlobCursor() {
             fontWeight: 500,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "#ff6a00",
+            color: "#ffffff",
             opacity: isHovering && cursorText ? 1 : 0,
             transition: "opacity 0.2s ease",
             userSelect: "none",
@@ -251,7 +251,7 @@ export function MagneticBlobCursor() {
         style={{
           width: "4px",
           height: "4px",
-          background: isHovering ? "transparent" : "#ff6a00",
+          background: isHovering ? "transparent" : "#ffffff",
           borderRadius: "50%",
           opacity: 0,
           transition: "background 0.2s ease",
