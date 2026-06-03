@@ -8,7 +8,6 @@ import { MarqueeStrip } from "@/components/site/marquee-strip";
 import { ChromaGrid } from "@/components/site/ChromaGrid";
 import type { ChromaGridItem } from "@/components/site/ChromaGrid";
 import { submitContact } from "@/lib/client-api";
-import { LightspeedBackground } from "@/components/site/lightspeed-background";
 import { PROFILE } from "@/lib/profile";
 import { useState } from "react";
 import { Github, Linkedin, Twitter, GraduationCap, Mail, Phone, MapPin, FileDown } from "lucide-react";
@@ -100,9 +99,7 @@ export function ContactPage() {
       {/* HERO */}
       <section className="relative border-b border-border">
         <CursorSpotlight />
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
-          <LightspeedBackground className="absolute inset-0" />
-        </div>
+        <div className="rain-bg z-0 pointer-events-none" />
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
             <div>// contact.landing</div>
