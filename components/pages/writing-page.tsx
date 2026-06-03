@@ -7,7 +7,6 @@ import type { Post } from "@/data/posts";
 import { CursorSpotlight } from "@/components/site/cursor-spotlight";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
-import { FireParticles } from "@/components/site/FireParticles";
 
 const TAGS = ["all", "data science", "startups", "education", "hackathons", "linux"];
 
@@ -22,9 +21,7 @@ export function WritingPage({ posts }: { posts: Post[] }) {
       {/* HERO */}
       <section className="border-b border-border relative">
         <CursorSpotlight />
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <FireParticles intensity={5} />
-        </div>
+        <div className="noise-bg z-0 pointer-events-none" />
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-32 relative">
           <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
             <div>// writing.landing</div>
