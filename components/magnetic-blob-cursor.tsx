@@ -211,16 +211,12 @@ export function MagneticBlobCursor() {
         style={{
           width: isHovering ? "38px" : "12px",
           height: isHovering ? "38px" : "12px",
-          background: isHovering
-            ? "rgba(255, 255, 255, 0.06)"
-            : "rgba(255, 255, 255, 0.18)",
-          border: isHovering ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(255,255,255,0.4)",
+          background: "transparent",
+          border: "1px solid rgba(255,255,255,0.25)",
           borderRadius: "50%",
           opacity: 0,
-          backdropFilter: isHovering ? "blur(8px)" : "blur(2px)",
-          boxShadow: isHovering
-            ? "0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(255,255,255,0.06)"
-            : "0 0 8px rgba(255,255,255,0.15)",
+          backdropFilter: "blur(4px)",
+          boxShadow: "inset 0 0 8px rgba(255,255,255,0.04)",
           transition:
             "width 0.35s cubic-bezier(0.23,1,0.32,1), height 0.35s cubic-bezier(0.23,1,0.32,1), background 0.25s ease, box-shadow 0.25s ease, border 0.25s ease, backdrop-filter 0.25s ease",
           willChange: "transform, width, height, opacity",
@@ -251,7 +247,8 @@ export function MagneticBlobCursor() {
         style={{
           width: "4px",
           height: "4px",
-          background: isHovering ? "transparent" : "rgba(255,255,255,0.5)",
+          background: "transparent",
+          border: "1px solid rgba(255,255,255,0.3)",
           borderRadius: "50%",
           opacity: 0,
           transition: "background 0.2s ease",
