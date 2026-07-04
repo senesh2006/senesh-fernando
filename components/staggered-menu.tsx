@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useCallback, useLayoutEffect, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { useTheme } from 'next-themes';
 import './StaggeredMenu.css';
 
 interface StaggeredMenuItem {
@@ -18,16 +17,16 @@ interface StaggeredMenuSocialItem {
 
 export const StaggeredMenu = ({
   position = 'right',
-  colors: propColors,
+  colors = ['#B497CF', '#5227FF'],
   items = [],
   socialItems = [],
   displaySocials = true,
   displayItemNumbering = true,
   className,
   logoUrl = '/logo.svg',
-  menuButtonColor: propMenuButtonColor,
-  openMenuButtonColor: propOpenMenuButtonColor,
-  accentColor: propAccentColor,
+  menuButtonColor = '#fff',
+  openMenuButtonColor = '#fff',
+  accentColor = '#5227FF',
   changeMenuColorOnOpen = true,
   isFixed = false,
   closeOnClickAway = true,
@@ -51,21 +50,6 @@ export const StaggeredMenu = ({
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
 }) => {
-  const { theme, resolvedTheme } = useTheme();
-  const currentTheme = resolvedTheme || theme;
-  const isDark = currentTheme === 'dark';
-
-  const defaultColors = isDark ? ['#B497CF', '#5227FF'] : ['#6366f1', '#4f46e5'];
-  const colors = propColors || defaultColors;
-
-  const defaultMenuButtonColor = isDark ? '#fff' : '#000';
-  const menuButtonColor = propMenuButtonColor || defaultMenuButtonColor;
-
-  const defaultOpenMenuButtonColor = isDark ? '#fff' : '#000';
-  const openMenuButtonColor = propOpenMenuButtonColor || defaultOpenMenuButtonColor;
-
-  const defaultAccentColor = isDark ? '#5227FF' : '#4f46e5';
-  const accentColor = propAccentColor || defaultAccentColor;
 
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
