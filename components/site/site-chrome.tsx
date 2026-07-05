@@ -6,7 +6,6 @@ import { useEffect, useState } from "react"
 import { BackgroundFX } from "@/components/site/background-fx"
 import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
 import { ChatBot } from "@/components/site/chat-bot"
-import { StaggeredMenu } from "@/components/staggered-menu"
 import { recordVisitor } from "@/lib/client-api"
 import { ConversationProvider } from "@elevenlabs/react"
 
@@ -137,37 +136,12 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
   const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
 
-  const menuItems = NAV.map((n) => ({
-    label: n.label,
-    ariaLabel: `Go to ${n.label} page`,
-    link: n.href,
-  }))
-
-  const socialItems = [
-    { label: 'GitHub', link: 'https://github.com/senesh2006' },
-    { label: 'LinkedIn', link: 'https://linkedin.com/in/seneshfernando' },
-  ]
-
   return (
     <ConversationProvider agentId={agentId}>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
         <MagneticBlobCursor />
         <BackgroundFX />
         <TopBar theme={theme} toggle={toggle} pathname={pathname} />
-        <StaggeredMenu
-          position="right"
-          items={menuItems}
-          socialItems={socialItems}
-          displaySocials={true}
-          displayItemNumbering={true}
-          menuButtonColor={theme === "dark" ? "#fff" : "#000"}
-          openMenuButtonColor={theme === "dark" ? "#fff" : "#000"}
-          changeMenuColorOnOpen={true}
-          colors={theme === "dark" ? ['#B497CF', '#5227FF'] : ['#6366f1', '#4f46e5']}
-          accentColor={theme === "dark" ? "#5227FF" : "#4f46e5"}
-          isFixed={true}
-          closeOnClickAway={true}
-        />
         <main key={pathname} className="flex-1 w-full animate-fade-in">
           {children}
         </main>
@@ -203,7 +177,19 @@ function TopBar({
           <span className="font-semibold">senesh.fernando</span>
           <span className="text-muted-foreground hidden sm:inline">~/portfolio</span>
         </Link>
-        <div className="flex items-center gap-2">
+        <nav className="flex items-center gap-1">
+          {NAV.map((n) => {
+            const active = pathname === n.href || (n.href !== "/" && pathname.startsWith(n.href))
+            return (
+              <Link
+                key={n.href}
+                href={n.href}
+                className={`px-2 py-0.5 rounded-sm link-hover ${active ? "bg-foreground text-background" : "text-muted-foreground"}`}
+              >
+                {n.label}
+              </Link>
+            )
+          })}
           <a
             href="/Senesh_Fernando_CV.pdf"
             target="_blank"
@@ -215,12 +201,12 @@ function TopBar({
           <button
             onClick={toggle}
             aria-label="Toggle theme"
-            className="px-2 py-0.5 rounded-sm link-hover text-muted-foreground"
+            className="ml-2 px-2 py-0.5 rounded-sm link-hover text-muted-foreground"
             title="Toggle theme (t)"
           >
             [{theme === "dark" ? "dark" : "light"}]
           </button>
-        </div>
+        </nav>
       </div>
     </header>
   )
