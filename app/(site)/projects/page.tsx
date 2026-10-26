@@ -5,10 +5,10 @@ import { IMAGES } from "@/lib/images"
 
 export const metadata: Metadata = {
   title: "Projects — Senesh Fernando",
-  description: "Selected open source, client work, and experiments by Senesh Fernando.",
+  description: "Projects by Senesh Fernando — data tools, CarbonWise, teaching resources, and full-stack experiments.",
   openGraph: {
     title: "Projects — Senesh Fernando",
-    description: "Selected open source, client work, and experiments.",
+    description: "Projects by Senesh Fernando — data tools, CarbonWise, teaching resources, and full-stack experiments.",
     images: [IMAGES.projectsHero],
   },
 }

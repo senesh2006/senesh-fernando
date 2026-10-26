@@ -6,10 +6,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const posts = await getPosts()
   return {
     title: "Writing — Senesh Fernando",
-    description: "Field notes on software, design systems, performance, and shipping fast.",
+    description: "Essays by Senesh Fernando on data, sustainability, teaching, and learning in public.",
     openGraph: {
       title: "Writing — Senesh Fernando",
-      description: "Field notes on software, design systems, performance, and shipping fast.",
+      description: "Essays by Senesh Fernando on data, sustainability, teaching, and learning in public.",
       images: posts[0]?.cover ? [posts[0].cover] : undefined,
     },
   }

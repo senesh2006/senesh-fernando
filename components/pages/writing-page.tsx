@@ -1,222 +1,146 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { useReveal } from "@/hooks/use-reveal";
-import type { Post } from "@/data/posts";
-import { CursorSpotlight } from "@/components/site/cursor-spotlight";
-import { ScrollProgress } from "@/components/site/scroll-progress";
-import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
-
-const TAGS = ["all", "data science", "startups", "education", "hackathons", "linux"];
+import Link from "next/link"
+import { useMemo, useState } from "react"
+import type { Post } from "@/data/posts"
+import { LikeButton } from "@/components/animate-ui/components/buttons/like-button"
+import {
+  Container,
+  CoverImage,
+  Eyebrow,
+  GhostLink,
+  PrimaryLink,
+  Reveal,
+  TextArrow,
+} from "@/components/site/redesign/ui"
 
 export function WritingPage({ posts }: { posts: Post[] }) {
-  useReveal();
-  const [featured, ...rest] = posts;
+  const tags = useMemo(() => ["all", ...Array.from(new Set(posts.map((post) => post.tag)))], [posts])
+  const [active, setActive] = useState("all")
+  const visible = active === "all" ? posts : posts.filter((post) => post.tag === active)
+  const [featured, ...rest] = visible
+  const minutes = posts.reduce((sum, post) => sum + (parseInt(post.read, 10) || 0), 0)
 
   return (
     <>
-      <ScrollProgress />
-
-      {/* HERO */}
-      <section className="border-b border-border relative">
-        <CursorSpotlight />
-        <div className="noise-bg z-0 pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-32 relative">
-          <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
-            <div>// writing.landing</div>
-            <div>[MODE: READING] · {posts.length} essays · est. {posts.reduce((s, p) => s + parseInt(p.read), 0)} min total</div>
-          </div>
-
-          {/* Main heading — isolated */}
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95] max-w-5xl">
-            <span className="caret">Field notes.</span>
-          </h1>
-
-          {/* Description — clearly separated, smaller, secondary */}
-          <div className="mt-10 grid md:grid-cols-12 gap-6 items-start animate-fade-in-up">
-            <div className="md:col-span-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground pt-1">
-              ▍ desc
-            </div>
-            <p className="md:col-span-7 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl">
-              A decade of shipping software the slow, honest way. Essays on
-              design systems, the modern web platform, performance budgets,
-              and the unglamorous middle of building things — no newsletters,
-              no popups, just text and the occasional photo.
-            </p>
-          </div>
-
-          <div className="mt-10 flex flex-wrap gap-2 font-mono text-xs">
-            {TAGS.map((t) => (
-              <a key={t} href={`#${t}`} className="px-3 py-1.5 border border-border rounded-full link-hover">
-                # {t}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Marquee strip */}
-        <div className="overflow-hidden border-t border-border bg-secondary/40">
-          <div className="marquee-track flex gap-12 whitespace-nowrap py-3 font-mono text-xs text-muted-foreground">
-            {[...Array(2)].map((_, dup) => (
-              <div key={dup} className="flex gap-12 shrink-0">
-                {["♪ deficit — mindvacy", "press ? for shortcuts", "j / k to scroll", "g w for writing index", "[MODE: READING]", "© senesh fernando", "no analytics. no cookies.", "rss available"].map((s) => (
-                  <span key={s} className="flex items-center gap-3"><span>•</span>{s}</span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURED */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
-        <SectionHeader
-          tag="// featured.essay"
-          title="Featured."
-          desc="The current pick — the one I'd hand someone if they only had ten minutes."
-          image={posts[1]?.cover}
-        />
-        <Link
-          href={`/writing/${featured.slug}`}
-          className="group block grid md:grid-cols-2 gap-8 md:gap-12 items-center mt-8"
-        >
-          <div className="aspect-[4/3] overflow-hidden rounded-md bg-secondary relative">
-            <img
-              src={featured.cover}
-              alt={featured.title}
-              width={1600}
-              height={1000}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-            />
-            <div className="absolute top-3 left-3 font-mono text-[10px] uppercase tracking-widest bg-background/80 backdrop-blur px-2 py-1 rounded-sm">
-              ↗ read essay
-            </div>
-          </div>
-          <div>
-            <div className="font-mono text-xs text-muted-foreground mb-3">{featured.date} · {featured.tag} · {featured.read}</div>
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">
-              <span className="story-link">{featured.title}</span>
-            </h2>
-            <p className="mt-4 text-muted-foreground leading-relaxed">{featured.dek}</p>
-            <div className="mt-6 flex items-center gap-3">
-              <div className="font-mono text-xs text-muted-foreground">→ continue reading</div>
-              <LikeButton id={featured.slug} type="blogs" size="sm" />
-            </div>
-          </div>
-        </Link>
-      </section>
-
-      {/* ARCHIVE GRID */}
-      <section id="all" className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <SectionHeader
-          tag="// archive.all"
-          title="Archive."
-          desc="Everything else, newest first. Skim the tags, open whatever catches the eye."
-          image={posts[2]?.cover}
-          right={<span className="font-mono text-xs text-muted-foreground">{rest.length} more</span>}
-        />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 stagger mt-8">
-          {rest.map((p, i) => (
-            <div key={p.slug} className="group block">
-              <Link href={`/writing/${p.slug}`}>
-                <div className="aspect-[4/3] overflow-hidden rounded-md bg-secondary mb-4 relative">
-                  <img
-                    src={p.cover}
-                    alt={p.title}
-                    width={1600}
-                    height={1000}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                  />
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-300" />
-                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between font-mono text-[10px] uppercase tracking-widest text-background opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                    <span className="bg-foreground px-2 py-1 rounded-sm">0{i + 2}</span>
-                    <span className="bg-foreground px-2 py-1 rounded-sm">read ↗</span>
-                  </div>
-                </div>
-              </Link>
-              <div className="font-mono text-[11px] text-muted-foreground mb-2 flex justify-between items-center">
-                <div className="flex gap-2 items-center">
-                  <span>{p.date}</span>
-                  <span>·</span>
-                  <span># {p.tag}</span>
-                  <span>·</span>
-                  <span>{p.read}</span>
-                </div>
-                <LikeButton id={p.slug} type="blogs" size="sm" variant="ghost" />
-              </div>
-              <Link href={`/writing/${p.slug}`}>
-                <h3 className="text-lg font-semibold leading-snug">
-                  <span className="story-link">{p.title}</span>
-                </h3>
-              </Link>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed line-clamp-2">{p.dek}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-32 sm:mt-40 reveal">
-        <div className="border-t border-b border-border py-16 text-center">
-          <div className="font-mono text-xs text-muted-foreground mb-4">// end.of.feed</div>
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight">
-            That's everything, for now.
-          </h2>
-          <p className="mt-4 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-            New essays land roughly once a month. Subscribe by RSS or just bookmark this page — the URL won't change.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
-            <a href="/rss.xml" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ rss feed</a>
-            <Link href="/contact" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ get in touch</Link>
-          </div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function SectionHeader({
-  tag,
-  title,
-  desc,
-  image,
-  right,
-}: {
-  tag: string;
-  title: string;
-  desc: string;
-  image?: string;
-  right?: ReactNode;
-}) {
-  return (
-    <div className="border-b border-border pb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="font-mono text-xs text-muted-foreground">{tag}</div>
-        {right}
-      </div>
-      <div className="grid md:grid-cols-12 gap-6 items-end">
-        {image && (
-          <div className="md:col-span-2 hidden md:block">
-            <div className="aspect-square overflow-hidden rounded-md bg-secondary">
-              <img
-                src={image}
-                alt=""
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out hover:scale-[1.08]"
-              />
-            </div>
-          </div>
-        )}
-        <h2 className={`${image ? "md:col-span-6" : "md:col-span-8"} text-4xl sm:text-5xl font-semibold tracking-tight leading-[1]`}>
-          {title}
-        </h2>
-        <p className="md:col-span-4 text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-sm">
-          {desc}
+      <Container as="section" className="pb-10 pt-28 sm:pt-36">
+        <Eyebrow>
+          {posts.length} essays · about {minutes} min
+        </Eyebrow>
+        <h1 className="mt-4 text-[clamp(3.2rem,12vw,6.5rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
+          Field notes
+          <span className="font-serif font-normal italic text-muted-foreground">.</span>
+        </h1>
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Notes from studying IT at Curtin, co-founding CarbonWise, tutoring C and data structures, and figuring out
+          how data becomes a decision someone can actually use.
         </p>
-      </div>
-    </div>
-  );
+        <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Filter essays">
+          {tags.map((tag) => {
+            const selected = tag === active
+            return (
+              <button
+                key={tag}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setActive(tag)}
+                className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm capitalize ${
+                  selected ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground"
+                }`}
+              >
+                {tag}
+              </button>
+            )
+          })}
+        </div>
+      </Container>
+
+      {featured ? (
+        <Container as="section" className="pb-16">
+          <Reveal>
+            <Eyebrow>Featured</Eyebrow>
+            <Link href={`/writing/${featured.slug}`} className="group mt-6 grid items-center gap-8 lg:grid-cols-2">
+              <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
+                <div className="aspect-[16/10]">
+                  <CoverImage
+                    src={featured.cover}
+                    alt={featured.title}
+                    className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.04]"
+                  />
+                </div>
+              </div>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                  {featured.date} · {featured.tag} · {featured.read}
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                  <TextArrow>{featured.title}</TextArrow>
+                </h2>
+                <p className="mt-4 leading-relaxed text-muted-foreground">{featured.dek}</p>
+                <div className="mt-6">
+                  <LikeButton id={featured.slug} type="blogs" size="sm" />
+                </div>
+              </div>
+            </Link>
+          </Reveal>
+        </Container>
+      ) : (
+        <Container as="section" className="pb-16">
+          <p className="text-muted-foreground">No essays in this category yet.</p>
+        </Container>
+      )}
+
+      {rest.length > 0 && (
+        <Container as="section" id="all" className="pb-16">
+          <Reveal>
+            <div className="flex items-end justify-between">
+              <Eyebrow>Archive</Eyebrow>
+              <p className="font-mono text-xs text-muted-foreground">{rest.length} more</p>
+            </div>
+            <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((post) => (
+                <article key={post.slug} className="group">
+                  <Link href={`/writing/${post.slug}`} className="block overflow-hidden rounded-2xl border border-border bg-secondary">
+                    <div className="aspect-[4/3]">
+                      <CoverImage
+                        src={post.cover}
+                        alt={post.title}
+                        className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.04]"
+                      />
+                    </div>
+                  </Link>
+                  <div className="mt-4 flex items-start justify-between gap-3">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {post.date} · {post.tag} · {post.read}
+                    </p>
+                    <LikeButton id={post.slug} type="blogs" size="sm" variant="ghost" />
+                  </div>
+                  <h3 className="mt-2 text-lg font-semibold leading-snug">
+                    <Link href={`/writing/${post.slug}`}>{post.title}</Link>
+                  </h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.dek}</p>
+                </article>
+              ))}
+            </div>
+          </Reveal>
+        </Container>
+      )}
+
+      <Container as="section" className="pb-8">
+        <Reveal>
+          <div className="rounded-[2rem] border border-border px-6 py-14 text-center">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">That&apos;s the journal, for now.</h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Essays on data, sustainability, teaching, and the things I&apos;m still learning.
+            </p>
+            <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
+              <PrimaryLink href="/contact">Get in touch</PrimaryLink>
+              <GhostLink href="/about">About</GhostLink>
+            </div>
+          </div>
+        </Reveal>
+      </Container>
+    </>
+  )
 }

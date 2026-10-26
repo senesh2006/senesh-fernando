@@ -2,23 +2,27 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { BackgroundFX } from "@/components/site/background-fx"
-import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
+import { useEffect, useId, useRef, useState } from "react"
+import { Menu, X, Moon, Sun } from "lucide-react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ChatBot } from "@/components/site/chat-bot"
 import { recordVisitor } from "@/lib/client-api"
+import { PROFILE } from "@/lib/profile"
 import { ConversationProvider } from "@elevenlabs/react"
+import { cn } from "@/lib/utils"
 
 const NAV = [
-  { href: "/", label: "index", key: "h" },
-  { href: "/about", label: "about", key: "a" },
-  { href: "/projects", label: "projects", key: "p" },
-  { href: "/writing", label: "writing", key: "w" },
-  { href: "/contact", label: "contact", key: "c" },
+  { href: "/", label: "Home", key: "h" },
+  { href: "/projects", label: "Work", key: "p" },
+  { href: "/about", label: "About", key: "a" },
+  { href: "/writing", label: "Writing", key: "w" },
+  { href: "/contact", label: "Contact", key: "c" },
 ] as const
 
+const MENU_NAV = NAV.filter((item) => item.href !== "/")
+
 function useTheme() {
-  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [theme, setTheme] = useState<"light" | "dark">("dark")
   useEffect(() => {
     const apply = () =>
       setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light")
@@ -26,7 +30,7 @@ function useTheme() {
     const onStorage = (e: StorageEvent) => {
       if (e.key === "theme") {
         const v = e.newValue
-        document.documentElement.classList.toggle("dark", v === "dark")
+        document.documentElement.classList.toggle("dark", v !== "light")
         apply()
       }
     }
@@ -49,8 +53,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { theme, toggle } = useTheme()
   const [helpOpen, setHelpOpen] = useState(false)
-  const [mode, setMode] = useState<"VISITOR" | "EXPLORING" | "READING">("VISITOR")
+  const [menuOpen, setMenuOpen] = useState(false)
   const [visitorCount, setVisitorCount] = useState<number | null>(null)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const reduce = useReducedMotion()
 
   useEffect(() => {
     recordVisitor()
@@ -59,10 +65,15 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (pathname === "/") setMode("VISITOR")
-    else if (pathname.startsWith("/writing")) setMode("READING")
-    else setMode("EXPLORING")
+    setMenuOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : ""
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [menuOpen])
 
   useEffect(() => {
     let buffer = ""
@@ -78,8 +89,15 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     }
 
     const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setHelpOpen(false)
+        setMenuOpen(false)
+        clearBuf()
+        return
+      }
       if (e.metaKey || e.ctrlKey || e.altKey) return
       if (isTyping(e.target)) return
+      if (menuOpen) return
       const k = e.key
 
       if (k === "?") {
@@ -87,17 +105,12 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         setHelpOpen((v) => !v)
         return
       }
-      if (k === "Escape") {
-        setHelpOpen(false)
-        clearBuf()
-        return
-      }
       if (k === "j") {
-        window.scrollBy({ top: 120, behavior: "smooth" })
+        window.scrollBy({ top: 120, behavior: reduce ? "auto" : "smooth" })
         return
       }
       if (k === "k") {
-        window.scrollBy({ top: -120, behavior: "smooth" })
+        window.scrollBy({ top: -120, behavior: reduce ? "auto" : "smooth" })
         return
       }
       if (k === "t") {
@@ -123,146 +136,321 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     }
     document.addEventListener("keydown", handler)
     return () => document.removeEventListener("keydown", handler)
-  }, [router, toggle])
-
-  const [nodeId, setNodeId] = useState<string>("------")
-  const [now, setNow] = useState<Date | null>(null)
-  useEffect(() => {
-    setNodeId(Math.random().toString(36).slice(2, 8).toUpperCase())
-    setNow(new Date())
-    const id = setInterval(() => setNow(new Date()), 30_000)
-    return () => clearInterval(id)
-  }, [])
+  }, [router, toggle, menuOpen, reduce])
 
   const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
 
   return (
     <ConversationProvider agentId={agentId}>
-      <div className="min-h-screen flex flex-col bg-background text-foreground">
-        <MagneticBlobCursor />
-        <BackgroundFX />
-        <TopBar theme={theme} toggle={toggle} pathname={pathname} />
-        <main key={pathname} className="flex-1 w-full animate-fade-in">
-          {children}
-        </main>
-        <MetaFooter
+      <div className="site-shell relative flex min-h-screen flex-col text-foreground">
+        <a href="#content" className="skip-link">
+          Skip to content
+        </a>
+        <Header
           pathname={pathname}
           theme={theme}
-          mode={mode}
-          nodeId={nodeId}
-          now={now}
-          visitorCount={visitorCount}
+          toggle={toggle}
+          menuOpen={menuOpen}
+          onMenu={() => setMenuOpen((v) => !v)}
+          menuButtonRef={menuButtonRef}
         />
-        <ChatBot />
+        <MobileMenu
+          open={menuOpen}
+          pathname={pathname}
+          onClose={() => {
+            setMenuOpen(false)
+            menuButtonRef.current?.focus()
+          }}
+        />
+        <main id="content" key={pathname} className="flex-1" aria-hidden={menuOpen} inert={menuOpen}>
+          {children}
+        </main>
+        <SiteFooter visitorCount={visitorCount} onHelp={() => setHelpOpen(true)} hidden={menuOpen} />
+        <div aria-hidden={menuOpen} inert={menuOpen}>
+          <ChatBot />
+        </div>
         {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
       </div>
     </ConversationProvider>
   )
 }
 
-function TopBar({
+function Header({
+  pathname,
   theme,
   toggle,
-  pathname,
+  menuOpen,
+  onMenu,
+  menuButtonRef,
 }: {
+  pathname: string
   theme: string
   toggle: () => void
-  pathname: string
+  menuOpen: boolean
+  onMenu: () => void
+  menuButtonRef: React.RefObject<HTMLButtonElement | null>
 }) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
   return (
-    <header className="border-b border-border sticky top-0 z-30 bg-background/85 backdrop-blur">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 flex items-center justify-between h-12 font-mono text-xs">
-        <Link href="/" className="flex items-center gap-2 link-hover px-1.5 py-0.5 rounded-sm">
-          <span className="text-muted-foreground">$</span>
-          <span className="font-semibold">senesh.fernando</span>
-          <span className="text-muted-foreground hidden sm:inline">~/portfolio</span>
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-[70] transition-colors",
+        scrolled || menuOpen
+          ? "border-b border-border bg-background/80 backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent",
+      )}
+    >
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
+        <Link href="/" className="min-h-11 inline-flex items-center text-sm font-semibold tracking-tight">
+          Senesh
+          <span className="ml-1 hidden font-serif text-base font-normal italic text-muted-foreground sm:inline">
+            Fernando
+          </span>
         </Link>
-        <nav className="flex items-center gap-1">
-          {NAV.map((n) => {
-            const active = pathname === n.href || (n.href !== "/" && pathname.startsWith(n.href))
+
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+          {MENU_NAV.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
               <Link
-                key={n.href}
-                href={n.href}
-                className={`px-2 py-0.5 rounded-sm link-hover ${active ? "bg-foreground text-background" : "text-muted-foreground"}`}
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "inline-flex min-h-11 items-center rounded-full px-3.5 text-sm transition-colors",
+                  active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+                )}
               >
-                {n.label}
+                {item.label}
               </Link>
             )
           })}
+        </nav>
+
+        <div className="flex items-center gap-1.5">
           <a
             href="/Senesh_Fernando_CV.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-2 py-0.5 rounded-sm link-hover text-muted-foreground"
+            className="hidden min-h-11 items-center rounded-full border border-border px-4 text-sm hover:bg-secondary md:inline-flex"
           >
             CV
           </a>
           <button
+            type="button"
             onClick={toggle}
-            aria-label="Toggle theme"
-            className="ml-2 px-2 py-0.5 rounded-sm link-hover text-muted-foreground"
-            title="Toggle theme (t)"
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border hover:bg-secondary"
           >
-            [{theme === "dark" ? "dark" : "light"}]
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-        </nav>
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border md:hidden"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            onClick={onMenu}
+          >
+            <span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
     </header>
   )
 }
 
-function MetaFooter({
+function MobileMenu({
+  open,
   pathname,
-  theme,
-  mode,
-  nodeId,
-  now,
-  visitorCount,
+  onClose,
 }: {
+  open: boolean
   pathname: string
-  theme: string
-  mode: string
-  nodeId: string
-  now: Date | null
-  visitorCount: number | null
+  onClose: () => void
 }) {
-  const t = now ? now.toISOString().slice(0, 19).replace("T", " ") : "----.--.-- --:--:--"
-  const year = now ? now.getFullYear() : "----"
+  const reduce = useReducedMotion()
+  const titleId = useId()
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const node = panelRef.current
+    const focusable = node?.querySelectorAll<HTMLElement>("a, button")
+    focusable?.[0]?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !node) return
+      const items = node.querySelectorAll<HTMLElement>("a, button")
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [open])
+
   return (
-    <footer className="border-t border-border mt-24">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 font-mono text-[11px] text-muted-foreground space-y-3">
-        <div className="text-foreground">// meta.footer</div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-6">
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          id="mobile-nav"
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          className="fixed inset-0 z-[60] flex flex-col bg-background px-5 pt-20 pb-8 md:hidden"
+          initial={reduce ? false : { opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduce ? { opacity: 1 } : { opacity: 0, y: -8 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p id={titleId} className="sr-only">
+            Site menu
+          </p>
+          <nav className="flex flex-1 flex-col justify-center gap-1" aria-label="Mobile">
+            {MENU_NAV.map((item, index) => {
+              const active = pathname === item.href || pathname.startsWith(item.href + "/")
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  aria-current={active ? "page" : undefined}
+                  className="flex min-h-14 items-baseline justify-between border-b border-border py-2"
+                >
+                  <span className={cn("text-4xl font-semibold tracking-tight", active && "font-serif italic")}>
+                    {item.label}
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">0{index + 1}</span>
+                </Link>
+              )
+            })}
+          </nav>
+          <div className="mt-8 space-y-4">
+            <a
+              href="/Senesh_Fernando_CV.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-foreground text-sm font-medium text-background"
+            >
+              Download CV
+            </a>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+              <a className="inline-flex min-h-11 items-center underline-offset-4 hover:underline" href={PROFILE.github}>
+                GitHub
+              </a>
+              <a className="inline-flex min-h-11 items-center underline-offset-4 hover:underline" href={PROFILE.linkedin}>
+                LinkedIn
+              </a>
+              <a className="inline-flex min-h-11 items-center" href={`mailto:${PROFILE.email}`}>
+                {PROFILE.email}
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function SiteFooter({
+  visitorCount,
+  onHelp,
+  hidden,
+}: {
+  visitorCount: number | null
+  onHelp: () => void
+  hidden?: boolean
+}) {
+  const year = new Date().getFullYear()
+  return (
+    <footer className="mt-8 border-t border-border pb-28" aria-hidden={hidden} inert={hidden}>
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:px-8 md:grid-cols-12">
+        <div className="md:col-span-6">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Contact</p>
+          <a
+            href={`mailto:${PROFILE.email}`}
+            className="mt-4 block break-all text-3xl font-semibold tracking-tight sm:text-5xl"
+          >
+            {PROFILE.email}
+          </a>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
+            {PROFILE.location}. {PROFILE.phoneDisplay}. Open to collaborations in tech, education, and AI.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-8 md:col-span-6 md:grid-cols-3">
           <div>
-            <span className="text-foreground/60">node.</span> {nodeId}
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Navigate</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {MENU_NAV.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="inline-flex min-h-11 items-center hover:text-accent">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
           <div>
-            <span className="text-foreground/60">mode.</span> [MODE: {mode}]
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Elsewhere</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <a className="inline-flex min-h-11 items-center" href={PROFILE.github}>
+                  GitHub
+                </a>
+              </li>
+              <li>
+                <a className="inline-flex min-h-11 items-center" href={PROFILE.linkedin}>
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a className="inline-flex min-h-11 items-center" href="https://x.com/SeneshF">
+                  X
+                </a>
+              </li>
+              <li>
+                <a
+                  className="inline-flex min-h-11 items-center"
+                  href="https://scholar.google.com/citations?user=BQ7naRAAAAAJ&hl=en"
+                >
+                  Google Scholar
+                </a>
+              </li>
+            </ul>
           </div>
-          <div>
-            <span className="text-foreground/60">path.</span> {pathname}
-          </div>
-          <div>
-            <span className="text-foreground/60">theme.</span> {theme}
-          </div>
-          <div>
-            <span className="text-foreground/60">time.</span> {t} UTC
-          </div>
-          <div>
-            <span className="text-foreground/60">views.</span> {visitorCount ?? "—"}
-          </div>
-          <div>
-            <span className="text-foreground/60">audio.</span> ♪ deficit — mindvacy
-          </div>
-          <div className="col-span-2">
-            <span className="text-foreground/60">cmd.</span> press <span className="kbd">?</span> for
-            shortcuts
+          <div className="col-span-2 md:col-span-1">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Visit</p>
+            <p className="mt-3 text-sm leading-relaxed">{PROFILE.address}</p>
+            <p className="text-sm text-muted-foreground">{PROFILE.location}</p>
+            <a className="mt-2 inline-flex min-h-11 items-center text-sm" href={`tel:${PROFILE.phone}`}>
+              {PROFILE.phoneDisplay}
+            </a>
           </div>
         </div>
-        <div className="pt-4 border-t border-border flex flex-wrap justify-between gap-3">
-          <span>© {year} Senesh Fernando — all rights reserved.</span>
-          <span>built minimal · zero dependencies · v1.0.0</span>
+      </div>
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-border px-5 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <p>© {year} Senesh Fernando. All rights reserved.</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span>{visitorCount == null ? "—" : visitorCount.toLocaleString()} views</span>
+          <button type="button" onClick={onHelp} className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+            Keyboard shortcuts
+          </button>
         </div>
       </div>
     </footer>
@@ -274,41 +462,41 @@ function HelpOverlay({ onClose }: { onClose: () => void }) {
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby="shortcut-title"
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-background/70 p-4 backdrop-blur-sm sm:items-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg border border-border bg-card text-card-foreground rounded-md p-6 font-mono text-sm shadow-lg"
+        className="w-full max-w-md rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-2xl"
       >
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-foreground">// keyboard.shortcuts</span>
-          <button onClick={onClose} className="text-muted-foreground link-hover px-1.5 rounded-sm">
-            [esc]
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <h2 id="shortcut-title" className="text-lg font-semibold tracking-tight">
+            Keyboard shortcuts
+          </h2>
+          <button type="button" onClick={onClose} className="inline-flex min-h-11 items-center text-sm text-muted-foreground">
+            Close
           </button>
         </div>
-        <ul className="space-y-2 text-xs">
+        <ul className="space-y-2 text-sm">
           {[
-            ["j", "scroll down"],
-            ["k", "scroll up"],
-            ["g h", "go home"],
-            ["g a", "go about"],
-            ["g p", "go projects"],
-            ["g w", "go writing"],
-            ["g c", "go contact"],
-            ["t", "toggle theme"],
-            ["?", "toggle this help"],
+            ["j", "Scroll down"],
+            ["k", "Scroll up"],
+            ["g h", "Go home"],
+            ["g a", "Go about"],
+            ["g p", "Go projects"],
+            ["g w", "Go writing"],
+            ["g c", "Go contact"],
+            ["t", "Toggle theme"],
+            ["?", "Toggle this help"],
           ].map(([k, label]) => (
-            <li key={k} className="flex justify-between border-b border-border/60 pb-1">
-              <span className="text-muted-foreground">{label}</span>
-              <span>
-                {k.split(" ").map((c, i) => (
-                  <span key={i}>
-                    <span className="kbd">{c}</span>
-                    {i < k.split(" ").length - 1 && (
-                      <span className="mx-1 text-muted-foreground">then</span>
-                    )}
-                  </span>
+            <li key={k} className="flex items-center justify-between gap-4 border-b border-border/70 py-2">
+              <span>{label}</span>
+              <span className="flex items-center gap-1">
+                {k.split(" ").map((part) => (
+                  <kbd key={part} className="kbd">
+                    {part}
+                  </kbd>
                 ))}
               </span>
             </li>

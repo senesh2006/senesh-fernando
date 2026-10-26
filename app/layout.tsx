@@ -4,8 +4,6 @@ import { Instrument_Serif, DM_Mono } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/next'
 import { MaintenanceScreen } from "@/components/maintenance-screen"
-import { MagneticBlobCursor } from "@/components/magnetic-blob-cursor"
-import { SitePreloader } from "@/components/site/site-preloader"
 import { PROFILE } from "@/lib/profile"
 import { IMAGES } from "@/lib/images"
 import './globals.css'
@@ -48,7 +46,7 @@ export const metadata: Metadata = {
   },
 }
 
-const themeScript = `(function(){try{var s=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||(!s&&m)){document.documentElement.classList.add('dark');}}catch(e){}})();`
+const themeScript = `(function(){try{var s=localStorage.getItem('theme');if(s!=='light'){document.documentElement.classList.add('dark');}}catch(e){document.documentElement.classList.add('dark');}})();`
 
 export default async function RootLayout({
   children,
@@ -75,8 +73,6 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${fontClasses} text-foreground`}>
-        <SitePreloader />
-        <MagneticBlobCursor />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

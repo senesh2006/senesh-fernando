@@ -168,6 +168,15 @@ export function ChatBot() {
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || ""
+  const [compact, setCompact] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    const apply = () => setCompact(mq.matches)
+    apply()
+    mq.addEventListener("change", apply)
+    return () => mq.removeEventListener("change", apply)
+  }, [])
 
   // Initialize ElevenLabs Conversation
   const conversation = useConversation({
@@ -179,7 +188,12 @@ export function ChatBot() {
     },
     onError: (err) => {
       console.error("ElevenLabs Error Details:", err)
-      const message = typeof err === 'string' ? err : err.message || "Failed to connect to voice agent."
+      const message =
+        typeof err === "string"
+          ? err
+          : err && typeof err === "object" && "message" in err
+            ? String((err as { message?: unknown }).message)
+            : "Failed to connect to voice agent."
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: `ElevenLabs Error: ${message}. Switching to fallback...` }
@@ -278,8 +292,8 @@ export function ChatBot() {
     }),
     [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, assemblyVoice, voiceProvider, agentId]
   )
-return (
-  <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
+  return (
+  <div className="fixed bottom-4 right-4 z-50 flex items-center justify-end sm:bottom-6 sm:right-6">
     <motion.div
       ref={wrapperRef}
       className={cn(
@@ -288,8 +302,8 @@ return (
       )}
       initial={false}
       animate={{
-        width: showForm ? FORM_WIDTH : 140,
-        height: showForm ? FORM_HEIGHT : 48,
+        width: showForm ? (compact ? 340 : FORM_WIDTH) : compact ? 48 : 140,
+        height: showForm ? (compact ? 460 : FORM_HEIGHT) : 48,
         borderRadius: showForm ? 16 : 24,
       }}
       transition={{
@@ -315,11 +329,11 @@ function DockBar() {
   return (
     <button
       onClick={triggerOpen}
-      className="flex h-full w-full items-center gap-2.5 px-4 font-mono text-[11px] uppercase tracking-wider text-foreground/80"
+      className="flex h-full w-full items-center gap-2.5 px-4 text-sm font-medium text-foreground"
     >
       <ColorOrb dimension="20px" tones={{ base: "oklch(20% 0 0)" }} />
-      <span>Ask AI</span>
-      <Sparkles className="h-3 w-3 ml-auto text-amber-500" />
+      <span className="hidden sm:inline">Ask AI</span>
+      <Sparkles className="ml-auto hidden h-3 w-3 text-amber-500 sm:block" />
     </button>
   )
 }

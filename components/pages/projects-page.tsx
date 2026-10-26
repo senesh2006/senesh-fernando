@@ -1,138 +1,135 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useReveal } from "@/hooks/use-reveal";
-import { CursorSpotlight } from "@/components/site/cursor-spotlight";
-import { ScrollProgress } from "@/components/site/scroll-progress";
-import { MarqueeStrip } from "@/components/site/marquee-strip";
-import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
-import type { Project } from "@/data/projects";
-import { RetroGrid } from "@/components/ui/retro-grid";
+import Link from "next/link"
+import type { Project } from "@/data/projects"
+import { LikeButton } from "@/components/animate-ui/components/buttons/like-button"
+import {
+  Container,
+  CoverImage,
+  Eyebrow,
+  GhostLink,
+  PrimaryLink,
+  Reveal,
+  TextArrow,
+} from "@/components/site/redesign/ui"
 
 export function ProjectsPage({ projects }: { projects: Project[] }) {
-  useReveal();
-  const [featured, ...rest] = projects;
+  const [featured, ...rest] = projects
+
   return (
     <>
-      <ScrollProgress />
+      <Container as="section" className="pb-12 pt-28 sm:pb-16 sm:pt-36">
+        <Eyebrow>{projects.length} projects</Eyebrow>
+        <h1 className="mt-4 max-w-4xl text-[clamp(3rem,11vw,6.25rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
+          Things I&apos;ve built,
+          <span className="block font-serif font-normal italic text-muted-foreground">and stand behind.</span>
+        </h1>
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Data tools, sustainability reporting, teaching resources, and full-stack experiments. Each one started with
+          a real problem and a reason to ship it.
+        </p>
+      </Container>
 
-      {/* HERO */}
-      <section className="relative border-b border-border">
-        <CursorSpotlight />
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <RetroGrid angle={65} cellSize={55} opacity={0.4} />
-        </div>
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 relative">
-          <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
-            <div>// projects.landing</div>
-            <div>[MODE: EXPLORING] · {projects.length} projects · est. 10 yrs of work</div>
-          </div>
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95] max-w-5xl">
-            <span className="caret">Things i've built,</span>
-            <span className="block text-muted-foreground">and stand behind.</span>
-          </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed animate-fade-in-up">
-            A mix of open-source libraries, design experiments, and client
-            projects. Each one is built around a single sharp question and
-            shipped only after it earned the shipping.
-          </p>
-        </div>
-        <MarqueeStrip items={[
-          "TypeScript", "React", "TanStack", "Node", "Postgres", "Redis",
-          "Cloudflare", "Tailwind CSS", "CSS variables", "Vite", "Bun", "Rust",
-        ]} />
-      </section>
-
-      {/* FEATURED PROJECT */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// featured.project</div>
-        <article className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <Link href={`/projects/${featured.slug}`} className="group aspect-[4/3] overflow-hidden rounded-md bg-secondary relative block">
-            <img
-              src={featured.cover}
-              alt={featured.name}
-              width={1600}
-              height={1000}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-            />
-            <div className="absolute top-3 left-3 font-mono text-[10px] uppercase tracking-widest bg-background/80 backdrop-blur px-2 py-1 rounded-sm">
-              ↗ case study
-            </div>
-          </Link>
-          <div>
-            <div className="font-mono text-xs text-muted-foreground mb-3">{featured.n} · {featured.year} · {featured.tag}</div>
-            <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight leading-tight">
-              <Link href={`/projects/${featured.slug}`} className="story-link">{featured.name}</Link>
-            </h2>
-            <p className="mt-4 text-muted-foreground leading-relaxed">{featured.body}</p>
-            <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-1 font-mono text-sm">
-              <ul className="space-y-1">{featured.pros.map((x) => <li key={x}><span className="text-foreground">+</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
-              <ul className="space-y-1">{featured.cons.map((x) => <li key={x}><span className="text-foreground">-</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
-            </div>
-            <div className="mt-6 flex items-center gap-3">
-              <Link href={`/projects/${featured.slug}`} className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-border rounded-sm link-hover">
-                → open case study
-              </Link>
-              <LikeButton id={featured.slug} type="projects" size="sm" />
-            </div>
-          </div>
-        </article>
-      </section>
-
-      {/* GRID */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="flex items-baseline justify-between mb-6">
-          <div className="font-mono text-xs text-muted-foreground">// archive.all</div>
-          <div className="font-mono text-xs text-muted-foreground">{rest.length} more</div>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 stagger">
-          {rest.map((p) => (
-            <div key={p.slug} className="group block">
-              <Link href={`/projects/${p.slug}`}>
-                <div className="aspect-[4/3] overflow-hidden rounded-md bg-secondary mb-4 relative">
-                  <img
-                    src={p.cover}
-                    alt={p.name}
-                    width={1600}
-                    height={1000}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+      {featured && (
+        <Container as="section" className="pb-16">
+          <Reveal>
+            <Eyebrow>Featured</Eyebrow>
+            <article className="mt-6 grid items-center gap-8 lg:grid-cols-2">
+              <Link href={`/projects/${featured.slug}`} className="group block overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
+                <div className="aspect-[16/10]">
+                  <CoverImage
+                    src={featured.cover}
+                    alt={featured.name}
+                    fallbackLabel={featured.name}
+                    className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.04]"
                   />
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-300" />
-                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between font-mono text-[10px] uppercase tracking-widest text-background opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                    <span className="bg-foreground px-2 py-1 rounded-sm">{p.n}</span>
-                    <span className="bg-foreground px-2 py-1 rounded-sm">view ↗</span>
-                  </div>
                 </div>
               </Link>
-              <div className="font-mono text-[11px] text-muted-foreground mb-2 flex justify-between items-center">
-                <div className="flex gap-2 items-center">
-                  <span>{p.year}</span><span>·</span><span># {p.tag}</span>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                  {featured.n} · {featured.year} · {featured.tag} · {featured.status}
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">
+                  <Link href={`/projects/${featured.slug}`} className="group">
+                    <TextArrow>{featured.name}</TextArrow>
+                  </Link>
+                </h2>
+                <p className="mt-4 leading-relaxed text-muted-foreground">{featured.body}</p>
+                <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    {featured.pros.map((item) => (
+                      <li key={item}>+ {item}</li>
+                    ))}
+                  </ul>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    {featured.cons.map((item) => (
+                      <li key={item}>− {item}</li>
+                    ))}
+                  </ul>
                 </div>
-                <LikeButton id={p.slug} type="projects" size="sm" variant="ghost" />
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <PrimaryLink href={`/projects/${featured.slug}`}>Open case study</PrimaryLink>
+                  <LikeButton id={featured.slug} type="projects" size="sm" />
+                </div>
               </div>
-              <Link href={`/projects/${p.slug}`}>
-                <h3 className="text-lg font-semibold leading-snug"><span className="story-link">{p.name}</span></h3>
-              </Link>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed line-clamp-2">{p.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            </article>
+          </Reveal>
+        </Container>
+      )}
 
-      {/* CTA */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-32 reveal">
-        <div className="border-t border-b border-border py-16 text-center">
-          <div className="font-mono text-xs text-muted-foreground mb-4">// end.of.list</div>
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight">Have a project worth a sharp question?</h2>
-          <p className="mt-4 text-muted-foreground max-w-lg mx-auto">I take on one or two new engagements per quarter.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
-            <Link href="/contact" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ get in touch</Link>
-            <Link href="/writing" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ read the journal</Link>
+      {rest.length > 0 && (
+        <Container as="section" className="pb-16">
+          <Reveal>
+            <div className="flex items-end justify-between gap-4">
+              <Eyebrow>All work</Eyebrow>
+              <p className="font-mono text-xs text-muted-foreground">{rest.length} more</p>
+            </div>
+            <div className="mt-8 grid gap-8 sm:grid-cols-2">
+              {rest.map((project) => (
+                <article key={project.slug} className="group">
+                  <Link href={`/projects/${project.slug}`} className="block overflow-hidden rounded-[1.5rem] border border-border bg-secondary">
+                    <div className="aspect-[16/10]">
+                      <CoverImage
+                        src={project.cover}
+                        alt={project.name}
+                        fallbackLabel={project.name}
+                        className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.04]"
+                      />
+                    </div>
+                  </Link>
+                  <div className="mt-4 flex items-start justify-between gap-3">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {project.year} · {project.tag}
+                    </p>
+                    <LikeButton id={project.slug} type="projects" size="sm" variant="ghost" />
+                  </div>
+                  <h3 className="mt-2 text-xl font-semibold tracking-tight">
+                    <Link href={`/projects/${project.slug}`} className="group">
+                      <TextArrow>{project.name}</TextArrow>
+                    </Link>
+                  </h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{project.body}</p>
+                </article>
+              ))}
+            </div>
+          </Reveal>
+        </Container>
+      )}
+
+      <Container as="section" className="pb-8">
+        <Reveal>
+          <div className="rounded-[2rem] border border-border px-6 py-14 text-center">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Have a project in mind?</h2>
+            <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+              I take on collaborations around data, AI, web development, and teaching alongside my studies.
+            </p>
+            <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
+              <PrimaryLink href="/contact">Get in touch</PrimaryLink>
+              <GhostLink href="/writing">Read the journal</GhostLink>
+            </div>
           </div>
-        </div>
-      </section>
+        </Reveal>
+      </Container>
     </>
-  );
+  )
 }

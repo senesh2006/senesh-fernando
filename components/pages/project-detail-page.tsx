@@ -1,156 +1,174 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { Star, GitFork, CircleDot, Scale, GitCommit, ExternalLink, Github, ArrowUpRight } from "lucide-react";
-import type { Project } from "@/data/projects";
-import { FilesTree } from "@/components/site/files-tree";
-import { ScrollProgress } from "@/components/site/scroll-progress";
-import { ProjectDetailShell } from "@/components/site/project-detail-shell";
-import { LikeButton } from "@/components/animate-ui/components/buttons/like-button";
-import { ContentSummarizer } from "@/components/content-summarizer";
-import { useReveal } from "@/hooks/use-reveal";
+import Link from "next/link"
+import { ArrowUpRight, CircleDot, ExternalLink, GitCommit, GitFork, Github, Scale, Star } from "lucide-react"
+import type { Project } from "@/data/projects"
+import { FilesTree } from "@/components/site/files-tree"
+import { LikeButton } from "@/components/animate-ui/components/buttons/like-button"
+import { ContentSummarizer } from "@/components/content-summarizer"
+import { Container, CoverImage, Eyebrow, Reveal } from "@/components/site/redesign/ui"
 
 const STATUS_COLOR: Record<Project["status"], string> = {
-  shipping: "bg-emerald-500",
-  maintained: "bg-blue-500",
-  beta: "bg-amber-500",
+  shipping: "bg-emerald-400",
+  maintained: "bg-sky-400",
+  beta: "bg-amber-400",
   archived: "bg-muted-foreground",
-};
+}
 
 export function ProjectDetailPage({ project, projects }: { project: Project; projects: Project[] }) {
-  useReveal();
-  const p = project;
-  const PROJECTS = projects;
-  const idx = PROJECTS.findIndex((x) => x.slug === p.slug);
-  const next = PROJECTS[(idx + 1) % PROJECTS.length];
+  const idx = projects.findIndex((item) => item.slug === project.slug)
+  const next = projects[(idx + 1) % projects.length]
 
   return (
-    <>
-      <ScrollProgress />
-      <ProjectDetailShell>
-      <article className="relative">
-        {/* HERO */}
-        <header className="mx-auto max-w-6xl px-5 sm:px-8 pt-8 sm:pt-12">
-          <Link href="/projects" className="font-mono text-xs text-muted-foreground link-hover px-1.5 py-0.5 rounded-sm">← projects</Link>
+    <article>
+      <Container as="header" className="pb-8 pt-28 sm:pt-36">
+        <Link href="/projects" className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:text-foreground">
+          ← All projects
+        </Link>
+        <div className="mt-8 grid items-end gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              <span>{project.n}</span>
+              <span>{project.year}</span>
+              <span>{project.tag}</span>
+              <span className="inline-flex items-center gap-2 normal-case tracking-normal">
+                <span className={`h-1.5 w-1.5 rounded-full ${STATUS_COLOR[project.status]}`} aria-hidden />
+                {project.status}
+              </span>
+            </p>
+            <h1 className="mt-4 text-[clamp(2.8rem,9vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.04em]">
+              {project.name}
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">{project.body}</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row lg:col-span-4 lg:flex-col lg:items-stretch">
+            <a
+              href={project.repo}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary"
+            >
+              <Github className="h-4 w-4" /> Repository
+            </a>
+            <a
+              href={project.demo}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-foreground px-4 text-sm font-medium text-background"
+            >
+              <ExternalLink className="h-4 w-4" /> Live demo
+            </a>
+            <LikeButton id={project.slug} type="projects" />
+          </div>
+        </div>
+      </Container>
 
-          <div className="mt-8 grid md:grid-cols-12 gap-8 items-end">
-            <div className="md:col-span-8 stagger">
-              <div className="font-mono text-xs text-muted-foreground flex flex-wrap items-center gap-3 mb-5">
-                <span>{p.n}</span><span>·</span>
-                <span>{p.year}</span><span>·</span>
-                <span># {p.tag}</span><span>·</span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className={`h-1.5 w-1.5 rounded-full ${STATUS_COLOR[p.status]} animate-pulse`} />
-                  {p.status}
-                </span>
-              </div>
-              <h1 className="text-5xl sm:text-7xl font-semibold tracking-tight leading-[0.95]">
-                <span className="caret">{p.name}</span>
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">{p.body}</p>
+      <Container>
+        <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
+          <div className="aspect-[16/9]">
+            <CoverImage
+              src={project.cover}
+              alt={project.name}
+              fallbackLabel={project.name}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      </Container>
+
+      <Container as="section" className="py-10">
+        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5">
+          {[
+            { icon: Star, label: "Stars", value: project.stats.stars },
+            { icon: GitFork, label: "Forks", value: project.stats.forks },
+            { icon: CircleDot, label: "Open issues", value: project.stats.issues },
+            { icon: Scale, label: "License", value: project.stats.license },
+            { icon: GitCommit, label: "Last commit", value: project.stats.lastCommit },
+          ].map(({ icon: Icon, label, value }) => (
+            <div key={label} className="bg-background px-4 py-5">
+              <dt className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                <Icon className="h-3 w-3" aria-hidden /> {label}
+              </dt>
+              <dd className="mt-2 text-lg font-semibold tracking-tight">{value}</dd>
             </div>
-            <div className="md:col-span-4 flex flex-wrap gap-2 font-mono text-xs items-center">
-              <a href={p.repo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm link-hover">
-                <Github className="h-3.5 w-3.5" /> repository
-              </a>
-              <a href={p.demo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm bg-foreground text-background hover:opacity-90 transition-opacity">
-                <ExternalLink className="h-3.5 w-3.5" /> live demo
-              </a>
-              <LikeButton id={p.slug} type="projects" />
-            </div>
+          ))}
+        </dl>
+      </Container>
+
+      <Container as="section" className="grid gap-12 pb-8 lg:grid-cols-12">
+        <div className="space-y-6 lg:col-span-7">
+          <Eyebrow>About this project</Eyebrow>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">What it is, and why it exists.</h2>
+          <p className="text-base leading-8 text-muted-foreground sm:text-[17px]">{project.longDescription}</p>
+          <ContentSummarizer id={project.slug} type="projects" className="pt-2" />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {project.pros.map((item) => (
+                <li key={item}>+ {item}</li>
+              ))}
+            </ul>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {project.cons.map((item) => (
+                <li key={item}>− {item}</li>
+              ))}
+            </ul>
           </div>
-        </header>
-
-        {/* COVER */}
-        <figure className="mx-auto max-w-6xl px-5 sm:px-8 mt-12 reveal">
-          <div className="overflow-hidden rounded-md aspect-[16/9] bg-secondary border border-border">
-            <img src={p.cover} alt={p.name} width={1920} height={1080} className="h-full w-full object-cover" />
-          </div>
-        </figure>
-
-        {/* STATS STRIP */}
-        <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-12 reveal">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-px bg-border border border-border rounded-md overflow-hidden">
-            {[
-              { icon: Star, label: "stars", value: p.stats.stars },
-              { icon: GitFork, label: "forks", value: p.stats.forks },
-              { icon: CircleDot, label: "open issues", value: p.stats.issues },
-              { icon: Scale, label: "license", value: p.stats.license },
-              { icon: GitCommit, label: "last commit", value: p.stats.lastCommit },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="bg-background px-4 py-5">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                  <Icon className="h-3 w-3" /> {label}
-                </div>
-                <div className="mt-2 text-xl font-semibold tracking-tight">{value}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* DESCRIPTION + FILES */}
-        <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 reveal">
-          <div className="grid md:grid-cols-12 gap-10 mb-10">
-            <div className="md:col-span-7 space-y-6">
-              <div className="font-mono text-xs text-muted-foreground">// about.project</div>
-              <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">What it is, and why it exists.</h2>
-              <p className="text-[17px] leading-[1.8] text-muted-foreground">{p.longDescription}</p>
-
-              <ContentSummarizer id={p.slug} type="projects" className="pt-2" />
-
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-mono text-sm pt-6">
-                <ul className="space-y-1">{p.pros.map((x) => <li key={x}><span className="text-foreground">+</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
-                <ul className="space-y-1">{p.cons.map((x) => <li key={x}><span className="text-foreground">-</span> <span className="text-muted-foreground">{x}</span></li>)}</ul>
-              </div>
-
-              <div className="pt-4">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">// stack</div>
-                <div className="flex flex-wrap gap-2">
-                  {p.stack.map((s) => (
-                    <span key={s} className="font-mono text-xs px-2 py-1 border border-border rounded-sm bg-secondary/50">{s}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div>
-            <div className="font-mono text-xs text-muted-foreground mb-3">// repo.tree</div>
-            <FilesTree tree={p.tree} isPrivate={p.isPrivate} repo={p.repo} />
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Stack</p>
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {project.stack.map((item) => (
+                <li key={item} className="rounded-full border border-border px-3 py-1.5 text-sm">
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
-        </section>
+        </div>
+        <div className="lg:col-span-5">
+          <Eyebrow className="mb-3">Repository</Eyebrow>
+          <FilesTree tree={project.tree} isPrivate={project.isPrivate} repo={project.repo} />
+        </div>
+      </Container>
 
-        {/* GALLERY */}
-        <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 reveal">
-          <div className="flex items-baseline justify-between mb-6">
-            <div className="font-mono text-xs text-muted-foreground">// screenshots</div>
-            <div className="font-mono text-xs text-muted-foreground">{p.gallery.length} frames</div>
+      {project.gallery.length > 0 && (
+        <Container as="section" className="py-12">
+          <div className="flex items-end justify-between gap-4">
+            <Eyebrow>Screenshots</Eyebrow>
+            <p className="font-mono text-xs text-muted-foreground">{project.gallery.length} frames</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
-            {p.gallery.map((src, i) => (
-              <div key={i} className="group aspect-[4/3] overflow-hidden rounded-md bg-secondary border border-border relative">
-                <img src={src} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]" />
-                <div className="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-widest bg-background/80 backdrop-blur px-1.5 py-0.5 rounded-sm">
-                  {String(i + 1).padStart(2, "0")} / {String(p.gallery.length).padStart(2, "0")}
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {project.gallery.map((src, index) => (
+              <figure key={`${src}-${index}`} className="overflow-hidden rounded-2xl border border-border bg-secondary">
+                <div className="aspect-[4/3]">
+                  <CoverImage
+                    src={src}
+                    alt={`${project.name} screenshot ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-              </div>
+                <figcaption className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                  {String(index + 1).padStart(2, "0")} / {String(project.gallery.length).padStart(2, "0")}
+                </figcaption>
+              </figure>
             ))}
           </div>
-        </section>
+        </Container>
+      )}
 
-        {/* NEXT */}
-        <nav className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 mb-24 border-t border-border pt-10 reveal">
-          <div className="font-mono text-xs text-muted-foreground mb-3">// next.project</div>
-          <Link href={`/projects/${next.slug}`} className="group flex items-baseline justify-between gap-6">
-            <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-              <span className="story-link">{next.name}</span>
-            </h3>
-            <ArrowUpRight className="h-6 w-6 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-          </Link>
-          <p className="mt-2 text-muted-foreground max-w-2xl">{next.body}</p>
-        </nav>
-      </article>
-      </ProjectDetailShell>
-    </>
-  );
+      {next && next.slug !== project.slug && (
+        <Container as="nav" className="pb-8 pt-6">
+          <Reveal>
+            <Link href={`/projects/${next.slug}`} className="group block border-t border-border pt-8">
+              <Eyebrow>Next project</Eyebrow>
+              <div className="mt-3 flex items-start justify-between gap-4">
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-4xl">{next.name}</h2>
+                <ArrowUpRight className="mt-1 h-6 w-6 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </div>
+              <p className="mt-3 max-w-2xl text-muted-foreground">{next.body}</p>
+            </Link>
+          </Reveal>
+        </Container>
+      )}
+    </article>
+  )
 }
