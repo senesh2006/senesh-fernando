@@ -1,49 +1,40 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useReveal } from "@/hooks/use-reveal";
-import { CursorSpotlight } from "@/components/site/cursor-spotlight";
-import { ScrollProgress } from "@/components/site/scroll-progress";
-import { MarqueeStrip } from "@/components/site/marquee-strip";
-import { RadialIntro, type OrbitItem } from "@/components/site/radial-intro";
-import { IMAGES } from "@/lib/images";
-import { PROFILE } from "@/lib/profile";
+import { useEffect, useState } from "react"
+import { IMAGES } from "@/lib/images"
+import { PROFILE } from "@/lib/profile"
+import {
+  Container,
+  CoverImage,
+  Eyebrow,
+  GhostLink,
+  PrimaryLink,
+  Reveal,
+} from "@/components/site/redesign/ui"
+import { SpotlightCard } from "@/components/site/redesign/fx"
 
 interface GitHubSkill {
-  name: string;
-  bytes: number;
-  icon: string | null;
+  name: string
+  bytes: number
+  icon: string | null
 }
 
-// simpleicons.org serves a black SVG per slug; `dark:invert` flips it for dark mode.
-const ICON = (slug: string) => `https://cdn.simpleicons.org/${slug}/000000`;
+const TOOLS = [
+  "React",
+  "Next.js",
+  "Node.js",
+  "Tailwind",
+  "PostgreSQL",
+  "MySQL",
+  "Git",
+  "Docker",
+  "Red Hat",
+  "Tableau",
+  "Power BI",
+  "Jupyter",
+  "VS Code",
+]
 
-// Curated frameworks / tools that GitHub's language stats don't surface.
-const TOOLS: OrbitItem[] = [
-  { id: "react",      name: "React",       src: ICON("react") },
-  { id: "next",       name: "Next.js",     src: ICON("nextdotjs") },
-  { id: "node",       name: "Node.js",     src: ICON("nodedotjs") },
-  { id: "tailwindcss",name: "Tailwind",    src: ICON("tailwindcss") },
-  { id: "postgresql", name: "PostgreSQL",  src: ICON("postgresql") },
-  { id: "mysql",      name: "MySQL",       src: ICON("mysql") },
-  { id: "git",        name: "Git",         src: ICON("git") },
-  { id: "docker",     name: "Docker",      src: ICON("docker") },
-  { id: "redhat",     name: "Red Hat",     src: ICON("redhat") },
-  { id: "tableau",    name: "Tableau",     src: ICON("tableau") },
-  { id: "powerbi",    name: "Power BI",    src: ICON("powerbi") },
-  { id: "jupyter",    name: "Jupyter",     src: ICON("jupyter") },
-  { id: "visualstudiocode", name: "VS Code", src: ICON("visualstudiocode") },
-];
-
-// Default orbit before GitHub data loads (Python/TS lead so it looks right pre-fetch).
-const TECH_ORBIT: OrbitItem[] = [
-  { id: "python", name: "Python",     src: ICON("python") },
-  { id: "typescript", name: "TypeScript", src: ICON("typescript") },
-  ...TOOLS,
-];
-
-// Skills / methodologies with no logo — shown as pills only.
 const OTHER_SKILLS = [
   "Data Pipelines",
   "Data Science & Analytics",
@@ -52,239 +43,200 @@ const OTHER_SKILLS = [
   "REST APIs",
   "Linux / RHEL",
   "Agile Project Management",
-];
+]
 
 export function AboutPage({ timeline, stack }: { timeline: [string, string][]; stack: string[] }) {
-  useReveal();
-
-  // Pull real languages detected across the user's GitHub repos and fold any
-  // logo-able ones into the orbit; falls back to the curated list on failure.
-  const [orbit, setOrbit] = useState<OrbitItem[]>(TECH_ORBIT);
-  const [ghStack, setGhStack] = useState<string[] | null>(null);
+  const [ghStack, setGhStack] = useState<string[] | null>(null)
 
   useEffect(() => {
-    let cancelled = false;
+    let cancelled = false
     fetch("/api/github/skills")
       .then((r) => r.json())
       .then((data: { skills?: GitHubSkill[] }) => {
-        if (cancelled || !data.skills?.length) return;
-
-        // Ranked list of detected language names (for the pills).
-        setGhStack(data.skills.map((s) => s.name));
-
-        // Orbit = GitHub-detected languages (with logos) FIRST, then the
-        // curated frameworks/tools, de-duped by icon slug, capped at 15.
-        const detected: OrbitItem[] = data.skills
-          .filter((s) => s.icon)
-          .map((s) => ({ id: s.icon!, name: s.name, src: ICON(s.icon!) }));
-
-        const seen = new Set<string>();
-        const merged: OrbitItem[] = [];
-        for (const item of [...detected, ...TOOLS]) {
-          if (seen.has(item.id as string)) continue;
-          seen.add(item.id as string);
-          merged.push(item);
-          if (merged.length >= 15) break;
-        }
-        setOrbit(merged);
+        if (cancelled || !data.skills?.length) return
+        setGhStack(data.skills.map((s) => s.name))
       })
-      .catch(() => {/* keep curated fallback */});
+      .catch(() => undefined)
     return () => {
-      cancelled = true;
-    };
-  }, []);
+      cancelled = true
+    }
+  }, [])
 
-  // Pills: detected languages (from GitHub) + curated tools + non-logo skills.
-  const languagePills = ghStack ?? stack;
-  const toolNames = TOOLS.map((t) => t.name);
+  const languagePills = ghStack?.length ? ghStack : [...stack]
+  const seen = new Set(languagePills.map((skill) => skill.toLowerCase()))
+  const toolNames = Array.from(new Set([...stack, ...TOOLS, ...OTHER_SKILLS])).filter(
+    (skill) => !seen.has(skill.toLowerCase()),
+  )
 
   return (
     <>
-      <ScrollProgress />
-
-      {/* HERO */}
-      <section className="relative border-b border-border">
-        <CursorSpotlight />
-        <div className="pattern-bg z-0 pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 grid md:grid-cols-5 gap-10 items-center relative">
-          <div className="md:col-span-3 space-y-6">
-            <div className="font-mono text-xs text-muted-foreground stagger">
-              <div>// about.landing</div>
-              <div>[MODE: EXPLORING] · {PROFILE.title} · still learning</div>
-            </div>
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95]">
-              <span className="caret">About.</span>
-              <span className="block text-muted-foreground font-normal">A short field guide.</span>
-            </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-xl animate-fade-in-up">
-              I'm Senesh — an IT undergraduate at Curtin University Colombo, based in
-              Negombo. I work across data science, AI, and full-stack development,
-              with a focus on tools that bridge data and decision-making.
-            </p>
-            <div className="flex gap-3 pt-2">
-              <a
-                href="https://github.com/senesh2006"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 border border-border rounded-sm bg-background hover:bg-primary/10 hover:border-primary transition-all font-mono text-sm"
-              >
-                GitHub
-              </a>
-              <a
-                href="https://www.linkedin.com/in/peter-senesh-fernando/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 border border-border rounded-sm bg-background hover:bg-primary/10 hover:border-primary transition-all font-mono text-sm"
-              >
-                LinkedIn
-              </a>
-              <a
-                href="/Senesh_Fernando_CV.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 border border-border rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-mono text-sm shadow-sm"
-              >
-                Download CV
-              </a>
-            </div>
+      <Container as="section" className="grid items-center gap-10 pb-16 pt-28 sm:pt-36 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <Eyebrow>{PROFILE.title}</Eyebrow>
+          <h1 className="mt-4 text-[clamp(3.2rem,12vw,6.5rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
+            About
+            <span className="gradient-text block font-serif font-normal italic">me.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            I&apos;m Senesh — an IT undergraduate at Curtin University Colombo, based in Negombo. I work across data
+            science, AI, and full-stack development, with a focus on tools that bridge data and decision-making.
+          </p>
+          <p className="mt-4 text-sm text-muted-foreground">{PROFILE.fullName}</p>
+          <div className="mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
+            <PrimaryLink href={PROFILE.github} external>
+              GitHub
+            </PrimaryLink>
+            <GhostLink href={PROFILE.linkedin} external>
+              LinkedIn
+            </GhostLink>
+            <GhostLink href="/Senesh_Fernando_CV.pdf" external>
+              Download CV
+            </GhostLink>
           </div>
-          <div className="md:col-span-2 flex justify-center items-start">
-            <div className="w-64 h-64 overflow-hidden rounded-full bg-secondary group border border-border">
-              <img
+        </div>
+        <div className="lg:col-span-5">
+          <div className="float-y relative overflow-hidden rounded-[2rem] p-[2px]">
+            <div className="spin-ring absolute opacity-90" />
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-secondary">
+            <div className="aspect-square sm:aspect-[4/5]">
+              <CoverImage
                 src={IMAGES.portrait}
                 alt="Senesh Fernando portrait"
-                width={400}
-                height={400}
-                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
+                className="h-full w-full object-cover object-[center_18%]"
               />
             </div>
           </div>
-
+          </div>
         </div>
-        <MarqueeStrip items={[
-          PROFILE.location, "Curtin University Colombo", "[MODE: EXPLORING]",
-          "data pipelines · AI · analytics", "CarbonWise co-founder",
-          "press ? for shortcuts",
-        ]} />
-      </section>
+      </Container>
 
-      {/* APPROACH */}
-      <section className="mx-auto max-w-3xl px-5 sm:px-8 mt-24 sm:mt-32 space-y-6 reveal">
-        <div className="font-mono text-xs text-muted-foreground">// approach</div>
-        <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight leading-tight">
-          Bridging data and decision-making.
-        </h2>
-        {PROFILE.summary.split("\n\n").map((paragraph) => (
-          <p key={paragraph.slice(0, 40)} className="text-muted-foreground leading-relaxed">
-            {paragraph}
+      <Container as="section" className="max-w-3xl pb-20 sm:pb-28">
+        <Reveal>
+          <Eyebrow>Approach</Eyebrow>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">
+            Bridging data and decision-making.
+          </h2>
+          <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground">
+            {PROFILE.summary.split("\n\n").map((paragraph) => (
+              <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+            ))}
+          </div>
+        </Reveal>
+      </Container>
+
+      <Container as="section" className="pb-20 sm:pb-28">
+        <Reveal>
+          <Eyebrow>Timeline</Eyebrow>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Experience & education.</h2>
+          <ol className="mt-10 space-y-3">
+            {timeline.map(([when, what], index) => (
+              <li key={when}>
+                <SpotlightCard className="glass-panel grid gap-2 rounded-3xl p-5 sm:grid-cols-[11rem_1fr] sm:gap-8 sm:p-6">
+                  <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">
+                    0{index + 1} · {when}
+                  </p>
+                  <p className="text-base leading-relaxed">{what}</p>
+                </SpotlightCard>
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </Container>
+
+      <Container as="section" className="pb-20 sm:pb-28">
+        <Reveal>
+          <Eyebrow>Stack {ghStack ? "· languages from GitHub" : ""}</Eyebrow>
+          <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl">
+            Skills and tools I work with.
+          </h2>
+          <p className="mt-4 max-w-xl text-muted-foreground">
+            From data pipelines and analytics to full-stack web development and Linux system administration — always
+            learning, always building.
           </p>
-        ))}
-      </section>
-
-      {/* TIMELINE */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// timeline</div>
-        <ol className="space-y-2 font-mono text-sm border-y border-border divide-y divide-border stagger">
-          {timeline.map(([when, what]) => (
-            <li key={when} className="grid grid-cols-[8rem_1fr] gap-4 py-4 row-hover rounded-sm">
-              <span className="text-muted-foreground">{when}</span>
-              <span>{what}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* STACK */}
-      <section className="mx-auto max-w-5xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="grid md:grid-cols-12 gap-10 items-center">
-          <div className="md:col-span-5 space-y-4">
-            <div className="font-mono text-xs text-muted-foreground">// stack</div>
-            <h2 className="text-2xl sm:text-4xl font-semibold tracking-tight leading-tight">
-              Skills and tools I work with.
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-              From data pipelines and analytics to full-stack web development
-              and Linux system administration — always learning, always building.
-            </p>
-            <div className="space-y-3 pt-2">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
-                  languages {ghStack ? "· from github" : ""}
-                </div>
-                <div className="flex flex-wrap gap-1.5 font-mono text-[11px]">
-                  {languagePills.map((s) => (
-                    <span key={s} className="px-2 py-0.5 border border-border rounded-full text-muted-foreground">{s}</span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
-                  tools &amp; skills
-                </div>
-                <div className="flex flex-wrap gap-1.5 font-mono text-[11px]">
-                  {Array.from(new Set([...toolNames, ...OTHER_SKILLS])).map((s) => (
-                    <span key={s} className="px-2 py-0.5 border border-border rounded-full text-muted-foreground">{s}</span>
-                  ))}
-                </div>
-              </div>
+          <div className="mt-8 space-y-5">
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                Languages {ghStack ? "· from GitHub" : ""}
+              </p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {languagePills.map((skill) => (
+                  <li key={skill} className="rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground">
+                    {skill}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Tools & skills</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {toolNames.map((skill) => (
+                  <li key={skill} className="rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground">
+                    {skill}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <div className="md:col-span-7">
-            <RadialIntro orbitItems={orbit} />
-          </div>
-        </div>
-      </section>
+        </Reveal>
+      </Container>
 
-      {/* CERTIFICATIONS */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// certifications</div>
-        <ul className="space-y-2 font-mono text-sm border-y border-border divide-y divide-border stagger">
-          {PROFILE.certifications.map((cert) => (
-            <li key={cert} className="py-4 row-hover rounded-sm text-muted-foreground">
-              + {cert}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <Container as="section" className="pb-20 sm:pb-28">
+        <Reveal>
+          <Eyebrow>Certifications</Eyebrow>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            {PROFILE.certifications.map((cert) => (
+              <li key={cert}>
+                <SpotlightCard className="glass-panel h-full rounded-3xl p-5 text-base leading-relaxed">
+                  {cert}
+                </SpotlightCard>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </Container>
 
-      {/* VALUES */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// values</div>
-        <div className="grid sm:grid-cols-2 gap-x-10 gap-y-4 font-mono text-sm stagger">
-          <div>
-            <div className="text-foreground mb-2">+ i care about</div>
-            <ul className="space-y-1 text-muted-foreground">
-              <li>+ data-driven decision making</li>
-              <li>+ AI applied to real problems</li>
-              <li>+ teaching and mentoring students</li>
-              <li>+ curiosity, consistency, compassion</li>
-            </ul>
+      <Container as="section" className="pb-20 sm:pb-28">
+        <Reveal>
+          <Eyebrow>Values</Eyebrow>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <SpotlightCard className="glass-panel rounded-3xl p-6 sm:p-8">
+              <h2 className="text-xl font-semibold">I care about</h2>
+              <ul className="mt-4 space-y-3 text-muted-foreground">
+                <li>data-driven decision making</li>
+                <li>AI applied to real problems</li>
+                <li>teaching and mentoring students</li>
+                <li>curiosity, consistency, compassion</li>
+              </ul>
+            </SpotlightCard>
+            <SpotlightCard className="glass-panel rounded-3xl p-6 sm:p-8">
+              <h2 className="text-xl font-semibold">What drives me</h2>
+              <ul className="mt-4 space-y-3 text-muted-foreground">
+                <li>sustainability & environmental tech</li>
+                <li>student & startup empowerment</li>
+                <li>hackathons & competitions</li>
+                <li>building things that create impact</li>
+              </ul>
+            </SpotlightCard>
           </div>
-          <div>
-            <div className="text-foreground mb-2">- what drives me</div>
-            <ul className="space-y-1 text-muted-foreground">
-              <li>- sustainability & environmental tech</li>
-              <li>- student & startup empowerment</li>
-              <li>- hackathons & competitions</li>
-              <li>- building things that create impact</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+        </Reveal>
+      </Container>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-32 reveal">
-        <div className="border-t border-b border-border py-16 text-center">
-          <div className="font-mono text-xs text-muted-foreground mb-4">// end.of.about</div>
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight">Want the long version?</h2>
-          <p className="mt-4 text-muted-foreground max-w-lg mx-auto">Either browse the work, read the essays, or just say hello.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-xs">
-            <Link href="/projects" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ projects</Link>
-            <Link href="/writing" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ writing</Link>
-            <Link href="/contact" className="px-3 py-1.5 border border-border rounded-sm link-hover">→ contact</Link>
+      <Container as="section" className="pb-8">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-14 text-center shadow-[0_0_80px_-20px_color-mix(in_oklab,var(--accent)_50%,transparent)] backdrop-blur-md sm:px-10">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--accent)_28%,transparent),transparent_55%)]" />
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Want the long version?</h2>
+            <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+              Either browse the work, read the essays, or just say hello.
+            </p>
+            <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
+              <PrimaryLink href="/projects">Projects</PrimaryLink>
+              <GhostLink href="/writing">Writing</GhostLink>
+              <GhostLink href="/contact">Contact</GhostLink>
+            </div>
           </div>
-        </div>
-      </section>
+        </Reveal>
+      </Container>
     </>
-  );
+  )
 }

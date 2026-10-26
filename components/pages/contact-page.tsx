@@ -1,81 +1,53 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useReveal } from "@/hooks/use-reveal";
-import { CursorSpotlight } from "@/components/site/cursor-spotlight";
-import { ScrollProgress } from "@/components/site/scroll-progress";
-import { MarqueeStrip } from "@/components/site/marquee-strip";
-import { ChromaGrid } from "@/components/site/ChromaGrid";
-import type { ChromaGridItem } from "@/components/site/ChromaGrid";
-import { submitContact } from "@/lib/client-api";
-import { PROFILE } from "@/lib/profile";
-import { useState } from "react";
-import { Github, Linkedin, Twitter, GraduationCap, Mail, Phone, MapPin, FileDown } from "lucide-react";
+import { useState } from "react"
+import { FileDown, Mail, MapPin, Phone } from "lucide-react"
+import { submitContact } from "@/lib/client-api"
+import { PROFILE } from "@/lib/profile"
+import { Container, Eyebrow, Reveal } from "@/components/site/redesign/ui"
+import { SpotlightCard } from "@/components/site/redesign/fx"
 
-const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL || PROFILE.email;
-
-const GITHUB_USER =
-  process.env.NEXT_PUBLIC_GITHUB_USERNAME || "senesh2006";
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || PROFILE.email
 
 const DIRECT = [
-  { icon: Mail, label: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, hint: "fastest · < 48h" },
+  { icon: Mail, label: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, hint: "fastest · under 48h" },
   { icon: Phone, label: "Phone", value: PROFILE.phoneDisplay, href: `tel:${PROFILE.phone}`, hint: "mobile" },
-  { icon: MapPin, label: "Location", value: PROFILE.address, href: `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`, hint: PROFILE.location },
+  {
+    icon: MapPin,
+    label: "Location",
+    value: PROFILE.address,
+    href: `https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}`,
+    hint: PROFILE.location,
+  },
   { icon: FileDown, label: "Resume / CV", value: "Senesh_Fernando_CV.pdf", href: "/Senesh_Fernando_CV.pdf", hint: "download" },
-] as const;
+] as const
 
-const SOCIAL_ITEMS: ChromaGridItem[] = [
+const SOCIALS = [
+  { title: "GitHub", subtitle: "Code & projects", handle: "@senesh2006", url: PROFILE.github },
+  { title: "LinkedIn", subtitle: "Professional", handle: "@peter-senesh", url: PROFILE.linkedin },
+  { title: "X", subtitle: "Social feed", handle: "@SeneshF", url: "https://x.com/SeneshF" },
   {
-    icon: Github,
-    title: "GitHub",
-    subtitle: "Code & Projects",
-    handle: " @senesh2006",
-    borderColor: "#4F46E5",
-    gradient: "linear-gradient(145deg, #4F46E5, #000)",
-    url: PROFILE.github,
-  },
-  {
-    icon: Linkedin,
-    title: "LinkedIn",
-    subtitle: "Professional",
-    handle: " @peter-senesh",
-    borderColor: "#0A66C2",
-    gradient: "linear-gradient(180deg, #0A66C2, #000)",
-    url: PROFILE.linkedin,
-  },
-  {
-    icon: Twitter,
-    title: "X",
-    subtitle: "Social Feed",
-    handle: " @SeneshF",
-    borderColor: "#ffffff",
-    gradient: "linear-gradient(165deg, #1da1f2, #000)",
-    url: "https://x.com/SeneshF",
-  },
-  {
-    icon: GraduationCap,
     title: "Google Scholar",
     subtitle: "Research",
-    handle: " @SeneshF",
-    borderColor: "#4285F4",
-    gradient: "linear-gradient(195deg, #4285F4, #000)",
+    handle: "@SeneshF",
     url: "https://scholar.google.com/citations?user=BQ7naRAAAAAJ&hl=en",
   },
-];
+]
+
+const inputClass =
+  "w-full min-h-12 rounded-2xl border border-border bg-background px-4 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-accent"
 
 export function ContactPage() {
-  useReveal();
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
+  const [errorMessage, setErrorMessage] = useState("")
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
+    event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
 
-    setStatus("sending");
-    setErrorMessage("");
+    setStatus("sending")
+    setErrorMessage("")
 
     try {
       await submitContact({
@@ -83,177 +55,186 @@ export function ContactPage() {
         email: String(data.get("email") || ""),
         subject: String(data.get("subject") || ""),
         message: String(data.get("message") || ""),
-      });
-      setStatus("sent");
-      form.reset();
+      })
+      setStatus("sent")
+      form.reset()
     } catch (error) {
-      setStatus("error");
-      setErrorMessage(error instanceof Error ? error.message : "Failed to send message");
+      setStatus("error")
+      setErrorMessage(error instanceof Error ? error.message : "Failed to send message")
     }
   }
 
   return (
     <>
-      <ScrollProgress />
+      <Container as="section" className="pb-8 pt-28 sm:pt-36">
+        <Eyebrow>
+          <span className="inline-flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden />
+            Open · {PROFILE.location} · response under 48h
+          </span>
+        </Eyebrow>
+        <h1 className="mt-4 max-w-4xl text-[clamp(3.1rem,12vw,6.4rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
+          Let&apos;s talk
+          <span className="gradient-text block font-serif font-normal italic">about the work.</span>
+        </h1>
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          If you&apos;re working on something exciting — or just want to connect and trade ideas — drop a message
+          below, or reach me directly. I read everything.
+        </p>
+      </Container>
 
-      {/* HERO */}
-      <section className="relative border-b border-border">
-        <CursorSpotlight />
-        <div className="rain-bg z-0 pointer-events-none" />
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-20 sm:py-28 relative">
-          <div className="font-mono text-xs text-muted-foreground mb-6 stagger">
-            <div>// contact.landing</div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              [MODE: OPEN] · {PROFILE.location} · response &lt; 48h
-            </div>
-          </div>
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-[0.95] max-w-5xl">
-            <span className="caret">Let's talk.</span>{" "}
-            <span className="text-muted-foreground block">Tech, education, or AI.</span>
-          </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed animate-fade-in-up">
-            If you're working on something exciting — or just want to connect and
-            trade ideas — drop a message below, or reach me directly. I read everything.
-          </p>
-        </div>
-        <MarqueeStrip items={[
-          "open to collaborations", "response within 48h", "[MODE: OPEN]",
-          PROFILE.location, "Curtin University Colombo", PROFILE.phoneDisplay,
-        ]} />
-      </section>
-
-      {/* FORM + DIRECT CONTACT (two-column centerpiece) */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-20 sm:mt-28 reveal">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Form */}
-          <div className="lg:col-span-7">
-            <div className="font-mono text-xs text-muted-foreground mb-6">// send.message</div>
-            <form onSubmit={handleSubmit} className="space-y-4 border border-border rounded-md p-6 sm:p-8 bg-card/40">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <label className="block space-y-2 font-mono text-xs">
-                  <span className="text-muted-foreground">name</span>
-                  <input required name="name" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
-                </label>
-                <label className="block space-y-2 font-mono text-xs">
-                  <span className="text-muted-foreground">email</span>
-                  <input required type="email" name="email" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
-                </label>
-              </div>
-              <label className="block space-y-2 font-mono text-xs">
-                <span className="text-muted-foreground">subject</span>
-                <input name="subject" className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
+      <Container as="section" className="grid items-start gap-8 py-8 lg:grid-cols-12">
+        <Reveal className="lg:col-span-7">
+          <Eyebrow className="mb-4">Send a message</Eyebrow>
+          <form onSubmit={handleSubmit} className="space-y-4 rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_20px_80px_-40px_color-mix(in_oklab,var(--accent)_60%,transparent)] backdrop-blur-md sm:p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block space-y-2 text-sm">
+                <span className="text-muted-foreground">Name</span>
+                <input required name="name" autoComplete="name" className={inputClass} />
               </label>
-              <label className="block space-y-2 font-mono text-xs">
-                <span className="text-muted-foreground">message</span>
-                <textarea required name="message" rows={7} className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm resize-y focus:outline-none focus:ring-1 focus:ring-foreground/30 transition-all" />
+              <label className="block space-y-2 text-sm">
+                <span className="text-muted-foreground">Email</span>
+                <input required type="email" name="email" autoComplete="email" className={inputClass} />
               </label>
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="submit"
-                  disabled={status === "sending"}
-                  className="font-mono text-xs px-4 py-2 border border-border rounded-sm bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {status === "sending" ? "sending…" : "→ send message"}
-                </button>
-                {status === "sent" && (
-                  <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">message sent — talk soon</span>
-                )}
-                {status === "error" && (
-                  <span className="font-mono text-xs text-red-500">{errorMessage}</span>
-                )}
-              </div>
-            </form>
-          </div>
-
-          {/* Direct channels */}
-          <div className="lg:col-span-5">
-            <div className="font-mono text-xs text-muted-foreground mb-6">// or.reach.directly</div>
-            <div className="space-y-3">
-              {DIRECT.map(({ icon: Icon, label, value, href, hint }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target={href.startsWith("mailto:") || href.startsWith("tel:") ? undefined : "_blank"}
-                  rel="noreferrer"
-                  className="group flex items-start gap-3 border border-border rounded-md p-4 bg-card/40 hover:border-foreground/30 transition-colors"
-                >
-                  <div className="p-2 rounded-sm border border-border bg-background shrink-0 group-hover:border-foreground/30 transition-colors">
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
-                    <div className="text-sm truncate group-hover:text-foreground transition-colors">{value}</div>
-                    <div className="font-mono text-[10px] text-muted-foreground mt-0.5">{hint}</div>
-                  </div>
-                </a>
-              ))}
             </div>
-          </div>
-        </div>
-      </section>
+            <label className="block space-y-2 text-sm">
+              <span className="text-muted-foreground">Subject</span>
+              <input name="subject" className={inputClass} />
+            </label>
+            <label className="block space-y-2 text-sm">
+              <span className="text-muted-foreground">Message</span>
+              <textarea required name="message" rows={7} className={`${inputClass} min-h-40 py-3`} />
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background disabled:opacity-60"
+              >
+                {status === "sending" ? "Sending…" : "Send message"}
+              </button>
+              {status === "sent" && (
+                <p className="text-sm text-emerald-500" role="status">
+                  Message sent. Talk soon.
+                </p>
+              )}
+              {status === "error" && (
+                <p className="text-sm text-red-400" role="alert">
+                  {errorMessage}
+                </p>
+              )}
+            </div>
+          </form>
+        </Reveal>
 
-      {/* SOCIALS */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// find.me.elsewhere</div>
-        <div className="relative min-h-[350px]">
-          <ChromaGrid
-            items={SOCIAL_ITEMS}
-            radius={300}
-            damping={0.45}
-            fadeOut={0.6}
-            ease="power3.out"
-            columns={2}
-          />
-        </div>
-      </section>
-
-      {/* GOOD FIT */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// good.fit</div>
-        <div className="grid sm:grid-cols-2 gap-x-10 gap-y-4 font-mono text-sm stagger">
-          <div>
-            <div className="text-foreground mb-3">+ great fit</div>
-            <ul className="space-y-1.5 text-muted-foreground">
-              <li>+ data & analytics projects</li>
-              <li>+ AI / ML collaborations</li>
-              <li>+ student & education initiatives</li>
-              <li>+ hackathons & tech events</li>
-            </ul>
-          </div>
-          <div>
-            <div className="text-foreground mb-3">- also happy to discuss</div>
-            <ul className="space-y-1.5 text-muted-foreground">
-              <li>- freelance web development</li>
-              <li>- sustainability tech (CarbonWise)</li>
-              <li>- tutoring & mentoring</li>
-              <li>- startup digital campaigns</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="mx-auto max-w-4xl px-5 sm:px-8 mt-24 sm:mt-32 mb-24 reveal">
-        <div className="font-mono text-xs text-muted-foreground mb-6">// frequently.asked</div>
-        <div className="divide-y divide-border border-y border-border">
-          {[
-            ["Where are you based?", `${PROFILE.address}, ${PROFILE.location}.`],
-            ["What's the fastest way to reach you?", `Email (${CONTACT_EMAIL}) or mobile (${PROFILE.phoneDisplay}). I usually respond within 48 hours.`],
-            ["Are you open to freelance work?", "Yes — especially data, AI, web development, and tutoring projects alongside my studies."],
-            ["What are you studying?", "Bachelor of Information Technology at Curtin University Colombo (since February 2025)."],
-          ].map(([q, a]) => (
-            <details key={q} className="py-5 group">
-              <summary className="cursor-pointer flex items-baseline gap-3 list-none">
-                <span className="font-mono text-xs text-muted-foreground">+</span>
-                <span className="font-semibold flex-1">{q}</span>
-                <span className="font-mono text-xs text-muted-foreground group-open:rotate-45 transition-transform">＋</span>
-              </summary>
-              <p className="mt-3 pl-6 text-muted-foreground text-sm leading-relaxed">{a}</p>
-            </details>
+        <div className="space-y-3 lg:col-span-5">
+          <Eyebrow className="mb-4">Or reach me directly</Eyebrow>
+          {DIRECT.map(({ icon: Icon, label, value, href, hint }) => (
+            <SpotlightCard key={label} className="glass-panel rounded-2xl">
+            <a
+              href={href}
+              target={href.startsWith("mailto:") || href.startsWith("tel:") ? undefined : "_blank"}
+              rel="noreferrer"
+              className="relative z-[3] flex min-h-16 items-start gap-3 p-4"
+            >
+              <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border">
+                <Icon className="h-4 w-4" aria-hidden />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
+                <span className="mt-1 block break-words text-sm">{value}</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>
+              </span>
+            </a>
+            </SpotlightCard>
           ))}
         </div>
-      </section>
+      </Container>
+
+      <Container as="section" className="py-12">
+        <Reveal>
+          <Eyebrow>Find me elsewhere</Eyebrow>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            {SOCIALS.map((item) => (
+              <li key={item.title}>
+                <SpotlightCard className="glass-panel rounded-2xl">
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="relative z-[3] flex min-h-20 items-center justify-between gap-4 px-5 py-4"
+                >
+                  <span>
+                    <span className="block text-lg font-semibold">{item.title}</span>
+                    <span className="text-sm text-muted-foreground">{item.subtitle}</span>
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">{item.handle}</span>
+                </a>
+                </SpotlightCard>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </Container>
+
+      <Container as="section" className="py-8">
+        <Reveal>
+          <Eyebrow>Good fit</Eyebrow>
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <SpotlightCard className="glass-panel rounded-3xl p-6">
+              <h2 className="text-lg font-semibold">Great fit</h2>
+              <ul className="mt-4 space-y-2 text-muted-foreground">
+                <li>data & analytics projects</li>
+                <li>AI / ML collaborations</li>
+                <li>student & education initiatives</li>
+                <li>hackathons & tech events</li>
+              </ul>
+            </SpotlightCard>
+            <SpotlightCard className="glass-panel rounded-3xl p-6">
+              <h2 className="text-lg font-semibold">Also happy to discuss</h2>
+              <ul className="mt-4 space-y-2 text-muted-foreground">
+                <li>freelance web development</li>
+                <li>sustainability tech (CarbonWise)</li>
+                <li>tutoring & mentoring</li>
+                <li>startup digital campaigns</li>
+              </ul>
+            </SpotlightCard>
+          </div>
+        </Reveal>
+      </Container>
+
+      <Container as="section" className="pb-8 pt-4">
+        <Reveal>
+          <Eyebrow>Frequently asked</Eyebrow>
+          <div className="mt-4 divide-y divide-border border-y border-border">
+            {[
+              ["Where are you based?", `${PROFILE.address}, ${PROFILE.location}.`],
+              [
+                "What's the fastest way to reach you?",
+                `Email (${CONTACT_EMAIL}) or mobile (${PROFILE.phoneDisplay}). I usually respond within 48 hours.`,
+              ],
+              [
+                "Are you open to freelance work?",
+                "Yes — especially data, AI, web development, and tutoring projects alongside my studies.",
+              ],
+              [
+                "What are you studying?",
+                "Bachelor of Information Technology at Curtin University Colombo (since February 2025).",
+              ],
+            ].map(([question, answer]) => (
+              <details key={question} className="group py-2">
+                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-base font-medium [&::-webkit-details-marker]:hidden">
+                  <span>{question}</span>
+                  <span className="font-mono text-muted-foreground transition-transform group-open:rotate-45" aria-hidden>
+                    +
+                  </span>
+                </summary>
+                <p className="pb-4 text-sm leading-relaxed text-muted-foreground">{answer}</p>
+              </details>
+            ))}
+          </div>
+        </Reveal>
+      </Container>
     </>
-  );
+  )
 }

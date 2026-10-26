@@ -1,18 +1,11 @@
 export const IMAGES = {
-  indexHero:
-    "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1600&q=80",
-  portrait:
-    "https://media.licdn.com/dms/image/v2/D5603AQFVENT05T1dDA/profile-displayphoto-scale_400_400/B56Z3jX3V9GgAg-/0/1777636181256?e=1781136000&v=beta&t=rsWvrjJGKbpDlGlPEjqhT8TNe9LhNWJJMbqREBHwHVg",
-  projectsHero:
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
-  coverVanilla:
-    "https://images.unsplash.com/photo-1504639725440-6f4df9ca0f61?auto=format&fit=crop&w=1200&q=80",
-  coverKeyboard:
-    "https://images.unsplash.com/photo-1511467687858-23d96c271e66?auto=format&fit=crop&w=1200&q=80",
-  coverSystem:
-    "https://images.unsplash.com/photo-1558652593-4eda4d5c9c82?auto=format&fit=crop&w=1200&q=80",
-  coverPerf:
-    "https://images.unsplash.com/photo-1558494943-ef526b0c0e2b?auto=format&fit=crop&w=1200&q=80",
-  coverHandoff:
-    "https://images.unsplash.com/photo-1455390582240-0447851f2f93?auto=format&fit=crop&w=1200&q=80",
+  indexHero: "/assets/index-hero.jpg",
+  // LinkedIn CDN portrait expired (403). This is Senesh's public GitHub portrait, saved locally.
+  portrait: "/assets/senesh-portrait.jpg",
+  projectsHero: "/assets/projects-hero.jpg",
+  coverVanilla: "/assets/writing-cover-vanilla.jpg",
+  coverKeyboard: "/assets/writing-cover-keyboard.jpg",
+  coverSystem: "/assets/writing-cover-system.jpg",
+  coverPerf: "/assets/writing-cover-perf.jpg",
+  coverHandoff: "/assets/writing-cover-handoff.jpg",
 } as const
