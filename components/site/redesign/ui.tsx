@@ -5,6 +5,7 @@ import { useEffect, useState, type ReactNode } from "react"
 import { motion, useReducedMotion } from "motion/react"
 import { ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Magnetic } from "@/components/site/redesign/fx"
 
 const LOCAL_IMAGE_FALLBACKS: [string, string][] = [
   ["1558652593", "/assets/writing-cover-system.jpg"],
@@ -78,28 +79,29 @@ export function PrimaryLink({
   children,
   external,
   className,
+  fill,
 }: {
   href: string
   children: ReactNode
   external?: boolean
   className?: string
+  fill?: boolean
 }) {
   const classes = cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-background transition-transform motion-safe:hover:-translate-y-0.5",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-background shadow-[0_0_0_1px_color-mix(in_oklab,var(--accent)_40%,transparent),0_10px_40px_-12px_color-mix(in_oklab,var(--accent)_70%,transparent)] transition-transform motion-safe:hover:-translate-y-0.5",
+    fill && "w-full min-[420px]:w-auto",
     className,
   )
-  if (external) {
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
-        {children}
-      </a>
-    )
-  }
-  return (
+  const node = external ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+      {children}
+    </a>
+  ) : (
     <Link href={href} className={classes}>
       {children}
     </Link>
   )
+  return <Magnetic className={fill ? "w-full min-[420px]:w-auto" : undefined}>{node}</Magnetic>
 }
 
 export function GhostLink({
@@ -107,28 +109,29 @@ export function GhostLink({
   children,
   external,
   className,
+  fill,
 }: {
   href: string
   children: ReactNode
   external?: boolean
   className?: string
+  fill?: boolean
 }) {
   const classes = cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-background/40 px-5 text-sm font-medium transition-colors hover:bg-secondary",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-background/40 px-5 text-sm font-medium backdrop-blur-md transition-colors hover:bg-secondary",
+    fill && "w-full min-[420px]:w-auto",
     className,
   )
-  if (external) {
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
-        {children}
-      </a>
-    )
-  }
-  return (
+  const node = external ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+      {children}
+    </a>
+  ) : (
     <Link href={href} className={classes}>
       {children}
     </Link>
   )
+  return <Magnetic className={fill ? "w-full min-[420px]:w-auto" : undefined}>{node}</Magnetic>
 }
 
 export function TextArrow({ children }: { children: ReactNode }) {
@@ -195,15 +198,27 @@ export function CoverImage({
 
 export function SkillMarquee({ items }: { items: readonly string[] }) {
   const row = [...items, ...items]
+  const reverse = [...items].reverse()
+  const back = [...reverse, ...reverse]
   return (
-    <div className="overflow-hidden border-y border-border bg-background/50">
-      <div className="marquee-track flex w-max gap-10 py-4 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+    <div className="relative overflow-hidden border-y border-white/10 bg-background/40 py-3 backdrop-blur-md">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-16 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-16 bg-gradient-to-l from-background to-transparent" />
+      <div className="marquee-track flex w-max gap-8 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-foreground/80">
         {row.map((item, i) => (
-          <span key={`${item}-${i}`} className="flex items-center gap-10" aria-hidden={i >= items.length}>
+          <span key={`a-${item}-${i}`} className="flex items-center gap-8" aria-hidden={i >= items.length}>
             <span>{item}</span>
             <span className="text-accent" aria-hidden>
               ✦
             </span>
+          </span>
+        ))}
+      </div>
+      <div className="marquee-track flex w-max gap-8 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground [animation-direction:reverse]">
+        {back.map((item, i) => (
+          <span key={`b-${item}-${i}`} className="flex items-center gap-8" aria-hidden>
+            <span>{item}</span>
+            <span className="text-[oklch(0.75_0.12_285)]">✺</span>
           </span>
         ))}
       </div>

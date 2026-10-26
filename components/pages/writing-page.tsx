@@ -13,6 +13,7 @@ import {
   Reveal,
   TextArrow,
 } from "@/components/site/redesign/ui"
+import { SpotlightCard } from "@/components/site/redesign/fx"
 
 export function WritingPage({ posts }: { posts: Post[] }) {
   const tags = useMemo(() => ["all", ...Array.from(new Set(posts.map((post) => post.tag)))], [posts])
@@ -29,7 +30,7 @@ export function WritingPage({ posts }: { posts: Post[] }) {
         </Eyebrow>
         <h1 className="mt-4 text-[clamp(3.2rem,12vw,6.5rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
           Field notes
-          <span className="font-serif font-normal italic text-muted-foreground">.</span>
+          <span className="gradient-text font-serif font-normal italic">.</span>
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
           Notes from studying IT at Curtin, co-founding CarbonWise, tutoring C and data structures, and figuring out
@@ -60,7 +61,8 @@ export function WritingPage({ posts }: { posts: Post[] }) {
         <Container as="section" className="pb-16">
           <Reveal>
             <Eyebrow>Featured</Eyebrow>
-            <Link href={`/writing/${featured.slug}`} className="group mt-6 grid items-center gap-8 lg:grid-cols-2">
+            <SpotlightCard className="glass-panel mt-6 rounded-[1.75rem] p-3 sm:p-4">
+            <Link href={`/writing/${featured.slug}`} className="group grid items-center gap-8 lg:grid-cols-2">
               <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
                 <div className="aspect-[16/10]">
                   <CoverImage
@@ -78,11 +80,12 @@ export function WritingPage({ posts }: { posts: Post[] }) {
                   <TextArrow>{featured.title}</TextArrow>
                 </h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">{featured.dek}</p>
-                <div className="mt-6">
+                <div className="relative z-[3] mt-6">
                   <LikeButton id={featured.slug} type="blogs" size="sm" />
                 </div>
               </div>
             </Link>
+            </SpotlightCard>
           </Reveal>
         </Container>
       ) : (
@@ -100,7 +103,7 @@ export function WritingPage({ posts }: { posts: Post[] }) {
             </div>
             <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {rest.map((post) => (
-                <article key={post.slug} className="group">
+                <SpotlightCard key={post.slug} className="glass-panel group rounded-[1.4rem] p-3">
                   <Link href={`/writing/${post.slug}`} className="block overflow-hidden rounded-2xl border border-border bg-secondary">
                     <div className="aspect-[4/3]">
                       <CoverImage
@@ -119,8 +122,8 @@ export function WritingPage({ posts }: { posts: Post[] }) {
                   <h3 className="mt-2 text-lg font-semibold leading-snug">
                     <Link href={`/writing/${post.slug}`}>{post.title}</Link>
                   </h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.dek}</p>
-                </article>
+                  <p className="relative z-[3] mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.dek}</p>
+                </SpotlightCard>
               ))}
             </div>
           </Reveal>
@@ -129,7 +132,8 @@ export function WritingPage({ posts }: { posts: Post[] }) {
 
       <Container as="section" className="pb-8">
         <Reveal>
-          <div className="rounded-[2rem] border border-border px-6 py-14 text-center">
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-14 text-center shadow-[0_0_80px_-20px_color-mix(in_oklab,var(--accent)_50%,transparent)] backdrop-blur-md">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--accent)_28%,transparent),transparent_55%)]" />
             <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">That&apos;s the journal, for now.</h2>
             <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
               Essays on data, sustainability, teaching, and the things I&apos;m still learning.

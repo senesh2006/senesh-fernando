@@ -15,6 +15,7 @@ import {
   SkillMarquee,
   TextArrow,
 } from "@/components/site/redesign/ui"
+import { Counter, Parallax, SplitHeading, SpotlightCard } from "@/components/site/redesign/fx"
 
 const SERVICES = [
   {
@@ -51,34 +52,63 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
 
   return (
     <>
-      <Container as="section" className="grid items-center gap-10 pb-14 pt-24 sm:gap-12 sm:pb-16 sm:pt-32 lg:grid-cols-12 lg:gap-10 lg:pb-24 lg:pt-36">
+      <Container as="section" className="relative grid min-h-[calc(100svh-4rem)] items-center gap-10 pb-10 pt-24 sm:gap-12 sm:pt-28 lg:grid-cols-12 lg:pb-16">
+        <div className="pointer-events-none absolute -left-10 top-24 h-40 w-40 rounded-full bg-accent/20 blur-3xl" />
         <div className="lg:col-span-7">
-          <Eyebrow>Open to collaborations · {PROFILE.location}</Eyebrow>
-          <h1 className="mt-5 text-[clamp(3.15rem,14vw,6.75rem)] font-semibold leading-[0.9] tracking-[-0.045em]">
-            Senesh
-            <span className="block font-serif font-normal italic text-muted-foreground">Fernando.</span>
-          </h1>
+          <Eyebrow>
+            <span className="inline-flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+                <span className="relative h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              Open to collaborations · {PROFILE.location}
+            </span>
+          </Eyebrow>
+          <SplitHeading
+            className="mt-5 text-[clamp(3.4rem,13vw,7.1rem)] font-semibold leading-[0.88] tracking-[-0.05em]"
+            lines={[
+              { text: "Senesh" },
+              { text: "Fernando.", className: "font-serif font-normal italic gradient-text" },
+            ]}
+          />
           <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             {PROFILE.tagline}
           </p>
           <p className="mt-3 text-sm text-foreground/80">{PROFILE.title}</p>
-          <div className="mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
-            <PrimaryLink href="/projects">View work</PrimaryLink>
-            <GhostLink href="/contact">Get in touch</GhostLink>
-            <GhostLink href="/Senesh_Fernando_CV.pdf" external>
+          <div className="mt-8 grid grid-cols-1 gap-3 min-[420px]:flex min-[420px]:flex-wrap">
+            <PrimaryLink href="/projects" fill>View work</PrimaryLink>
+            <GhostLink href="/contact" fill>Get in touch</GhostLink>
+            <GhostLink href="/Senesh_Fernando_CV.pdf" external fill>
               Download CV
             </GhostLink>
           </div>
+          <dl className="mt-10 grid max-w-lg grid-cols-3 gap-3">
+            {[
+              [projects.length, "Projects"],
+              [PROFILE.skills.length, "Skills"],
+              [PROFILE.certifications.length, "Certificates"],
+            ].map(([value, label]) => (
+              <SpotlightCard key={String(label)} className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-4 backdrop-blur-md">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</dt>
+                <dd className="mt-1 text-3xl font-semibold tracking-tight">
+                  <Counter value={Number(value)} />
+                </dd>
+              </SpotlightCard>
+            ))}
+          </dl>
         </div>
         <div className="lg:col-span-5">
-          <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
-            <div className="aspect-[4/3] sm:aspect-[5/4] lg:aspect-[4/5]">
-              <CoverImage
-                src={IMAGES.portrait}
-                alt="Senesh Fernando"
-                className="h-full w-full object-cover object-[center_28%] lg:object-[center_22%]"
-                fallbackLabel="Senesh Fernando"
-              />
+          <div className="float-y relative overflow-hidden rounded-[2rem] p-[2px]">
+            <div className="spin-ring absolute opacity-90" />
+            <div className="relative overflow-hidden rounded-[1.85rem] border border-white/10 bg-secondary shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
+              <div className="aspect-[4/3] sm:aspect-[5/4] lg:aspect-[4/5]">
+                <CoverImage
+                  src={IMAGES.portrait}
+                  alt="Senesh Fernando"
+                  className="h-full w-full object-cover object-[center_28%] lg:object-[center_22%]"
+                  fallbackLabel="Senesh Fernando"
+                />
+              </div>
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between gap-4 text-sm text-muted-foreground">
@@ -101,33 +131,35 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Currently.</h2>
             </div>
           </div>
-          <ul className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
             {[
-              ["Studying", "BIT @ Curtin University Colombo"],
-              ["Building", "CarbonWise — sustainability & data reporting"],
-              ["Teaching", "C & DS&A as a tutor at Curtin"],
-            ].map(([title, body]) => (
-              <li key={title} className="rounded-3xl border border-border bg-card/70 p-6">
-                <p className="text-sm text-accent">{title}</p>
+              ["01", "Studying", "BIT @ Curtin University Colombo"],
+              ["02", "Building", "CarbonWise — sustainability & data reporting"],
+              ["03", "Teaching", "C & DS&A as a tutor at Curtin"],
+            ].map(([n, title, body]) => (
+              <SpotlightCard key={title} className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md">
+                <p className="font-mono text-xs text-accent">{n} · {title}</p>
                 <p className="mt-3 text-lg font-medium leading-snug">{body}</p>
-              </li>
+              </SpotlightCard>
             ))}
-          </ul>
+          </div>
         </Reveal>
       </Container>
 
       <Container as="section" className="grid items-end gap-10 pb-20 sm:pb-28 lg:grid-cols-12">
         <Reveal className="lg:col-span-5">
-          <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
-            <div className="aspect-[4/5]">
-              <CoverImage
-                src="https://i0.wp.com/lumenore.com/wp-content/uploads/2024/06/42-B.png?fit=720%2C400&ssl=1"
-                alt="Data and analytics visualization"
-                className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
-                fallbackLabel="Data and analytics"
-              />
+          <Parallax>
+            <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-secondary shadow-[0_20px_80px_-30px_rgba(0,0,0,0.7)]">
+              <div className="aspect-[4/5]">
+                <CoverImage
+                  src="https://i0.wp.com/lumenore.com/wp-content/uploads/2024/06/42-B.png?fit=720%2C400&ssl=1"
+                  alt="Data and analytics visualization"
+                  className="h-full w-full scale-110 object-cover"
+                  fallbackLabel="Data and analytics"
+                />
+              </div>
             </div>
-          </div>
+          </Parallax>
         </Reveal>
         <Reveal className="lg:col-span-7" delay={0.08}>
           <Eyebrow>Manifesto</Eyebrow>
@@ -160,18 +192,15 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
             </div>
             <GhostLink href="/contact">Enquire</GhostLink>
           </div>
-          <ul className="mt-10 divide-y divide-border border-y border-border">
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
             {SERVICES.map((service) => (
-              <li
-                key={service.n}
-                className="grid gap-3 py-6 transition-colors sm:grid-cols-[4rem_1fr] sm:gap-6 sm:py-8 md:grid-cols-[4rem_16rem_1fr] md:items-baseline"
-              >
-                <span className="font-mono text-xs text-muted-foreground">{service.n}</span>
-                <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{service.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{service.body}</p>
-              </li>
+              <SpotlightCard key={service.n} className="glass-panel rounded-[1.75rem] p-6 sm:p-8">
+                <p className="font-serif text-4xl italic gradient-text">{service.n}</p>
+                <h3 className="mt-4 text-2xl font-semibold tracking-tight">{service.title}</h3>
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">{service.body}</p>
+              </SpotlightCard>
             ))}
-          </ul>
+          </div>
         </Reveal>
       </Container>
 
@@ -185,9 +214,10 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
               </div>
               <GhostLink href="/writing">All essays</GhostLink>
             </div>
+            <SpotlightCard className="glass-panel mt-10 rounded-[1.75rem] p-3 sm:p-4">
             <Link
               href={`/writing/${featuredPost.slug}`}
-              className="group mt-10 grid items-center gap-8 lg:grid-cols-2"
+              className="group grid items-center gap-8 lg:grid-cols-2"
             >
               <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
                 <div className="aspect-[16/10]">
@@ -208,6 +238,7 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
                 <p className="mt-4 text-base leading-relaxed text-muted-foreground">{featuredPost.dek}</p>
               </div>
             </Link>
+            </SpotlightCard>
           </Reveal>
         </Container>
       )}
@@ -217,7 +248,7 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
           <Eyebrow>Principles</Eyebrow>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">What I build for.</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <div className="rounded-3xl border border-border p-6 sm:p-8">
+            <SpotlightCard className="glass-panel rounded-3xl p-6 sm:p-8">
               <h3 className="text-lg font-semibold">What I build for</h3>
               <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
                 {PROFILE.interests.map((item) => (
@@ -226,8 +257,8 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
                   </li>
                 ))}
               </ul>
-            </div>
-            <div className="rounded-3xl border border-border p-6 sm:p-8">
+            </SpotlightCard>
+            <SpotlightCard className="glass-panel rounded-3xl p-6 sm:p-8">
               <h3 className="text-lg font-semibold">Currently exploring</h3>
               <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
                 {EXPLORING.map((item) => (
@@ -236,7 +267,7 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
                   </li>
                 ))}
               </ul>
-            </div>
+            </SpotlightCard>
           </div>
         </Reveal>
       </Container>
@@ -257,32 +288,39 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
             <GhostLink href="/projects">View more</GhostLink>
           </div>
           <div className="mt-10 space-y-6">
-            {projects.slice(0, 3).map((project) => (
-              <Link
+            {projects.slice(0, 3).map((project, index) => (
+              <SpotlightCard
                 key={project.slug}
-                href={`/projects/${project.slug}`}
-                className="group grid gap-5 rounded-[1.75rem] border border-border p-3 transition-colors hover:bg-card/60 sm:p-4 lg:grid-cols-12 lg:items-center"
+                className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-3 backdrop-blur-md sm:p-4"
               >
-                <div className="overflow-hidden rounded-2xl bg-secondary lg:col-span-7">
-                  <div className="aspect-[16/10]">
-                    <CoverImage
-                      src={project.cover}
-                      alt={project.name}
-                      fallbackLabel={project.name}
-                      className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.04]"
-                    />
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="group grid gap-5 lg:grid-cols-12 lg:items-center"
+                >
+                  <div className="overflow-hidden rounded-2xl bg-secondary lg:col-span-7">
+                    <div className="aspect-[16/10]">
+                      <CoverImage
+                        src={project.cover}
+                        alt={project.name}
+                        fallbackLabel={project.name}
+                        className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.06]"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="px-2 pb-3 lg:col-span-5 lg:px-4">
-                  <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                    {project.n} · {project.year} · {project.tag}
-                  </p>
-                  <h3 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-                    <TextArrow>{project.name}</TextArrow>
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{project.body}</p>
-                </div>
-              </Link>
+                  <div className="relative z-[3] px-2 pb-3 lg:col-span-5 lg:px-4">
+                    <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                      {project.n} · {project.year} · {project.tag}
+                    </p>
+                    <h3 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+                      <TextArrow>{project.name}</TextArrow>
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{project.body}</p>
+                    <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
+                      0{index + 1} / case study
+                    </p>
+                  </div>
+                </Link>
+              </SpotlightCard>
             ))}
           </div>
         </Reveal>
@@ -290,7 +328,8 @@ export function HomePage({ featuredPost, projects }: { featuredPost: Post; proje
 
       <Container as="section" className="pb-12">
         <Reveal>
-          <div className="rounded-[2rem] border border-border bg-card/50 px-6 py-14 text-center sm:px-12 sm:py-20">
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-14 text-center shadow-[0_0_80px_-20px_color-mix(in_oklab,var(--accent)_50%,transparent)] backdrop-blur-md sm:px-12 sm:py-20">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--accent)_30%,transparent),transparent_55%)]" />
             <Eyebrow>Let&apos;s talk</Eyebrow>
             <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
               Working on something in tech, education, or AI?

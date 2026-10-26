@@ -5,6 +5,7 @@ import { FileDown, Mail, MapPin, Phone } from "lucide-react"
 import { submitContact } from "@/lib/client-api"
 import { PROFILE } from "@/lib/profile"
 import { Container, Eyebrow, Reveal } from "@/components/site/redesign/ui"
+import { SpotlightCard } from "@/components/site/redesign/fx"
 
 const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || PROFILE.email
 
@@ -74,7 +75,7 @@ export function ContactPage() {
         </Eyebrow>
         <h1 className="mt-4 max-w-4xl text-[clamp(3.1rem,12vw,6.4rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
           Let&apos;s talk
-          <span className="block font-serif font-normal italic text-muted-foreground">about the work.</span>
+          <span className="gradient-text block font-serif font-normal italic">about the work.</span>
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
           If you&apos;re working on something exciting — or just want to connect and trade ideas — drop a message
@@ -85,7 +86,7 @@ export function ContactPage() {
       <Container as="section" className="grid items-start gap-8 py-8 lg:grid-cols-12">
         <Reveal className="lg:col-span-7">
           <Eyebrow className="mb-4">Send a message</Eyebrow>
-          <form onSubmit={handleSubmit} className="space-y-4 rounded-[1.75rem] border border-border bg-card/50 p-5 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_20px_80px_-40px_color-mix(in_oklab,var(--accent)_60%,transparent)] backdrop-blur-md sm:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block space-y-2 text-sm">
                 <span className="text-muted-foreground">Name</span>
@@ -129,12 +130,12 @@ export function ContactPage() {
         <div className="space-y-3 lg:col-span-5">
           <Eyebrow className="mb-4">Or reach me directly</Eyebrow>
           {DIRECT.map(({ icon: Icon, label, value, href, hint }) => (
+            <SpotlightCard key={label} className="glass-panel rounded-2xl">
             <a
-              key={label}
               href={href}
               target={href.startsWith("mailto:") || href.startsWith("tel:") ? undefined : "_blank"}
               rel="noreferrer"
-              className="flex min-h-16 items-start gap-3 rounded-2xl border border-border bg-card/40 p-4 transition-colors hover:bg-secondary/60"
+              className="relative z-[3] flex min-h-16 items-start gap-3 p-4"
             >
               <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border">
                 <Icon className="h-4 w-4" aria-hidden />
@@ -145,6 +146,7 @@ export function ContactPage() {
                 <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>
               </span>
             </a>
+            </SpotlightCard>
           ))}
         </div>
       </Container>
@@ -155,11 +157,12 @@ export function ContactPage() {
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {SOCIALS.map((item) => (
               <li key={item.title}>
+                <SpotlightCard className="glass-panel rounded-2xl">
                 <a
                   href={item.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex min-h-20 items-center justify-between gap-4 rounded-2xl border border-border px-5 py-4 transition-colors hover:bg-card"
+                  className="relative z-[3] flex min-h-20 items-center justify-between gap-4 px-5 py-4"
                 >
                   <span>
                     <span className="block text-lg font-semibold">{item.title}</span>
@@ -167,6 +170,7 @@ export function ContactPage() {
                   </span>
                   <span className="font-mono text-xs text-muted-foreground">{item.handle}</span>
                 </a>
+                </SpotlightCard>
               </li>
             ))}
           </ul>
@@ -177,7 +181,7 @@ export function ContactPage() {
         <Reveal>
           <Eyebrow>Good fit</Eyebrow>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <div className="rounded-3xl border border-border p-6">
+            <SpotlightCard className="glass-panel rounded-3xl p-6">
               <h2 className="text-lg font-semibold">Great fit</h2>
               <ul className="mt-4 space-y-2 text-muted-foreground">
                 <li>data & analytics projects</li>
@@ -185,8 +189,8 @@ export function ContactPage() {
                 <li>student & education initiatives</li>
                 <li>hackathons & tech events</li>
               </ul>
-            </div>
-            <div className="rounded-3xl border border-border p-6">
+            </SpotlightCard>
+            <SpotlightCard className="glass-panel rounded-3xl p-6">
               <h2 className="text-lg font-semibold">Also happy to discuss</h2>
               <ul className="mt-4 space-y-2 text-muted-foreground">
                 <li>freelance web development</li>
@@ -194,7 +198,7 @@ export function ContactPage() {
                 <li>tutoring & mentoring</li>
                 <li>startup digital campaigns</li>
               </ul>
-            </div>
+            </SpotlightCard>
           </div>
         </Reveal>
       </Container>

@@ -11,6 +11,7 @@ import {
   PrimaryLink,
   Reveal,
 } from "@/components/site/redesign/ui"
+import { SpotlightCard } from "@/components/site/redesign/fx"
 
 interface GitHubSkill {
   name: string
@@ -74,7 +75,7 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
           <Eyebrow>{PROFILE.title}</Eyebrow>
           <h1 className="mt-4 text-[clamp(3.2rem,12vw,6.5rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
             About
-            <span className="block font-serif font-normal italic text-muted-foreground">me.</span>
+            <span className="gradient-text block font-serif font-normal italic">me.</span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             I&apos;m Senesh — an IT undergraduate at Curtin University Colombo, based in Negombo. I work across data
@@ -94,7 +95,9 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
           </div>
         </div>
         <div className="lg:col-span-5">
-          <div className="overflow-hidden rounded-[1.75rem] border border-border bg-secondary">
+          <div className="float-y relative overflow-hidden rounded-[2rem] p-[2px]">
+            <div className="spin-ring absolute opacity-90" />
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-secondary">
             <div className="aspect-square sm:aspect-[4/5]">
               <CoverImage
                 src={IMAGES.portrait}
@@ -102,6 +105,7 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
                 className="h-full w-full object-cover object-[center_18%]"
               />
             </div>
+          </div>
           </div>
         </div>
       </Container>
@@ -124,11 +128,15 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
         <Reveal>
           <Eyebrow>Timeline</Eyebrow>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Experience & education.</h2>
-          <ol className="mt-10 border-t border-border">
-            {timeline.map(([when, what]) => (
-              <li key={when} className="grid gap-2 border-b border-border py-6 sm:grid-cols-[11rem_1fr] sm:gap-8 sm:py-7">
-                <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">{when}</p>
-                <p className="text-base leading-relaxed">{what}</p>
+          <ol className="mt-10 space-y-3">
+            {timeline.map(([when, what], index) => (
+              <li key={when}>
+                <SpotlightCard className="glass-panel grid gap-2 rounded-3xl p-5 sm:grid-cols-[11rem_1fr] sm:gap-8 sm:p-6">
+                  <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">
+                    0{index + 1} · {when}
+                  </p>
+                  <p className="text-base leading-relaxed">{what}</p>
+                </SpotlightCard>
               </li>
             ))}
           </ol>
@@ -175,10 +183,12 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
       <Container as="section" className="pb-20 sm:pb-28">
         <Reveal>
           <Eyebrow>Certifications</Eyebrow>
-          <ul className="mt-6 divide-y divide-border border-y border-border">
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {PROFILE.certifications.map((cert) => (
-              <li key={cert} className="py-5 text-base leading-relaxed">
-                {cert}
+              <li key={cert}>
+                <SpotlightCard className="glass-panel h-full rounded-3xl p-5 text-base leading-relaxed">
+                  {cert}
+                </SpotlightCard>
               </li>
             ))}
           </ul>
@@ -189,7 +199,7 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
         <Reveal>
           <Eyebrow>Values</Eyebrow>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <div className="rounded-3xl border border-border p-6 sm:p-8">
+            <SpotlightCard className="glass-panel rounded-3xl p-6 sm:p-8">
               <h2 className="text-xl font-semibold">I care about</h2>
               <ul className="mt-4 space-y-3 text-muted-foreground">
                 <li>data-driven decision making</li>
@@ -197,8 +207,8 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
                 <li>teaching and mentoring students</li>
                 <li>curiosity, consistency, compassion</li>
               </ul>
-            </div>
-            <div className="rounded-3xl border border-border p-6 sm:p-8">
+            </SpotlightCard>
+            <SpotlightCard className="glass-panel rounded-3xl p-6 sm:p-8">
               <h2 className="text-xl font-semibold">What drives me</h2>
               <ul className="mt-4 space-y-3 text-muted-foreground">
                 <li>sustainability & environmental tech</li>
@@ -206,14 +216,15 @@ export function AboutPage({ timeline, stack }: { timeline: [string, string][]; s
                 <li>hackathons & competitions</li>
                 <li>building things that create impact</li>
               </ul>
-            </div>
+            </SpotlightCard>
           </div>
         </Reveal>
       </Container>
 
       <Container as="section" className="pb-8">
         <Reveal>
-          <div className="rounded-[2rem] border border-border px-6 py-14 text-center sm:px-10">
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-14 text-center shadow-[0_0_80px_-20px_color-mix(in_oklab,var(--accent)_50%,transparent)] backdrop-blur-md sm:px-10">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--accent)_28%,transparent),transparent_55%)]" />
             <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Want the long version?</h2>
             <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
               Either browse the work, read the essays, or just say hello.

@@ -6,6 +6,10 @@ import { useEffect, useId, useRef, useState } from "react"
 import { Menu, X, Moon, Sun } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ChatBot } from "@/components/site/chat-bot"
+import { Atmosphere } from "@/components/site/redesign/atmosphere"
+import { PremiumCursor } from "@/components/site/redesign/cursor"
+import { ScrollProgress } from "@/components/site/redesign/fx"
+import { SmoothScroll } from "@/components/site/redesign/smooth-scroll"
 import { recordVisitor } from "@/lib/client-api"
 import { PROFILE } from "@/lib/profile"
 import { ConversationProvider } from "@elevenlabs/react"
@@ -143,6 +147,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <ConversationProvider agentId={agentId}>
       <div className="site-shell relative flex min-h-screen flex-col text-foreground">
+        <Atmosphere />
+        <SmoothScroll />
+        <PremiumCursor />
+        <ScrollProgress />
         <a href="#content" className="skip-link">
           Skip to content
         </a>
@@ -162,10 +170,22 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             menuButtonRef.current?.focus()
           }}
         />
-        <main id="content" key={pathname} className="flex-1" aria-hidden={menuOpen} inert={menuOpen}>
-          {children}
+        <main id="content" className="relative z-[1] flex-1" aria-hidden={menuOpen} inert={menuOpen}>
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={pathname}
+              initial={reduce ? false : { opacity: 0, y: 22, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={reduce ? undefined : { opacity: 0, y: -12 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
-        <SiteFooter visitorCount={visitorCount} onHelp={() => setHelpOpen(true)} hidden={menuOpen} />
+        <div className="relative z-[1]">
+          <SiteFooter visitorCount={visitorCount} onHelp={() => setHelpOpen(true)} hidden={menuOpen} />
+        </div>
         <div aria-hidden={menuOpen} inert={menuOpen}>
           <ChatBot />
         </div>
@@ -224,11 +244,18 @@ function Header({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-11 items-center rounded-full px-3.5 text-sm transition-colors",
-                  active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+                  "relative inline-flex min-h-11 items-center rounded-full px-3.5 text-sm transition-colors",
+                  active ? "text-background" : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {item.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full bg-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--accent)_45%,transparent)]"
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <span className="relative z-[1]">{item.label}</span>
               </Link>
             )
           })}
@@ -313,7 +340,7 @@ function MobileMenu({
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
-          className="fixed inset-0 z-[60] flex flex-col bg-background px-5 pt-20 pb-8 md:hidden"
+          className="fixed inset-0 z-[60] flex flex-col bg-background/80 px-5 pt-20 pb-8 backdrop-blur-2xl md:hidden"
           initial={reduce ? false : { opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 1 } : { opacity: 0, y: -8 }}
@@ -326,18 +353,24 @@ function MobileMenu({
             {MENU_NAV.map((item, index) => {
               const active = pathname === item.href || pathname.startsWith(item.href + "/")
               return (
-                <Link
+                <motion.div
                   key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  aria-current={active ? "page" : undefined}
-                  className="flex min-h-14 items-baseline justify-between border-b border-border py-2"
+                  initial={reduce ? false : { opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.06 * index, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <span className={cn("text-4xl font-semibold tracking-tight", active && "font-serif italic")}>
-                    {item.label}
-                  </span>
-                  <span className="font-mono text-xs text-muted-foreground">0{index + 1}</span>
-                </Link>
+                  <Link
+                    href={item.href}
+                    onClick={onClose}
+                    aria-current={active ? "page" : undefined}
+                    className="flex min-h-14 items-baseline justify-between border-b border-border py-2"
+                  >
+                    <span className={cn("text-4xl font-semibold tracking-tight", active && "font-serif italic")}>
+                      {item.label}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">0{index + 1}</span>
+                  </Link>
+                </motion.div>
               )
             })}
           </nav>

@@ -293,7 +293,7 @@ export function ChatBot() {
     [showForm, triggerOpen, triggerClose, messages, isLoading, handleSend, conversation, assemblyVoice, voiceProvider, agentId]
   )
   return (
-  <div className="fixed bottom-4 right-4 z-50 flex items-center justify-end sm:bottom-6 sm:right-6">
+  <div className="fixed bottom-4 left-4 z-50 flex items-center justify-start sm:bottom-6 sm:left-auto sm:right-6 sm:justify-end">
     <motion.div
       ref={wrapperRef}
       className={cn(
